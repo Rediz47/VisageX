@@ -10,8 +10,9 @@
 
 [[redirects]]
   from = "/ingest/*"
-  to = "/.netlify/functions/api/ingest/:splat"
+  to = "https://us.i.posthog.com/:splat"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/*"
