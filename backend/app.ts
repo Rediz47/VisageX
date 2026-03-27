@@ -1,6 +1,4 @@
-import 'dotenv/config';
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import path from 'path';
 
@@ -41,16 +39,7 @@ export async function configureApp() {
     res.status(500).json({ error: "Internal server error" });
   });
 
-  // Vite middleware handle
-  if (process.env.NODE_ENV !== 'production' && !process.env.NETLIFY) {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    app.use(express.static('dist'));
-  }
+  app.use(express.static('dist'));
 
   return app;
 }
