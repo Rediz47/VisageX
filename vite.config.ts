@@ -10,11 +10,11 @@ const Prerender = require('vite-plugin-prerender');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export default defineConfig(({mode}) => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [
-      react(), 
+      react(),
       tailwindcss(),
       Prerender({
         staticDir: path.join(process.cwd(), 'dist'),

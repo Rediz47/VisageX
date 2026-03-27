@@ -11,8 +11,9 @@ import referralRoutes from './routes/referral.routes.js';
 import emailRoutes from './routes/email.routes.js';
 import authRoutes from './routes/auth.routes.js';
 
-async function startServer() {
-  const app = express();
+export const app = express();
+
+async function configureApp() {
   const PORT = process.env.PORT || 3000;
 
   // PostHog Reverse Proxy
@@ -52,8 +53,8 @@ async function startServer() {
     res.status(500).json({ error: "Internal server error" });
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== 'production') {
+  // Vite middleware for development (Skip in serverless/production)
+  if (process.env.NODE_ENV !== 'production' && !process.env.NETLIFY) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -63,9 +64,18 @@ async function startServer() {
     app.use(express.static('dist'));
   }
 
-  app.listen(Number(PORT), '0.0.0.0', () => {
-    console.log(`Backend Initialized. Secure Server running on http://localhost:${PORT}`);
+  return app;
+}
+
+// Start server ONLY if run directly (not in serverless)
+if (import.meta.url === `file://${path.resolve(process.argv[1])}`) {
+  configureApp().then((configuredApp) => {
+    const PORT = process.env.PORT || 3000;
+    configuredApp.listen(Number(PORT), '0.0.0.0', () => {
+      console.log(`Backend Initialized. Secure Server running on http://localhost:${PORT}`);
+    });
   });
 }
 
-startServer();
+// Fallback initialization for serverless imports
+configureApp();
