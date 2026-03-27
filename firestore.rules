@@ -1,0 +1,117 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required, email format)
+    //   - displayName: string (optional)
+    //   - photoURL: string (optional)
+    //   - createdAt: timestamp (required)
+    //   - role: string (required, enum: ['user', 'admin'])
+    //   - credits: integer (required)
+    //
+    // Collection: scans
+    // Document ID: {scanId}
+    // Fields:
+    //   - userId: string (required)
+    //   - userEmail: string (required)
+    //   - createdAt: timestamp (required)
+    //   - overallScore: number (required)
+    //   - imageBase64: string (required)
+    //   - analysisData: string (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return data.keys().hasOnly(['uid', 'email', 'displayName', 'photoURL', 'createdAt', 'role', 'credits', 'referralCode', 'invitedCount', 'referredBy']) &&
+             data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             (!('role' in data) || data.role in ['user', 'admin']) &&
+             (!('credits' in data) || data.credits is number) &&
+             (!('invitedCount' in data) || data.invitedCount is number) &&
+             (!('referralCode' in data) || data.referralCode is string) &&
+             (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    function isValidUserCreate(data) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt', 'role', 'credits', 'referralCode', 'invitedCount']) &&
+             isValidUser(data);
+    }
+
+    function isValidScan(data) {
+      return data.keys().hasAll(['userId', 'userEmail', 'createdAt', 'overallScore', 'imageUrl', 'analysisData']) &&
+             data.keys().hasOnly(['userId', 'userEmail', 'createdAt', 'overallScore', 'imageUrl', 'analysisData']) &&
+             data.userId == request.auth.uid &&
+             data.userEmail is string &&
+             data.createdAt is string &&
+             data.overallScore is number &&
+             data.imageUrl is string && // Allow base64 string
+             data.analysisData is string && data.analysisData.size() < 1048576;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Users can only read their own profile
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can create their own profile as 'user' role
+      allow create: if isOwner(userId) && 
+                      isValidUserCreate(request.resource.data) && 
+                      (request.resource.data.role == 'user' || isAdmin());
+      
+      // Users can update their own profile but cannot change their role or credits
+      allow update: if isOwner(userId) && 
+                      isValidUser(request.resource.data) && 
+                      (!('role' in request.resource.data) || !('role' in resource.data) || request.resource.data.role == resource.data.role || isAdmin()) &&
+                      (!('credits' in request.resource.data) || !('credits' in resource.data) || request.resource.data.credits == resource.data.credits || isAdmin());
+      
+      allow delete: if isAdmin();
+    }
+
+    match /scans/{scanId} {
+      allow read: if (isAuthenticated() && resource.data.userId == request.auth.uid) || isAdmin();
+      allow create: if isAuthenticated() && isValidScan(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+    
+    match /processed_orders/{orderId} {
+      allow read, write: if false; // Only backend can access this
+    }
+  }
+}

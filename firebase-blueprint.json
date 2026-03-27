@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "Stores user profile information and scan history metadata.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL to the user's profile picture."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the profile was created."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["user", "admin"],
+          "description": "The user's role in the system."
+        },
+        "credits": {
+          "type": "integer",
+          "description": "The number of analysis credits the user has."
+        }
+      },
+      "required": ["uid", "email", "createdAt", "role", "credits"]
+    },
+    "scans": {
+      "title": "Facial Scan",
+      "description": "Facial scans performed by users.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who performed the scan."
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "The email of the user who performed the scan."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the scan was performed."
+        },
+        "overallScore": {
+          "type": "number",
+          "description": "The overall calculated score."
+        },
+        "imageBase64": {
+          "type": "string",
+          "description": "The base64 encoded image."
+        },
+        "analysisData": {
+          "type": "string",
+          "description": "Stringified JSON of the full analysis result."
+        }
+      },
+      "required": ["userId", "userEmail", "createdAt", "overallScore", "imageBase64", "analysisData"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "users",
+      "description": "User profile documents."
+    },
+    "scans/{scanId}": {
+      "schema": "scans",
+      "description": "All facial scans."
+    }
+  }
+}

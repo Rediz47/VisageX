@@ -1,0 +1,5 @@
+{
+  "name": "VISAGE.AI - Facial Intelligence",
+  "description": "Next-gen facial intelligence platform for structural harmony and skin health analysis.",
+  "requestFramePermissions": ["camera"]
+}
