@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Lenis from '@studio-freight/lenis';
+import Lenis from 'lenis';
 
 // Global State Providers
 import { ThemeProvider, useTheme } from './context/ThemeProvider';
