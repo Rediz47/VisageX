@@ -29,11 +29,11 @@ router.post('/gemini-analysis', requireAuth, async (req, res) => {
     // Verify user has credits BEFORE processing
     const userRef = db.collection('users').doc(userId);
     const userSnap = await userRef.get();
-    
+
     if (!userSnap.exists) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     const currentCredits = userSnap.data()?.credits || 0;
     if (currentCredits < 1) {
       return res.status(403).json({ error: 'Insufficient credits', code: 'INSUFFICIENT_CREDITS' });
@@ -156,7 +156,7 @@ Also provide:
       }
 
       console.log('Gemini analysis completed successfully for user', userId);
-      
+
       // OPTION A: Deduct credit securely ONLY AFTER successful generation
       try {
         await userRef.update({ credits: FieldValue.increment(-1) });
