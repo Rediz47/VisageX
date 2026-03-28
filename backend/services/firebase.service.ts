@@ -14,6 +14,12 @@ export function getAdminApp() {
       try {
         const cleanJson = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
         const cert = JSON.parse(cleanJson);
+        
+        // Handle common formatting issue: replace escaped newlines in private_key
+        if (cert.private_key) {
+          cert.private_key = cert.private_key.replace(/\\n/g, '\n');
+        }
+
         admin.initializeApp({
           credential: admin.credential.cert(cert),
           projectId: cert.project_id

@@ -25,6 +25,19 @@ export async function configureApp() {
 
   app.use(express.json({ limit: '50mb' }));
 
+  // Health check endpoint for debugging
+  app.get('/api/health', (req, res) => {
+    res.json({
+      status: 'ok',
+      env: {
+        hasGeminiKey: !!process.env.GEMINI_API_KEY,
+        hasFirebaseAccount: !!process.env.FIREBASE_SERVICE_ACCOUNT,
+        nodeEnv: process.env.NODE_ENV,
+        isNetlify: !!process.env.NETLIFY
+      }
+    });
+  });
+
   // Mount API Routes
   app.use('/api', geometryRoutes);
   app.use('/api', aiRoutes);
@@ -36,7 +49,11 @@ export async function configureApp() {
   // Global Error Handler
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error('Unhandled server error:', err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ 
+      error: "Internal server error",
+      message: err.message,
+      path: req.path
+    });
   });
 
   app.use(express.static('dist'));

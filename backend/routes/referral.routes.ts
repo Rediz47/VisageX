@@ -129,4 +129,32 @@ router.get('/leaderboard', async (req, res) => {
   }
 });
 
+// Scan Completion Endpoint: Trigger referral rewards for the inviter
+router.post('/scan/complete', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+    const db = getAdminDb();
+    if (!db) return res.status(500).json({ error: 'Database error' });
+
+    const userDoc = await db.collection('users').doc(userId).get();
+    if (!userDoc.exists) return res.status(404).json({ error: 'User not found' });
+
+    const inviterId = userDoc.data()?.referredBy;
+    if (!inviterId) return res.json({ success: true, message: 'No referral found' });
+
+    // Mark current user as having completed a scan
+    await db.collection('users').doc(userId).update({
+      referralRewardTriggered: true
+    });
+
+    console.log(`Scan completion recorded for user ${userId}. Inviter: ${inviterId}`);
+    return res.json({ success: true, message: 'Scan completion reward triggered' });
+  } catch (error: any) {
+    console.error('Scan complete error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
