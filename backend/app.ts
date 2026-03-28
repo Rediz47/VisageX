@@ -44,5 +44,5 @@ export async function configureApp() {
   return app;
 }
 
-// Netlify/Serverless will call configureApp() as needed or we do it here:
-configureApp();
+// configureApp() call removed to prevent race conditions in serverless environments.
+// It is explicitly called in backend/index.ts (local) and netlify/functions/api.ts (serverless).

@@ -1,4 +1,13 @@
 import serverless from 'serverless-http';
-import { app } from '../../backend/app.js';
+import { app, configureApp } from '../../backend/app.js';
 
-export const handler = serverless(app);
+let initialized = false;
+
+export const handler = async (event: any, context: any) => {
+  if (!initialized) {
+    await configureApp();
+    initialized = true;
+  }
+  const serve = serverless(app);
+  return await serve(event, context);
+};
