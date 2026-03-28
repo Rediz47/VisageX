@@ -117,7 +117,7 @@ export function useAnalysis(userCredits: number) {
       console.log("Scan saved to Firebase successfully.");
 
       try {
-        await fetch('/api/scan/complete', {
+        await fetch('/api/referral/scan/complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: auth.currentUser.uid })

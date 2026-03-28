@@ -58,15 +58,23 @@ export function getAdminApp() {
 export function getAdminDb() {
   if (!adminDb) {
     const app = getAdminApp();
-    const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
     let databaseId = '(default)';
-    if (existsSync(configPath)) {
+
+    // Priority 1: Environment variable (works on Netlify and all deployments)
+    if (process.env.FIRESTORE_DATABASE_ID) {
+      databaseId = process.env.FIRESTORE_DATABASE_ID;
+    } else {
+      // Priority 2: Local config file (works in local development)
+      const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
+      if (existsSync(configPath)) {
         const firebaseConfig = JSON.parse(readFileSync(configPath, 'utf8'));
         if (firebaseConfig.firestoreDatabaseId) {
-            databaseId = firebaseConfig.firestoreDatabaseId;
+          databaseId = firebaseConfig.firestoreDatabaseId;
         }
+      }
     }
-    
+
+    console.log(`Firestore connecting to database: "${databaseId}"`);
     adminDb = getFirestore(app, databaseId);
   }
   return adminDb;

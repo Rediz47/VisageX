@@ -523,7 +523,7 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
 
             // Trigger referral reward logic for inviter
             try {
-              await fetch('/api/scan/complete', {
+              await fetch('/api/referral/scan/complete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: auth.currentUser.uid })
