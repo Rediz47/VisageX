@@ -12,14 +12,16 @@ export function getAdminApp() {
     // 1. Check for Service Account in environment variables (JSON string)
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
       try {
-        const cert = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        const cleanJson = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
+        const cert = JSON.parse(cleanJson);
         admin.initializeApp({
           credential: admin.credential.cert(cert),
           projectId: cert.project_id
         });
+        console.log("Firebase Admin Initialized via Environment Variable.");
         return admin.app();
-      } catch (e) {
-        console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT env var:", e);
+      } catch (e: any) {
+        console.error("CRITICAL: Failed to parse FIREBASE_SERVICE_ACCOUNT env var. Check for copy-paste errors.", e.message);
       }
     }
 
