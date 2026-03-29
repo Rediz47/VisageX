@@ -182,11 +182,20 @@ export default function BlogIndexPage() {
                     isDarkMode ? 'bg-black/60' : 'bg-zinc-100'
                   }`}>
                     {article.thumbnail ? (
-                      <img 
-                        src={article.thumbnail} 
-                        alt={article.title} 
-                        className="w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-105"
-                      />
+                      <div className="w-full h-full relative group">
+                        {/* Blurred background to 'fill' the space */}
+                        <img 
+                          src={article.thumbnail} 
+                          alt="" 
+                          className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-150 transition-opacity group-hover:opacity-60"
+                        />
+                        {/* Clear image on top */}
+                        <img 
+                          src={article.thumbnail} 
+                          alt={article.title} 
+                          className="relative z-10 w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
                     ) : (
                       <div className={`flex flex-col items-center justify-center space-y-2 w-full h-full border border-dashed ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'} rounded-2xl m-4`}>
                         <ImagePlus className="w-8 h-8 opacity-50" />
