@@ -25,69 +25,83 @@ export function useAnalysis(userCredits: number) {
       return currentAnalysis;
     }
 
-    try {
-      const idToken = await auth.currentUser.getIdToken();
-      const aiResponse = await fetch('/api/gemini-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ image: croppedImageBase64 })
-      });
+    const MAX_RETRIES = 3;
+    let lastError: any = null;
 
-      if (!aiResponse.ok) {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const idToken = await auth.currentUser!.getIdToken(attempt > 1); // Force refresh on retry
+        const aiResponse = await fetch('/api/gemini-analysis', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ image: croppedImageBase64 })
+        });
+
         if (aiResponse.status === 403) {
           console.warn("Insufficient credits for AI analysis.");
-        } else {
-          throw new Error("AI analysis failed on server.");
-        }
-        return currentAnalysis;
-      }
-
-      const geminiData = await aiResponse.json();
-      if (geminiData && typeof geminiData.skin_quality === 'number') {
-        const aiAesthetics = geminiData.overall_aesthetics_score || currentAnalysis.overallScore;
-        const aiWeight = 0.85;
-        const newOverallScore = (currentAnalysis.overallScore * (1 - aiWeight)) + (aiAesthetics * aiWeight);
-
-        if (!isNaN(newOverallScore)) {
-          currentAnalysis.overallScore = Number(newOverallScore.toFixed(1));
+          return currentAnalysis;
         }
 
-        if (geminiData.potentialScore <= currentAnalysis.overallScore) {
-          geminiData.potentialScore = Math.min(10, currentAnalysis.overallScore + 0.5);
+        if (!aiResponse.ok) {
+          throw new Error(`AI analysis failed (status ${aiResponse.status})`);
         }
-        currentAnalysis.breakdown["Skin Quality"] = Number((geminiData.overall_skin_score || 0).toFixed(1));
-        currentAnalysis.breakdown["Grooming"] = Number((geminiData.grooming || 0).toFixed(1));
-        currentAnalysis.breakdown["Cheekbones"] = Number((geminiData.cheekbone_prominence || 0).toFixed(1));
 
-        if (geminiData.visualStrengths) currentAnalysis.analysis.strengths.push(...geminiData.visualStrengths);
-        if (geminiData.visualWeaknesses) currentAnalysis.analysis.weaknesses.push(...geminiData.visualWeaknesses);
+        const geminiData = await aiResponse.json();
+        if (geminiData && typeof geminiData.skin_quality === 'number') {
+          const aiAesthetics = geminiData.overall_aesthetics_score || currentAnalysis.overallScore;
+          const aiWeight = 0.85;
+          const newOverallScore = (currentAnalysis.overallScore * (1 - aiWeight)) + (aiAesthetics * aiWeight);
 
-        currentAnalysis.visionAnalysis = {
-          colorSeason: geminiData.color_season,
-          skinAnalysis: geminiData.skinAnalysis,
-          aestheticsAnalysis: geminiData.aestheticsAnalysis,
-          potentialScore: geminiData.potentialScore,
-          improvements: geminiData.improvements,
-          recommendedProducts: geminiData.recommendedProducts || [],
-          faceShape: geminiData.faceShape,
-          hairRecommendations: geminiData.hairRecommendations,
-          dermatology: {
-            skin_quality: geminiData.skin_quality,
-            acne_presence: geminiData.acne_presence,
-            wrinkle_visibility: geminiData.wrinkle_visibility,
-            skin_texture: geminiData.skin_texture,
-            dark_circles: geminiData.dark_circles,
-            redness: geminiData.redness,
-            oiliness: geminiData.oiliness
+          if (!isNaN(newOverallScore)) {
+            currentAnalysis.overallScore = Number(newOverallScore.toFixed(1));
           }
-        };
+
+          if (geminiData.potentialScore <= currentAnalysis.overallScore) {
+            geminiData.potentialScore = Math.min(10, currentAnalysis.overallScore + 0.5);
+          }
+          currentAnalysis.breakdown["Skin Quality"] = Number((geminiData.overall_skin_score || 0).toFixed(1));
+          currentAnalysis.breakdown["Grooming"] = Number((geminiData.grooming || 0).toFixed(1));
+          currentAnalysis.breakdown["Cheekbones"] = Number((geminiData.cheekbone_prominence || 0).toFixed(1));
+
+          if (geminiData.visualStrengths) currentAnalysis.analysis.strengths.push(...geminiData.visualStrengths);
+          if (geminiData.visualWeaknesses) currentAnalysis.analysis.weaknesses.push(...geminiData.visualWeaknesses);
+
+          currentAnalysis.visionAnalysis = {
+            colorSeason: geminiData.color_season,
+            skinAnalysis: geminiData.skinAnalysis,
+            aestheticsAnalysis: geminiData.aestheticsAnalysis,
+            potentialScore: geminiData.potentialScore,
+            improvements: geminiData.improvements,
+            recommendedProducts: geminiData.recommendedProducts || [],
+            faceShape: geminiData.faceShape,
+            hairRecommendations: geminiData.hairRecommendations,
+            dermatology: {
+              skin_quality: geminiData.skin_quality,
+              acne_presence: geminiData.acne_presence,
+              wrinkle_visibility: geminiData.wrinkle_visibility,
+              skin_texture: geminiData.skin_texture,
+              dark_circles: geminiData.dark_circles,
+              redness: geminiData.redness,
+              oiliness: geminiData.oiliness
+            }
+          };
+        }
+        // Success — return immediately
+        return currentAnalysis;
+      } catch (e) {
+        lastError = e;
+        console.warn(`Gemini analysis attempt ${attempt}/${MAX_RETRIES} failed:`, e);
+        if (attempt < MAX_RETRIES) {
+          // Wait before retrying (2s, then 4s)
+          await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+        }
       }
-    } catch (e) {
-      console.error("Gemini Vision Error:", e);
     }
+
+    console.error("Gemini Vision Error: All retries failed.", lastError);
     return currentAnalysis;
   };
 

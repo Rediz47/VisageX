@@ -5,6 +5,10 @@
 
 [functions]
   external_node_modules = ["lightningcss", "esbuild"]
+  node_bundler = "esbuild"
+
+[functions."api"]
+  timeout = 26
 
 [[redirects]]
   from = "/api/*"

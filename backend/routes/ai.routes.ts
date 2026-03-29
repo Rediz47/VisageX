@@ -6,6 +6,24 @@ import { FieldValue } from 'firebase-admin/firestore';
 
 const router = Router();
 
+// Retry helper: retries a function up to maxRetries times with exponential backoff
+async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3, baseDelayMs: number = 1000): Promise<T> {
+  let lastError: any;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      console.warn(`Attempt ${attempt}/${maxRetries} failed:`, error.message || error);
+      if (attempt < maxRetries) {
+        const delay = baseDelayMs * Math.pow(2, attempt - 1); // 1s, 2s, 4s
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  throw lastError;
+}
+
 // Secure AI Skin & Aesthetics Analysis Endpoint
 router.post('/gemini-analysis', requireAuth, async (req, res) => {
   try {
@@ -76,8 +94,9 @@ Also provide:
 - **Recommended Products** (recommendedProducts): Array of 3-5 product recommendations, each with "name", "category", and "reason"`;
 
     try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+      // Retry the Gemini API call up to 3 times to handle transient failures
+      const response = await withRetry(() => ai.models.generateContent({
+        model: 'gemini-2.5-flash',
         contents: [
           {
             role: 'user',
@@ -144,7 +163,7 @@ Also provide:
             ]
           }
         }
-      });
+      }));
 
       const resultText = response.text || '{}';
       let geminiResult;
