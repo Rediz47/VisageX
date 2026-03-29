@@ -26,7 +26,7 @@ export default function BlogCanthalTiltPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-700 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
-      <SEO 
+      <SEO
         title="What is Canthal Tilt? Positive vs Negative & Hunter Eyes"
         description="Learn the geometry behind canthal tilt, the difference between hunter eyes and prey eyes, and how to accurately measure your eye attractiveness."
         canonical="https://visagex.online/blog/what-is-canthal-tilt"
@@ -56,14 +56,8 @@ export default function BlogCanthalTiltPage() {
             </p>
           </header>
 
-          {/* HERO IMAGE DROP-ZONE */}
           <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
-            {/* If you have a photo, delete this entire <div> block and replace with: 
-                <img src="/my-canthal-tilt-cover.jpg" className="w-full h-full object-cover" /> 
-            */}
-            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
-            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Hero Cover Here ]</p>
-            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/your-photo.jpg" /&gt;</p>
+            <img src="/canthil.png" className="w-full h-full object-cover" alt="Canthal Tilt Guide" />
           </div>
 
           <div className={`max-w-3xl mx-auto p-8 rounded-3xl border ${isDarkMode ? 'bg-white/[0.02] border-white/5' : 'bg-zinc-100/50 border-zinc-200'} text-center`}>
@@ -105,14 +99,14 @@ export default function BlogCanthalTiltPage() {
             </div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className={`mt-24 p-10 md:p-16 rounded-[3rem] text-center relative overflow-hidden group ${isDarkMode ? 'bg-gradient-to-b from-sky-900/40 to-black border border-sky-500/20' : 'bg-sky-50 border border-sky-100'}`}
           >
             <div className={`absolute inset-0 opacity-50 transition-opacity duration-700 group-hover:opacity-100 ${isDarkMode ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-sky-500/20 via-transparent to-transparent' : 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent'}`} />
-            
+
             <div className="relative z-10 max-w-2xl mx-auto space-y-8">
               <h2 className={`text-4xl md:text-5xl font-display font-medium ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
                 Measure Your Tilt Now
@@ -121,8 +115,8 @@ export default function BlogCanthalTiltPage() {
                 Our 468-point neural mesh will calculate your exact left and right canthal tilt angles to the decimal point for free.
               </p>
               <div className="pt-4 flex justify-center">
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className={`inline-flex items-center gap-3 px-10 py-5 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-2xl hover:scale-105 duration-300 ${isDarkMode ? 'bg-white text-black hover:bg-sky-400 hover:text-white shadow-white/10' : 'bg-zinc-900 text-white hover:bg-black shadow-black/20'}`}
                 >
                   Start Face Analysis <ArrowRight className="w-5 h-5" />

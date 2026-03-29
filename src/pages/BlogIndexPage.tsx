@@ -46,7 +46,7 @@ export default function BlogIndexPage() {
       icon: Eye,
       color: "sky",
       link: "/blog/what-is-canthal-tilt",
-      thumbnail: "" 
+      thumbnail: "/canthil.png" 
     },
     {
       title: "How to Fix a Recessed Jawline",
