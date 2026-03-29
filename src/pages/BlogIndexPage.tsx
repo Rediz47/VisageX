@@ -81,19 +81,19 @@ export default function BlogIndexPage() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="space-y-16"
         >
-          {/* Header */}
-          <header className="text-center max-w-3xl mx-auto space-y-6">
+          {/* Premium Left-Aligned Header */}
+          <header className="max-w-4xl space-y-6 pb-4">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border ${isDarkMode ? 'border-zinc-500/30 text-zinc-300 bg-zinc-500/10' : 'border-zinc-200 text-zinc-600 bg-zinc-100'}`}>
               <BookOpen className="w-4 h-4" />
               The Glow-Up Library
             </div>
-            <h1 className={`text-5xl md:text-7xl font-display font-bold tracking-tight leading-[1.1] ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
-              Master Your
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-600">
-                Aesthetics
+            <h1 className={`text-5xl md:text-7xl lg:text-8xl font-display font-medium tracking-tight leading-[1.05] ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
+              Master Your{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-600">
+                Aesthetics.
               </span>
             </h1>
-            <p className={`text-lg md:text-xl font-light max-w-2xl mx-auto ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+            <p className={`text-xl md:text-2xl font-light max-w-2xl leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
               Clinical guides, AI breakdowns, and proven routines to naturally enhance your facial harmony.
             </p>
           </header>
