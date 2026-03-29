@@ -56,10 +56,10 @@ export default function BlogCanthalTiltPage() {
             </p>
           </header>
 
-          {/* HERO IMAGE SECTION */}
-          <div className="max-w-4xl mx-auto">
-            <div className={`aspect-video rounded-[3rem] overflow-hidden border ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-200 bg-zinc-100 shadow-2xl'}`}>
-              <img src="/canthil.png" className="w-full h-full object-cover" alt="Canthal Tilt Guide" />
+          {/* REFINED IMAGE SECTION */}
+          <div className="max-w-lg mx-auto">
+            <div className={`rounded-[2.5rem] overflow-hidden border ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-200 bg-zinc-100 shadow-2xl'}`}>
+              <img src="/canthil.png" className="w-full h-auto block" alt="Canthal Tilt Guide" />
             </div>
           </div>
 
