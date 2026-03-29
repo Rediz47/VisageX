@@ -11,8 +11,8 @@ interface SEOProps {
 }
 
 const SEO: React.FC<SEOProps> = ({
-  title = "VisageX | The Ultimate Glow-Up AI",
-  description = "Get a clinical facial analysis and personalized aesthetic routine powered by advanced AI.",
+  title = "VisageX | AI Face Analysis & Facial Symmetry Test Free Online",
+  description = "Get a professional AI face analysis and test your facial symmetry. Discover your personalized glow-up guide and looksmaxxing routine with our free online tool.",
   image = "https://visagex.online/og-default.jpg",
   canonical = "https://visagex.online",
   type = "website",

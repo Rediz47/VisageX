@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
   Shield, 
@@ -125,9 +126,10 @@ export function Hero({ isDarkMode, onNavigateMethodology }: { isDarkMode: boolea
               <div className={`absolute inset-0 rounded-[3rem] overflow-hidden border ${isDarkMode ? 'border-white/10' : 'border-zinc-200 shadow-2xl'}`}>
                 <img 
                   src="/chico.jpg" 
-                  alt="Analyzing your facial features" 
+                  alt="AI scanning male jawline and facial symmetry results" 
                   className="w-full h-full object-cover opacity-90 transition-opacity duration-700 hover:opacity-100"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 
@@ -403,9 +405,16 @@ export function Footer({ isDarkMode, onNavigatePrivacy, onNavigateTerms }: { isD
             </div>
             <div>
               <h4 className={`text-[10px] font-bold uppercase tracking-[0.3em] mb-6 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Product</h4>
-              <ul className={`space-y-4 text-sm font-light ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
-                <li className={`cursor-pointer transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Methodology</li>
-                <li className={`cursor-pointer transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Neural Scan</li>
+              <ul className={`space-y-4 text-sm font-light flex flex-col ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
+                <Link to="/methodology" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Methodology</Link>
+                <Link to="/" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Neural Scan</Link>
+              </ul>
+            </div>
+            <div>
+              <h4 className={`text-[10px] font-bold uppercase tracking-[0.3em] mb-6 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Resources</h4>
+              <ul className={`space-y-4 text-sm font-light flex flex-col ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
+                <Link to="/blog/how-to-improve-face-symmetry" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>How to Improve Symmetry</Link>
+                <Link to="/blog/ai-face-analysis-explained" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>AI Face Analysis Explained</Link>
               </ul>
             </div>
           </div>
