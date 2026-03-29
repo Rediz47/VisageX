@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       Prerender({
         staticDir: path.join(process.cwd(), 'dist'),
-        routes: ['/', '/methodology', '/privacy', '/terms', '/blog/how-to-improve-face-symmetry', '/blog/ai-face-analysis-explained'],
+        routes: ['/', '/methodology', '/privacy', '/terms', '/blog/how-to-improve-face-symmetry', '/blog/ai-face-analysis-explained', '/blog/best-ai-face-analysis-tool'],
       })
     ],
     define: {

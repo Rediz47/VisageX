@@ -24,6 +24,7 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const BlogSymmetryPage = lazy(() => import('./pages/BlogSymmetryPage'));
 const BlogAnalysisPage = lazy(() => import('./pages/BlogAnalysisPage'));
+const BlogBestToolPage = lazy(() => import('./pages/BlogBestToolPage'));
 
 // A small inner app component to access contexts for Modals and internal features
 function InnerApp() {
@@ -113,6 +114,7 @@ function InnerApp() {
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/blog/how-to-improve-face-symmetry" element={<BlogSymmetryPage />} />
             <Route path="/blog/ai-face-analysis-explained" element={<BlogAnalysisPage />} />
+            <Route path="/blog/best-ai-face-analysis-tool" element={<BlogBestToolPage />} />
             
             {/* Protected Routes */}
             <Route path="/profile" element={

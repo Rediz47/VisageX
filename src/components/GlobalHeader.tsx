@@ -50,6 +50,9 @@ export function GlobalHeader({
             <Link to="/blog/how-to-improve-face-symmetry" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
               Glow Up Guide
             </Link>
+            <Link to="/blog/best-ai-face-analysis-tool" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
+              Best AI Tool
+            </Link>
 
             <button onClick={toggleTheme} className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white hover:bg-white/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-900/10'}`}>
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -126,6 +129,9 @@ export function GlobalHeader({
               </Link>
               <Link to="/blog/how-to-improve-face-symmetry" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
                 Glow Up Guide
+              </Link>
+              <Link to="/blog/best-ai-face-analysis-tool" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
+                Best AI Tool
               </Link>
               {user ? (
                 <>
