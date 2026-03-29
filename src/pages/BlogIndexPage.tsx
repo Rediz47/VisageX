@@ -20,7 +20,7 @@ export default function BlogIndexPage() {
     link: "/blog/best-ai-face-analysis-tool",
     // To add your image, change this line to something like:
     // heroImage: "/images/best-tool-cover.jpg",
-    heroImage: "" 
+    heroImage: "/main-hero.png" 
   };
 
   const articles = [

@@ -58,12 +58,7 @@ export default function BlogBestToolPage() {
 
           {/* HERO IMAGE DROP-ZONE */}
           <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
-            {/* If you have a photo, delete this entire <div> block and replace with: 
-                <img src="/my-cover.jpg" className="w-full h-full object-cover" /> 
-            */}
-            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
-            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Tool Interface Photo ]</p>
-            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/app-screenshot.jpg" /&gt;</p>
+            <img src="/main-hero.png" className="w-full h-full object-cover" alt="Face Tesselation" />
           </div>
 
           {/* Intro block */}
