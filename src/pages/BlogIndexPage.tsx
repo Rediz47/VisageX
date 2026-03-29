@@ -185,7 +185,7 @@ export default function BlogIndexPage() {
                       <img 
                         src={article.thumbnail} 
                         alt={article.title} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
                       <div className={`flex flex-col items-center justify-center space-y-2 w-full h-full border border-dashed ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'} rounded-2xl m-4`}>
