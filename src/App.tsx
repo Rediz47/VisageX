@@ -25,6 +25,10 @@ const TermsPage = lazy(() => import('./pages/TermsPage'));
 const BlogSymmetryPage = lazy(() => import('./pages/BlogSymmetryPage'));
 const BlogAnalysisPage = lazy(() => import('./pages/BlogAnalysisPage'));
 const BlogBestToolPage = lazy(() => import('./pages/BlogBestToolPage'));
+const BlogIndexPage = lazy(() => import('./pages/BlogIndexPage'));
+const BlogCanthalTiltPage = lazy(() => import('./pages/BlogCanthalTiltPage'));
+const BlogRecessedJawPage = lazy(() => import('./pages/BlogRecessedJawPage'));
+const BlogGuaShaPage = lazy(() => import('./pages/BlogGuaShaPage'));
 
 // A small inner app component to access contexts for Modals and internal features
 function InnerApp() {
@@ -115,6 +119,10 @@ function InnerApp() {
             <Route path="/blog/how-to-improve-face-symmetry" element={<BlogSymmetryPage />} />
             <Route path="/blog/ai-face-analysis-explained" element={<BlogAnalysisPage />} />
             <Route path="/blog/best-ai-face-analysis-tool" element={<BlogBestToolPage />} />
+            <Route path="/blog" element={<BlogIndexPage />} />
+            <Route path="/blog/what-is-canthal-tilt" element={<BlogCanthalTiltPage />} />
+            <Route path="/blog/how-to-fix-recessed-jawline" element={<BlogRecessedJawPage />} />
+            <Route path="/blog/does-gua-sha-work" element={<BlogGuaShaPage />} />
             
             {/* Protected Routes */}
             <Route path="/profile" element={

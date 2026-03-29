@@ -47,11 +47,8 @@ export function GlobalHeader({
             <Link to="/methodology" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
               Methodology
             </Link>
-            <Link to="/blog/how-to-improve-face-symmetry" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
-              Glow Up Guide
-            </Link>
-            <Link to="/blog/best-ai-face-analysis-tool" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
-              Best AI Tool
+            <Link to="/blog" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
+              The Hub
             </Link>
 
             <button onClick={toggleTheme} className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white hover:bg-white/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-900/10'}`}>
@@ -127,11 +124,8 @@ export function GlobalHeader({
               <Link to="/methodology" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
                 Methodology
               </Link>
-              <Link to="/blog/how-to-improve-face-symmetry" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
-                Glow Up Guide
-              </Link>
-              <Link to="/blog/best-ai-face-analysis-tool" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
-                Best AI Tool
+              <Link to="/blog" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
+                The Hub
               </Link>
               {user ? (
                 <>

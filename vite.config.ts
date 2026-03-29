@@ -4,6 +4,7 @@ import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 const require = createRequire(import.meta.url);
 const Prerender = require('vite-plugin-prerender');
@@ -16,9 +17,28 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       tailwindcss(),
+      ViteImageOptimizer({
+        png: { quality: 80, compressionLevel: 8 },
+        jpeg: { quality: 80 },
+        jpg: { quality: 80 },
+        webp: { quality: 80, lossless: false },
+        avif: { quality: 70, lossless: false }
+      }),
       Prerender({
         staticDir: path.join(process.cwd(), 'dist'),
-        routes: ['/', '/methodology', '/privacy', '/terms', '/blog/how-to-improve-face-symmetry', '/blog/ai-face-analysis-explained', '/blog/best-ai-face-analysis-tool'],
+        routes: [
+          '/', 
+          '/methodology', 
+          '/privacy', 
+          '/terms', 
+          '/blog',
+          '/blog/how-to-improve-face-symmetry', 
+          '/blog/ai-face-analysis-explained', 
+          '/blog/best-ai-face-analysis-tool',
+          '/blog/what-is-canthal-tilt',
+          '/blog/how-to-fix-recessed-jawline',
+          '/blog/does-gua-sha-work'
+        ],
       })
     ],
     define: {

@@ -413,8 +413,13 @@ export function Footer({ isDarkMode, onNavigatePrivacy, onNavigateTerms }: { isD
             <div>
               <h4 className={`text-[10px] font-bold uppercase tracking-[0.3em] mb-6 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Resources</h4>
               <ul className={`space-y-4 text-sm font-light flex flex-col ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
-                <Link to="/blog/how-to-improve-face-symmetry" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>How to Improve Symmetry</Link>
-                <Link to="/blog/ai-face-analysis-explained" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>AI Face Analysis Explained</Link>
+                  <li><Link to="/blog" className={`text-sm font-bold ${isDarkMode ? 'text-zinc-200 hover:text-white' : 'text-zinc-700 hover:text-black'}`}>All Articles (The Hub)</Link></li>
+                  <li><Link to="/blog/how-to-improve-face-symmetry" className={`text-sm ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Symmetry Guide</Link></li>
+                  <li><Link to="/blog/ai-face-analysis-explained" className={`text-sm ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>How the AI Works</Link></li>
+                  <li><Link to="/blog/best-ai-face-analysis-tool" className={`text-sm ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Best Tools Ranked</Link></li>
+                  <li><Link to="/blog/what-is-canthal-tilt" className={`text-sm ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Canthal Tilt Geometry</Link></li>
+                  <li><Link to="/blog/how-to-fix-recessed-jawline" className={`text-sm ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Fixing a Weak Jaw</Link></li>
+                  <li><Link to="/blog/does-gua-sha-work" className={`text-sm ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Gua Sha Facts</Link></li>
               </ul>
             </div>
           </div>
