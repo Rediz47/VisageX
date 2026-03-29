@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Brain, Camera, Settings, Activity, ArrowRight, ScanFace } from 'lucide-react';
+import { Brain, Camera, Settings, Activity, ArrowRight, ScanFace, ImagePlus } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -52,9 +52,19 @@ export default function BlogAnalysisPage() {
               </span>
             </h1>
             <p className={`text-lg md:text-xl font-light max-w-2xl mx-auto ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-              The era of guessing your best features in the mirror is over. Here is the complete technical breakdown of how an AI analyzes a selfie to decode human attractiveness.
+              Ever wondered how bots actually map your face? We break down the clinical geometry and the science of the 468-point neural mesh.
             </p>
           </header>
+
+          {/* HERO IMAGE DROP-ZONE */}
+          <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
+            {/* If you have a photo, delete this entire <div> block and replace with: 
+                <img src="/my-analysis-cover.jpg" className="w-full h-full object-cover" /> 
+            */}
+            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
+            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Face Map Photo ]</p>
+            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/face-mesh.jpg" /&gt;</p>
+          </div>
 
           {/* Core Steps in Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

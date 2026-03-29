@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Eye, ArrowRight, Ruler as Rulers, Activity, Sparkles } from 'lucide-react';
+import { Eye, ArrowRight, Ruler as Rulers, Activity, Sparkles, ImagePlus } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -55,6 +55,16 @@ export default function BlogCanthalTiltPage() {
               The mathematical secret to "Hunter Eyes". Discover the absolute clinical truth behind eye geometry and facial dimorphism.
             </p>
           </header>
+
+          {/* HERO IMAGE DROP-ZONE */}
+          <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
+            {/* If you have a photo, delete this entire <div> block and replace with: 
+                <img src="/my-canthal-tilt-cover.jpg" className="w-full h-full object-cover" /> 
+            */}
+            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
+            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Hero Cover Here ]</p>
+            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/your-photo.jpg" /&gt;</p>
+          </div>
 
           <div className={`max-w-3xl mx-auto p-8 rounded-3xl border ${isDarkMode ? 'bg-white/[0.02] border-white/5' : 'bg-zinc-100/50 border-zinc-200'} text-center`}>
             <p className={`text-lg leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>

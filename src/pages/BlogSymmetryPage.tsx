@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Sparkles, ArrowRight, Bed, Dumbbell, MoveDown, Compass } from 'lucide-react';
+import { Sparkles, ArrowRight, Bed, Dumbbell, MoveDown, Compass, ImagePlus } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -52,9 +52,16 @@ export default function BlogSymmetryPage() {
               </span>
             </h1>
             <p className={`text-lg md:text-xl font-light max-w-2xl mx-auto ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-              Perfect symmetry is rare, but achieving a visually balanced face is absolutely possible. Here's what causes asymmetry and how you can naturally fix it over time.
+              Uneven eyes? Tilted jawline? Discover the science behind facial asymmetry and what you can naturally do to fix it.
             </p>
           </header>
+
+          {/* HERO IMAGE DROP-ZONE */}
+          <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
+            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
+            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Asymmetry Photo ]</p>
+            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/symmetry.jpg" /&gt;</p>
+          </div>
 
           {/* Intro block */}
           <div className={`max-w-3xl mx-auto p-8 rounded-3xl border ${isDarkMode ? 'bg-white/[0.02] border-white/5' : 'bg-zinc-100/50 border-zinc-200'} text-center`}>

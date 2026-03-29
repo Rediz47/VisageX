@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { MoveDown, ArrowRight, ShieldCheck, Dumbbell, ActivitySquare } from 'lucide-react';
+import { MoveDown, ArrowRight, ShieldCheck, Dumbbell, ActivitySquare, ImagePlus } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -55,6 +55,16 @@ export default function BlogRecessedJawPage() {
               Is it possible to correct a "weak chin" without surgery? The medical truth behind mewing, chewing habits, and orthotropics.
             </p>
           </header>
+
+          {/* HERO IMAGE DROP-ZONE */}
+          <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
+            {/* If you have a photo, delete this entire <div> block and replace with: 
+                <img src="/my-jawline-cover.jpg" className="w-full h-full object-cover" /> 
+            */}
+            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
+            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Jawline Profile Photo ]</p>
+            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/jawline-before-after.jpg" /&gt;</p>
+          </div>
 
           <div className="space-y-8">
             <h2 className={`text-3xl font-display text-center ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>What Causes a Recessed Jawline?</h2>
