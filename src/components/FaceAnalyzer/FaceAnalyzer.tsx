@@ -166,7 +166,7 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
             transition={{ delay: 0.2, duration: 0.5 }}
             className="relative group"
           >
-            <div className={`relative border rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 text-center transition-all cursor-pointer backdrop-blur-sm overflow-hidden ${isDarkMode ? 'border-white/5 hover:border-white/10 bg-black/80' : 'border-black/5 hover:border-black/10 bg-white/80 shadow-2xl shadow-indigo-500/5'}`}
+            <div className={`relative border rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 text-center transition-all duration-300 cursor-pointer backdrop-blur-sm overflow-hidden ${isDarkMode ? 'border-white/5 hover:border-white/10 bg-black/80' : 'border-black/5 hover:border-black/10 bg-white/80 shadow-2xl shadow-indigo-500/5'}`}
               onClick={() => !isModelLoading && !isProcessing && fileInputRef.current?.click()}
             >
               {/* File input — hidden, used by both click-to-upload and camera button */}

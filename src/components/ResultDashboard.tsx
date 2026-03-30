@@ -672,7 +672,7 @@ export function ResultDashboard({
                 <div
                   key={tier.count}
                   className={cn(
-                    "flex flex-col items-center justify-center p-4 rounded-2xl border transition-all relative overflow-hidden",
+                    "flex flex-col items-center justify-center p-4 rounded-2xl border transition-all duration-300 relative overflow-hidden",
                     invites >= tier.count
                       ? `bg-gradient-to-br ${tier.color} text-white border-transparent`
                       : (isDarkMode ? "bg-white/5 border-white/5 opacity-50" : "bg-zinc-50 border-zinc-100 opacity-50"),
@@ -728,11 +728,11 @@ export function ResultDashboard({
               {!user ? (
                 <button
                   onClick={() => onOpenAuth('signup')}
-                  className="w-full py-8 rounded-[2rem] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex flex-col items-center justify-center gap-3 transition-all hover:bg-indigo-500/20 group relative overflow-hidden"
+                  className="w-full py-8 rounded-[2rem] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex flex-col items-center justify-center gap-3 transition-all duration-300 hover:bg-indigo-500/20 group relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center mb-1">
-                    <Lock className="w-6 h-6 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <Lock className="w-6 h-6 text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-black uppercase tracking-[0.2em] text-white">Login to Get Code</p>
@@ -752,7 +752,7 @@ export function ResultDashboard({
                         setCopied(true);
                         setTimeout(() => setCopied(false), 2000);
                       }}
-                      className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-all", isDarkMode ? "bg-white/10 hover:bg-white/20 text-white" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-900")}
+                      className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300", isDarkMode ? "bg-white/10 hover:bg-white/20 text-white" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-900")}
                     >
                       {copied ? <Check className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5" />}
                     </button>
@@ -773,7 +773,7 @@ export function ResultDashboard({
                         setTimeout(() => setCopied(false), 2000);
                       }
                     }}
-                    className="w-full py-5 rounded-2xl bg-indigo-500 text-white font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.4)] relative overflow-hidden group"
+                    className="w-full py-5 rounded-2xl bg-indigo-500 text-white font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.4)] relative overflow-hidden group"
                   >
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                     <Share2 className="w-5 h-5 relative z-10" />
@@ -785,7 +785,7 @@ export function ResultDashboard({
 
             {/* Redeem Box */}
             <div className="relative">
-              <div className={cn("flex rounded-2xl border transition-all focus-within:ring-2 ring-indigo-500/20", isDarkMode ? "bg-black/20 border-white/5" : "bg-white border-zinc-200")}>
+              <div className={cn("flex rounded-2xl border transition-all duration-300 focus-within:ring-2 ring-indigo-500/20", isDarkMode ? "bg-black/20 border-white/5" : "bg-white border-zinc-200")}>
                 <input
                   type="text"
                   placeholder="Redeem code..."
@@ -855,7 +855,7 @@ export function ResultDashboard({
             onClick={generateShareCard}
             disabled={isGeneratingCard}
             className={cn(
-              "flex items-center px-5 py-2.5 rounded-xl border text-xs font-bold transition-all group",
+              "flex items-center px-5 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 group",
               isDarkMode
                 ? "bg-white/5 hover:bg-white/10 border-white/10 text-white"
                 : "bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-900 shadow-sm",
@@ -943,7 +943,7 @@ export function ResultDashboard({
               {isLocked ? (
                 <button
                   onClick={scrollToPricing}
-                  className="w-full max-w-sm group relative px-8 py-6 rounded-[2rem] bg-indigo-500 text-white font-black text-xs md:text-sm uppercase tracking-[0.2em] transition-all hover:scale-[1.03] active:scale-[0.97] shadow-[0_20px_40px_rgba(99,102,241,0.3)] hover:shadow-[0_25px_50px_rgba(99,102,241,0.4)] overflow-hidden"
+                  className="w-full max-w-sm group relative px-8 py-6 rounded-[2rem] bg-indigo-500 text-white font-black text-xs md:text-sm uppercase tracking-[0.2em] transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-[0_20px_40px_rgba(99,102,241,0.3)] hover:shadow-[0_25px_50px_rgba(99,102,241,0.4)] overflow-hidden"
                 >
                   {/* Glowing Pulse Animation */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -973,7 +973,7 @@ export function ResultDashboard({
                         alert("Copied share link to clipboard!");
                       }
                     }}
-                    className="w-full relative group px-8 py-5 rounded-[2rem] bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-black text-xs md:text-sm uppercase tracking-[0.15em] transition-all hover:scale-[1.03] active:scale-[0.97] shadow-[0_10px_30px_rgba(6,182,212,0.4)] overflow-hidden flex items-center justify-center gap-3 border border-cyan-400/50"
+                    className="w-full relative group px-8 py-5 rounded-[2rem] bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-black text-xs md:text-sm uppercase tracking-[0.15em] transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-[0_10px_30px_rgba(6,182,212,0.4)] overflow-hidden flex items-center justify-center gap-3 border border-cyan-400/50"
                   >
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                     <Share2 className="w-5 h-5 relative z-10" />
@@ -1034,7 +1034,7 @@ export function ResultDashboard({
                       )}
                     >
                       {isItemLocked && (
-                        <div className="absolute inset-0 z-20 backdrop-blur-md bg-black/40 flex flex-col items-center justify-center p-4 transition-all group-hover:bg-black/50">
+                        <div className="absolute inset-0 z-20 backdrop-blur-md bg-black/40 flex flex-col items-center justify-center p-4 transition-all duration-300 group-hover:bg-black/50">
                           <Lock className="w-6 h-6 text-white/20" />
                         </div>
                       )}
@@ -1083,7 +1083,7 @@ export function ResultDashboard({
                             <Link 
                               to={TRAIT_GUIDE_MAP[item.subject]}
                               className={cn(
-                                "inline-flex items-center text-[10px] font-bold uppercase tracking-widest mt-auto transition-all",
+                                "inline-flex items-center text-[10px] font-bold uppercase tracking-widest mt-auto transition-all duration-300",
                                 isDarkMode ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-700"
                               )}
                             >
@@ -1166,7 +1166,7 @@ export function ResultDashboard({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onUnlock}
-                    className="w-full py-5 rounded-2xl bg-indigo-600 text-white font-black text-xs uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(79,70,229,0.3)] hover:shadow-[0_25px_50px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 relative overflow-hidden group/btn"
+                    className="w-full py-5 rounded-2xl bg-indigo-600 text-white font-black text-xs uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(79,70,229,0.3)] hover:shadow-[0_25px_50px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group/btn"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
                     <Sparkles className="w-4 h-4" />
@@ -1785,7 +1785,7 @@ export function ResultDashboard({
             <div className="flex justify-center mt-6 md:mt-8">
               <button
                 onClick={() => (window as any).navigateToRoadmap?.()}
-                className="w-full sm:w-auto px-8 md:px-12 py-3 md:py-4 rounded-full bg-black text-white font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2 md:gap-3 group text-[10px] md:text-sm"
+                className="w-full sm:w-auto px-8 md:px-12 py-3 md:py-4 rounded-full bg-black text-white font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl flex items-center justify-center gap-2 md:gap-3 group text-[10px] md:text-sm"
               >
                 View Personalized Roadmap
                 <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
