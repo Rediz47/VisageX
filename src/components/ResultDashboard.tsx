@@ -640,9 +640,9 @@ export function ResultDashboard({
             : (isDarkMode ? "bg-zinc-900 border-white/5" : "bg-white border-zinc-100 shadow-indigo-500/5")
         )}
       >
-        {/* Decorative Background Glows */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-rose-500/5 blur-[120px] pointer-events-none" />
+        {/* Decorative Background Glows — lightweight radial gradients instead of blur */}
+        <div className="absolute top-0 right-0 w-80 h-80 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.06) 0%, transparent 70%)' }} />
 
         <div className="relative z-10 flex flex-col lg:flex-row gap-12 items-stretch">
 
@@ -917,7 +917,7 @@ export function ResultDashboard({
           >
             {/* Background Aesthetic Glows */}
             <div className={cn("absolute inset-0 opacity-20 bg-gradient-to-b", isDarkMode ? "from-indigo-500/10 to-rose-500/5" : "from-zinc-50 to-white")} />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-indigo-500/10 blur-[80px] rounded-full" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(99,102,241,0.1) 0%, transparent 70%)' }} />
 
             <div className="relative z-10 flex flex-col items-center w-full">
               <h3 className={cn("text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-4 md:mb-6 opacity-40", isDarkMode ? "text-white" : "text-zinc-900")}>
@@ -1120,7 +1120,7 @@ export function ResultDashboard({
             >
               {/* Premium Gradient Glow */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-transparent to-purple-500/20 opacity-40 mix-blend-overlay" />
-              <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/10 blur-[120px] rounded-full animate-pulse" />
+              <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%)' }} />
 
               <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
                 <div className="flex-1 text-center lg:text-left">

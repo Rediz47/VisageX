@@ -133,11 +133,13 @@ export function Hero({ isDarkMode, onNavigateMethodology }: { isDarkMode: boolea
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 
-                {/* Scanning Line */}
-                <motion.div 
-                  animate={{ top: ["0%", "100%", "0%"] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                {/* Scanning Line — CSS animation for GPU perf */}
+                <div 
                   className="absolute left-0 right-0 h-[2px] bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] z-20 pointer-events-none"
+                  style={{ 
+                    animation: 'scanLine 4s linear infinite',
+                    willChange: 'top',
+                  }}
                 />
                 
                 {/* Technical Grid Overlay */}
@@ -146,24 +148,22 @@ export function Hero({ isDarkMode, onNavigateMethodology }: { isDarkMode: boolea
                 />
               </div>
 
-              {/* Floating Data Elements */}
-              <motion.div 
-                animate={{ y: [0, -20, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className={`absolute -top-4 -right-4 md:-top-10 md:-right-10 p-4 md:p-6 rounded-2xl md:rounded-3xl border backdrop-blur-md ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white/80 border-black/5 shadow-xl'} scale-75 md:scale-100 origin-top-right`}
+              {/* Floating Data Elements — CSS animation instead of Framer Motion for perf */}
+              <div 
+                className={`absolute -top-4 -right-4 md:-top-10 md:-right-10 p-4 md:p-6 rounded-2xl md:rounded-3xl border md:backdrop-blur-md ${isDarkMode ? 'bg-zinc-900/90 md:bg-white/5 border-white/10' : 'bg-white md:bg-white/80 border-black/5 shadow-xl'} scale-75 md:scale-100 origin-top-right`}
+                style={{ animation: 'floatUp 4s ease-in-out infinite', willChange: 'transform' }}
               >
                 <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Symmetry</p>
                 <p className={`text-2xl md:text-3xl font-display ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>98.2%</p>
-              </motion.div>
+              </div>
 
-              <motion.div 
-                animate={{ y: [0, 20, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className={`absolute -bottom-4 -left-4 md:-bottom-10 md:-left-10 p-4 md:p-6 rounded-2xl md:rounded-3xl border backdrop-blur-md ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white/80 border-black/5 shadow-xl'} scale-75 md:scale-100 origin-bottom-left`}
+              <div 
+                className={`absolute -bottom-4 -left-4 md:-bottom-10 md:-left-10 p-4 md:p-6 rounded-2xl md:rounded-3xl border md:backdrop-blur-md ${isDarkMode ? 'bg-zinc-900/90 md:bg-white/5 border-white/10' : 'bg-white md:bg-white/80 border-black/5 shadow-xl'} scale-75 md:scale-100 origin-bottom-left`}
+                style={{ animation: 'floatDown 5s ease-in-out 1s infinite', willChange: 'transform' }}
               >
                 <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Health Index</p>
                 <p className={`text-2xl md:text-3xl font-display ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>Optimal</p>
-              </motion.div>
+              </div>
             </motion.div>
           </div>
         </div>

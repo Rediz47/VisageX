@@ -57,14 +57,15 @@ function InnerApp() {
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
     const lenis = new Lenis({
-      duration: isMobile ? 0.8 : 1.2,
+      duration: isMobile ? 0.6 : 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
-      smoothWheel: true,
+      smoothWheel: !isMobile,
       wheelMultiplier: 1,
-      touchMultiplier: isMobile ? 1.5 : 2,
+      touchMultiplier: isMobile ? 1.2 : 2,
       infinite: false,
+      autoResize: true,
     });
     (window as any).lenis = lenis;
 
@@ -92,10 +93,10 @@ function InnerApp() {
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-700 ${isDarkMode ? 'bg-black text-zinc-100 selection:bg-cyan-500/30 selection:text-cyan-200' : 'bg-zinc-50 text-zinc-900 selection:bg-indigo-500/10 selection:text-indigo-900'} overflow-x-hidden`}>
-      {/* Ambient Background Glow */}
+      {/* Ambient Background Glow — uses opacity+radial-gradient instead of blur for perf */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className={`absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[80px] will-change-transform transition-colors duration-1000 ${isDarkMode ? 'bg-zinc-800/10' : 'bg-zinc-500/5'}`} />
-        <div className={`absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full blur-[80px] will-change-transform transition-colors duration-1000 ${isDarkMode ? 'bg-zinc-900/10' : 'bg-zinc-400/5'}`} />
+        <div className={`absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full will-change-transform transition-colors duration-1000 ${isDarkMode ? 'bg-zinc-800/5' : 'bg-zinc-400/[0.03]'}`} style={{ background: isDarkMode ? 'radial-gradient(circle, rgba(39,39,42,0.08) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(161,161,170,0.04) 0%, transparent 70%)' }} />
+        <div className={`absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full will-change-transform transition-colors duration-1000 ${isDarkMode ? 'bg-zinc-900/5' : 'bg-zinc-300/[0.03]'}`} style={{ background: isDarkMode ? 'radial-gradient(circle, rgba(24,24,27,0.08) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(212,212,216,0.04) 0%, transparent 70%)' }} />
       </div>
 
       <GlobalHeader 
