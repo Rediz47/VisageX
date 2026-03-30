@@ -11,8 +11,8 @@ interface SEOProps {
 }
 
 const SEO: React.FC<SEOProps> = ({
-  title = "VisageX | AI Face Analysis & Facial Symmetry Test Free Online",
-  description = "Get a professional AI face analysis and test your facial symmetry. Discover your personalized glow-up guide and looksmaxxing routine with our free online tool.",
+  title = "VisageX — Free AI Face Analysis & Symmetry Score",
+  description = "Get your AI face score in seconds. VisageX scans 468 facial landmarks to rate symmetry, jawline, skin health & more. Free online tool — no download needed.",
   image = "https://visagex.online/og-default.jpg",
   canonical = "https://visagex.online",
   type = "website",

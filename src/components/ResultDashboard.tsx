@@ -4,9 +4,28 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import { CheckCircle2, AlertCircle, ArrowLeft, ArrowRight, Activity, User, Maximize2, Target, Sparkles, Share2, Download, TrendingUp, Lock, Sun, Moon, Eye, Scissors, Loader2, Search, Copy, Check, Trophy } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Link } from 'react-router-dom';
 import { Tooltip } from './Tooltip';
 import { toPng } from 'html-to-image';
 import { cn } from '../lib/utils';
+
+// Mapping identifying which traits have educational articles in the /blog library.
+const TRAIT_GUIDE_MAP: Record<string, string> = {
+  'Eyes': '/blog/what-is-canthal-tilt',
+  'Jawline': '/blog/how-to-fix-recessed-jawline',
+  'Symmetry': '/blog/how-to-improve-face-symmetry',
+  'Skin Health': '/blog/does-gua-sha-work',
+  'Skin Quality': '/blog/does-gua-sha-work',
+};
+
+// Keywords to look for in analysis text strings to provide contextual links.
+const KEYWORD_GUIDE_MAP = [
+  { keyword: 'Canthal Tilt', link: '/blog/what-is-canthal-tilt' },
+  { keyword: 'Jawline', link: '/blog/how-to-fix-recessed-jawline' },
+  { keyword: 'Symmetry', link: '/blog/how-to-improve-face-symmetry' },
+  { keyword: 'Skin', link: '/blog/does-gua-sha-work' },
+  { keyword: 'Mewing', link: '/blog/complete-mewing-guide' },
+];
 
 import { GlowUpCoach } from './GlowUpCoach';
 
@@ -706,44 +725,62 @@ export function ResultDashboard({
 
             {/* Share & Code Region */}
             <div className="space-y-3">
-              <div className={cn("flex items-center justify-between gap-4 p-2 pl-6 rounded-2xl border", isDarkMode ? "bg-white/5 border-white/10" : "bg-white border-zinc-200")}>
-                <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest opacity-40">Your Invite Code</p>
-                  <p className={cn("font-mono font-bold text-xl tracking-wider", isDarkMode ? "text-cyan-400" : "text-cyan-600")}>{userData?.referralCode || "------"}</p>
-                </div>
+              {!user ? (
                 <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(userData?.referralCode || "");
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }}
-                  className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-all", isDarkMode ? "bg-white/10 hover:bg-white/20 text-white" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-900")}
+                  onClick={() => onOpenAuth('signup')}
+                  className="w-full py-8 rounded-[2rem] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex flex-col items-center justify-center gap-3 transition-all hover:bg-indigo-500/20 group relative overflow-hidden"
                 >
-                  {copied ? <Check className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5" />}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center mb-1">
+                    <Lock className="w-6 h-6 text-indigo-400 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-white">Login to Get Code</p>
+                    <p className="text-[10px] font-bold text-indigo-400/60 uppercase tracking-widest mt-1">Unlock your $9.99 reward</p>
+                  </div>
                 </button>
-              </div>
+              ) : (
+                <>
+                  <div className={cn("flex items-center justify-between gap-4 p-2 pl-6 rounded-2xl border", isDarkMode ? "bg-white/5 border-white/10" : "bg-white border-zinc-200")}>
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-widest opacity-40">Your Invite Code</p>
+                      <p className={cn("font-mono font-bold text-xl tracking-wider", isDarkMode ? "text-cyan-400" : "text-cyan-600")}>{userData?.referralCode || "------"}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(userData?.referralCode || "");
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-all", isDarkMode ? "bg-white/10 hover:bg-white/20 text-white" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-900")}
+                    >
+                      {copied ? <Check className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5" />}
+                    </button>
+                  </div>
 
-              <button
-                onClick={() => {
-                  const shareText = `I scored ${overallScore?.toFixed(1) || '9.0'}/10 on the VisageX AI Face Analysis (Top ${topPercentile}% globally).`;
-                  const shareUrl = `${window.location.origin}?ref=${userData?.referralCode || ''}`;
-                  if ((window as any).posthog) {
-                    (window as any).posthog.capture('viral_share_clicked', { source: 'growth_engine', score: overallScore.toFixed(1) });
-                  }
-                  if (navigator.share) {
-                    navigator.share({ title: 'My VisageX AI Score', text: shareText, url: shareUrl });
-                  } else {
-                    navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }
-                }}
-                className="w-full py-5 rounded-2xl bg-indigo-500 text-white font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.4)] relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                <Share2 className="w-5 h-5 relative z-10" />
-                <span className="relative z-10">{copied ? "Copied Link!" : "Share My Score"}</span>
-              </button>
+                  <button
+                    onClick={() => {
+                      const shareText = `I scored ${overallScore?.toFixed(1) || '9.0'}/10 on the VisageX AI Face Analysis (Top ${topPercentile}% globally).`;
+                      const shareUrl = `${window.location.origin}?ref=${userData?.referralCode || ''}`;
+                      if ((window as any).posthog) {
+                        (window as any).posthog.capture('viral_share_clicked', { source: 'growth_engine', score: overallScore.toFixed(1) });
+                      }
+                      if (navigator.share) {
+                        navigator.share({ title: 'My VisageX AI Score', text: shareText, url: shareUrl });
+                      } else {
+                        navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }
+                    }}
+                    className="w-full py-5 rounded-2xl bg-indigo-500 text-white font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.4)] relative overflow-hidden group"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                    <Share2 className="w-5 h-5 relative z-10" />
+                    <span className="relative z-10">{copied ? "Copied Link!" : "Share My Score"}</span>
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Redeem Box */}
@@ -753,7 +790,7 @@ export function ResultDashboard({
                   type="text"
                   placeholder="Redeem code..."
                   value={userData?.referredBy ? "Applied ✅" : promoCode}
-                  disabled={!!userData?.referredBy || isApplying}
+                  disabled={!user || !!userData?.referredBy || isApplying}
                   onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                   className="bg-transparent border-none outline-none px-6 py-4 text-xs w-full font-bold uppercase tracking-widest placeholder:opacity-30 disabled:opacity-50"
                 />
@@ -1038,9 +1075,21 @@ export function ResultDashboard({
                             </span>
                             <span className={cn("text-[10px] md:text-xs font-medium opacity-10", isDarkMode ? "text-zinc-100" : "text-zinc-900")}>/10</span>
                           </div>
-                          <p className={cn("text-[11px] md:text-[12px] leading-relaxed mb-2 md:mb-3 opacity-90 font-medium", isDarkMode ? "text-white/90" : "text-zinc-900")}>
+                          <p className={cn("text-[11px] md:text-[12px] leading-relaxed mb-3 opacity-90 font-medium", isDarkMode ? "text-white/90" : "text-zinc-900")}>
                             {isItemLocked ? "Unlock the full report to see detailed analysis and metrics for this feature." : getFeatureDescription(item.subject)}
                           </p>
+
+                          {!isItemLocked && TRAIT_GUIDE_MAP[item.subject] && (
+                            <Link 
+                              to={TRAIT_GUIDE_MAP[item.subject]}
+                              className={cn(
+                                "inline-flex items-center text-[10px] font-bold uppercase tracking-widest mt-auto transition-all",
+                                isDarkMode ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-700"
+                              )}
+                            >
+                              Read Strategy &rarr;
+                            </Link>
+                          )}
                         </div>
 
                         {/* Progress Bar removed as per user request */}
@@ -1174,12 +1223,20 @@ export function ResultDashboard({
                     <li className={cn("flex items-start text-[11px] md:text-xs italic", isDarkMode ? "text-emerald-200/40" : "text-emerald-700/40")}>
                       Unlock to see your key strengths
                     </li>
-                  ) : analysis.strengths.map((strength: string, i: number) => (
-                    <li key={i} className={cn("flex items-start text-[11px] md:text-xs", isDarkMode ? "text-emerald-200/70" : "text-emerald-700/70")}>
-                      <span className="w-1 h-1 rounded-full bg-emerald-500 mt-1.5 mr-2 flex-shrink-0"></span>
-                      {strength}
-                    </li>
-                  ))}
+                  ) : analysis.strengths.map((strength: string, i: number) => {
+                    const guideMatch = KEYWORD_GUIDE_MAP.find(m => strength.toLowerCase().includes(m.keyword.toLowerCase()));
+                    return (
+                      <li key={i} className={cn("flex items-center text-[11px] md:text-xs", isDarkMode ? "text-emerald-200/70" : "text-emerald-700/70")}>
+                        <span className="w-1 h-1 rounded-full bg-emerald-500 mr-2 flex-shrink-0"></span>
+                        <span className="flex-grow">{strength}</span>
+                        {guideMatch && (
+                          <Link to={guideMatch.link} className="ml-2 whitespace-nowrap text-[8px] font-black uppercase tracking-widest text-emerald-500 hover:text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-md bg-emerald-500/5">
+                            Guide &rarr;
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
 
@@ -1196,12 +1253,20 @@ export function ResultDashboard({
                     <li className={cn("flex items-start text-xs md:text-sm italic", isDarkMode ? "text-rose-200/40" : "text-rose-700/40")}>
                       Unlock to see areas for improvement
                     </li>
-                  ) : analysis.weaknesses.map((weakness: string, i: number) => (
-                    <li key={i} className={cn("flex items-start text-xs md:text-sm", isDarkMode ? "text-rose-200/70" : "text-rose-700/70")}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 mr-2 flex-shrink-0"></span>
-                      {weakness}
-                    </li>
-                  ))}
+                  ) : analysis.weaknesses.map((weakness: string, i: number) => {
+                    const guideMatch = KEYWORD_GUIDE_MAP.find(m => weakness.toLowerCase().includes(m.keyword.toLowerCase()));
+                    return (
+                      <li key={i} className={cn("flex items-center text-xs md:text-sm segment-item", isDarkMode ? "text-rose-200/70" : "text-rose-700/70")}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mr-2 flex-shrink-0"></span>
+                        <span className="flex-grow">{weakness}</span>
+                        {guideMatch && (
+                          <Link to={guideMatch.link} className="ml-2 whitespace-nowrap text-[9px] font-black uppercase tracking-widest text-rose-400 hover:text-rose-300 border border-rose-500/20 px-2 py-0.5 rounded-md bg-rose-500/5">
+                            Fix &rarr;
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>

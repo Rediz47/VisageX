@@ -77,8 +77,8 @@ export default function Landing({
   return (
     <>
       <SEO 
-        title="Free AI Face Analysis — Get Your Score Instantly | VisageX"
-        description="Get a free AI face analysis in seconds. Test your facial symmetry, discover your skin health score, and get a personalized glow-up guide powered by 468 neural landmarks."
+        title="VisageX — Free AI Face Analysis & Symmetry Score"
+        description="Get your AI face score in seconds. VisageX scans 468 facial landmarks to rate symmetry, jawline, skin health & more. Free online tool — no download needed."
         canonical="https://visagex.online"
         type="website"
       />

@@ -55,9 +55,10 @@ export async function configureApp() {
       path: req.path
     });
   });
-
-  app.use(express.static('dist'));
-
+  // Only serve static build directory in production, otherwise Vite middleware handles it
+  if (process.env.NODE_ENV === 'production' || process.env.NETLIFY) {
+    app.use(express.static('dist'));
+  }
   return app;
 }
 

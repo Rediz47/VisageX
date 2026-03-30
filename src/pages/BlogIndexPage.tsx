@@ -20,7 +20,7 @@ export default function BlogIndexPage() {
     link: "/blog/best-ai-face-analysis-tool",
     // To add your image, change this line to something like:
     // heroImage: "/images/best-tool-cover.jpg",
-    heroImage: "/main-hero.png" 
+    heroImage: "/main-hero.png"
   };
 
   const articles = [
@@ -38,7 +38,7 @@ export default function BlogIndexPage() {
       icon: Brain,
       color: "indigo",
       link: "/blog/ai-face-analysis-explained",
-      thumbnail: "" 
+      thumbnail: ""
     },
     {
       title: "What is Canthal Tilt?",
@@ -46,7 +46,7 @@ export default function BlogIndexPage() {
       icon: Eye,
       color: "sky",
       link: "/blog/what-is-canthal-tilt",
-      thumbnail: "/canthil.png" 
+      thumbnail: "/canthil.png"
     },
     {
       title: "How to Fix a Recessed Jawline",
@@ -54,7 +54,7 @@ export default function BlogIndexPage() {
       icon: MoveDown,
       color: "rose",
       link: "/blog/how-to-fix-recessed-jawline",
-      thumbnail: "" 
+      thumbnail: ""
     },
     {
       title: "Does Gua Sha Work for Face Fat?",
@@ -62,7 +62,7 @@ export default function BlogIndexPage() {
       icon: Feather,
       color: "purple",
       link: "/blog/does-gua-sha-work",
-      thumbnail: "" 
+      thumbnail: ""
     },
     {
       title: "Free AI Face Analysis — What Actually Works",
@@ -92,7 +92,7 @@ export default function BlogIndexPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-700 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
-      <SEO 
+      <SEO
         title="Glow-Up Academy | Aesthetics & AI Face Analysis Guides"
         description="The ultimate resource for facial aesthetics, looksmaxxing techniques, and understanding your facial geometry."
         canonical="https://visagex.online/blog"
@@ -126,59 +126,49 @@ export default function BlogIndexPage() {
             <h2 className={`text-sm font-bold uppercase tracking-[0.3em] mb-8 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               Featured Publication
             </h2>
-            
+
             {/* FEATURED HERO ARTICLE */}
-            <Link 
+            <Link
               to={featuredArticle.link}
-              className={`group block rounded-[3rem] overflow-hidden border transition-all duration-500 hover:-translate-y-2 ${
-                isDarkMode 
-                  ? 'bg-zinc-900/50 border-white/5 hover:border-white/10 hover:bg-zinc-800/50' 
+              className={`group block rounded-[3rem] overflow-hidden border transition-all duration-500 hover:-translate-y-2 ${isDarkMode
+                  ? 'bg-zinc-900/50 border-white/5 hover:border-white/10 hover:bg-zinc-800/50'
                   : 'bg-white border-zinc-200 shadow-xl hover:shadow-2xl'
-              }`}
+                }`}
             >
               <div className="flex flex-col lg:flex-row">
-                {/* 
-                  =======================================================
-                  HERO IMAGE PLACEHOLDER:
-                  If featuredArticle.heroImage has a URL (e.g. "/images/photo.png"), it will show. 
-                  Otherwise, it shows the blank drop-zone.
-                  =======================================================
-                */}
-                <div className={`w-full lg:w-3/5 aspect-video md:aspect-[16/9] lg:aspect-auto flex items-center justify-center relative overflow-hidden ${
-                  isDarkMode ? 'bg-black/40' : 'bg-zinc-100'
-                }`}>
+                {/* Featured Image */}
+                <div className={`w-full lg:w-1/2 aspect-video md:aspect-[16/9] lg:aspect-auto flex items-center justify-center relative overflow-hidden p-8 ${isDarkMode ? 'bg-black/40' : 'bg-zinc-50'
+                  }`}>
                   {featuredArticle.heroImage ? (
-                    <img 
-                      src={featuredArticle.heroImage} 
-                      alt={featuredArticle.title} 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    <img
+                      src={featuredArticle.heroImage}
+                      alt={featuredArticle.title}
+                      className="w-full h-full object-contain rounded-[2.5rem] transition-transform duration-700 group-hover:scale-105"
                     />
                   ) : (
-                    <div className={`flex flex-col items-center justify-center space-y-3 w-full h-full border-2 border-dashed ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'} rounded-3xl m-6`}>
+                    <div className={`flex flex-col items-center justify-center space-y-3 w-full h-full border-2 border-dashed ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'} rounded-[2.5rem] m-6`}>
                       <ImagePlus className="w-12 h-12 mb-2 opacity-50" />
-                      <p className="text-sm font-bold tracking-widest uppercase">Insert Hero Cover</p>
-                      <p className="text-xs font-light text-center px-4">Find code: featuredArticle.heroImage</p>
+                      <p className="text-sm font-bold tracking-widest uppercase text-center">Featured Cover</p>
                     </div>
                   )}
                 </div>
 
                 {/* Featured Text Content */}
-                <div className="w-full lg:w-2/5 p-10 md:p-14 flex flex-col justify-center">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 duration-500 ${
-                    isDarkMode 
-                      ? `bg-${featuredArticle.color}-500/20 text-${featuredArticle.color}-400`
-                      : `bg-${featuredArticle.color}-50 text-${featuredArticle.color}-600`
+                <div className="w-full lg:w-1/2 p-10 md:p-14 lg:p-20 flex flex-col justify-center">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 duration-500 ${isDarkMode
+                    ? `bg-${featuredArticle.color}-500/20 text-${featuredArticle.color}-400`
+                    : `bg-${featuredArticle.color}-50 text-${featuredArticle.color}-600`
                   }`}>
                     <featuredArticle.icon className="w-7 h-7" />
                   </div>
-                  <h3 className={`text-4xl md:text-5xl font-display font-medium mb-6 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  <h3 className={`text-3xl md:text-5xl font-display font-medium mb-6 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
                     {featuredArticle.title}
                   </h3>
-                  <p className={`text-lg leading-relaxed mb-10 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                  <p className={`text-lg md:text-xl font-light leading-relaxed mb-10 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                     {featuredArticle.description}
                   </p>
-                  <div className="mt-auto flex items-center text-sm font-bold uppercase tracking-widest text-amber-500 transition-colors">
-                    Read the Guide &rarr;
+                  <div className="flex items-center text-sm font-bold uppercase tracking-[0.2em] text-amber-500 transition-colors">
+                    Read the Full Publication &rarr;
                   </div>
                 </div>
               </div>
@@ -190,53 +180,31 @@ export default function BlogIndexPage() {
             <h2 className={`text-sm font-bold uppercase tracking-[0.3em] mb-8 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               The Library
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {articles.map((article, i) => (
-                <Link 
-                  key={i} 
+                <Link
+                  key={i}
                   to={article.link}
-                  className={`group rounded-[2.5rem] overflow-hidden border transition-all duration-500 hover:-translate-y-2 flex flex-col h-full ${
-                    isDarkMode 
-                      ? 'bg-zinc-900/50 border-white/5 hover:bg-white/[0.05] hover:border-white/10' 
+                  className={`group rounded-[2.5rem] overflow-hidden border transition-all duration-500 hover:-translate-y-2 flex flex-col h-full p-10 ${isDarkMode
+                      ? 'bg-zinc-900/50 border-white/5 hover:bg-white/[0.05] hover:border-white/10'
                       : 'bg-white border-zinc-200 shadow-lg hover:shadow-xl'
-                  }`}
+                    }`}
                 >
-                  {/* Thumbnail Row */}
-                  {/* TALLER PORTRAIT ASPECT RATIO */}
-                  <div className={`w-full aspect-[4/5] relative overflow-hidden flex items-center justify-center ${
-                    isDarkMode ? 'bg-black/60' : 'bg-zinc-100'
-                  }`}>
-                    {article.thumbnail ? (
-                      <img 
-                        src={article.thumbnail} 
-                        alt={article.title} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className={`flex flex-col items-center justify-center space-y-2 w-full h-full border border-dashed ${isDarkMode ? 'border-zinc-800 text-zinc-600' : 'border-zinc-300 text-zinc-400'} rounded-2xl m-4`}>
-                        <ImagePlus className="w-8 h-8 opacity-50" />
-                        <p className="text-[10px] font-bold tracking-widest uppercase">Insert Thumbnail</p>
-                        <p className="text-[10px] opacity-70">articles[{i}].thumbnail</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-8 flex-grow flex flex-col">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-6 ${
-                      isDarkMode 
+                  <div className="flex-grow flex flex-col">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 duration-500 ${isDarkMode
                         ? `bg-${article.color}-500/20 text-${article.color}-400`
                         : `bg-${article.color}-50 text-${article.color}-600`
-                    }`}>
-                      <article.icon className="w-5 h-5" />
+                      }`}>
+                      <article.icon className="w-6 h-6" />
                     </div>
-                    <h3 className={`text-2xl font-display font-bold mb-3 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+                    <h3 className={`text-2xl font-display font-bold mb-4 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
                       {article.title}
                     </h3>
-                    <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                    <p className={`text-base leading-relaxed mb-8 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                       {article.description}
                     </p>
-                    <div className="mt-8 pt-6 border-t border-zinc-500/10 flex items-center text-xs font-bold uppercase tracking-[0.2em] group-hover:text-indigo-500 transition-colors">
-                      View Details &rarr;
+                    <div className="mt-auto pt-6 border-t border-zinc-500/10 flex items-center text-xs font-bold uppercase tracking-[0.2em] group-hover:text-indigo-500 transition-colors">
+                      Full Publication &rarr;
                     </div>
                   </div>
                 </Link>
