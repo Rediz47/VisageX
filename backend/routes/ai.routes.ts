@@ -1,10 +1,39 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { GoogleGenAI, Type } from '@google/genai';
 import { getAdminDb } from '../services/firebase.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { FieldValue } from 'firebase-admin/firestore';
 
 const router = Router();
+
+// Rate limiters — per IP, returns JSON so frontend can handle gracefully
+const analysisLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many analysis requests. Please wait before trying again.', code: 'RATE_LIMITED' },
+  skip: (req) => req.method === 'OPTIONS',
+});
+
+const celebrityLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many celebrity scan requests. Please wait before trying again.', code: 'RATE_LIMITED' },
+  skip: (req) => req.method === 'OPTIONS',
+});
+
+const coachLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many coach requests. Please slow down.', code: 'RATE_LIMITED' },
+  skip: (req) => req.method === 'OPTIONS',
+});
 
 // Retry helper: retries a function up to maxRetries times with exponential backoff
 async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3, baseDelayMs: number = 1000): Promise<T> {
@@ -25,7 +54,7 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3, baseDe
 }
 
 // Secure AI Skin & Aesthetics Analysis Endpoint
-router.post('/gemini-analysis', requireAuth, async (req, res) => {
+router.post('/gemini-analysis', analysisLimiter, requireAuth, async (req, res) => {
   try {
     const { image } = req.body;
     const userId = req.user!.uid;
@@ -196,7 +225,7 @@ Also provide:
 });
 
 // Celebrity Lookalike Analysis Endpoint (Secure)
-router.post('/celebrity-lookalike', requireAuth, async (req, res) => {
+router.post('/celebrity-lookalike', celebrityLimiter, requireAuth, async (req, res) => {
   try {
     const { image } = req.body;
     if (!image) {
@@ -274,7 +303,7 @@ router.post('/celebrity-lookalike', requireAuth, async (req, res) => {
 });
 
 // Glow-Up Coach Chat Endpoint (Secure)
-router.post('/glow-coach', requireAuth, async (req, res) => {
+router.post('/glow-coach', coachLimiter, requireAuth, async (req, res) => {
   try {
     const { message, history, context } = req.body;
     if (!message) {

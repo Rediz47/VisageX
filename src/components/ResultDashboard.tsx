@@ -6,12 +6,10 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Tooltip } from './Tooltip';
 import { toPng } from 'html-to-image';
+import { cn } from '../lib/utils';
 
 import { GlowUpCoach } from './GlowUpCoach';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 function AnimatedCounter({ value, duration = 1.5, delay = 0, maxDecimals = 1 }: { value: number, duration?: number, delay?: number, maxDecimals?: number }) {
   const springValue = useSpring(0, {
@@ -727,19 +725,24 @@ export function ResultDashboard({
 
               <button
                 onClick={() => {
+                  const shareText = `I scored ${overallScore?.toFixed(1) || '9.0'}/10 on the VisageX AI Face Analysis (Top ${topPercentile}% globally).`;
                   const shareUrl = `${window.location.origin}?ref=${userData?.referralCode || ''}`;
+                  if ((window as any).posthog) {
+                    (window as any).posthog.capture('viral_share_clicked', { source: 'growth_engine', score: overallScore.toFixed(1) });
+                  }
                   if (navigator.share) {
-                    navigator.share({ title: 'Join VisageX', url: shareUrl });
+                    navigator.share({ title: 'My VisageX AI Score', text: shareText, url: shareUrl });
                   } else {
-                    navigator.clipboard.writeText(shareUrl);
+                    navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }
                 }}
-                className="w-full py-5 rounded-2xl bg-indigo-500 text-white font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20"
+                className="w-full py-5 rounded-2xl bg-indigo-500 text-white font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:shadow-[0_15px_30px_rgba(99,102,241,0.4)] relative overflow-hidden group"
               >
-                <Share2 className="w-5 h-5" />
-                Share Invitation
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <Share2 className="w-5 h-5 relative z-10" />
+                <span className="relative z-10">{copied ? "Copied Link!" : "Share My Score"}</span>
               </button>
             </div>
 
@@ -913,11 +916,32 @@ export function ResultDashboard({
                   </div>
                 </button>
               ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <div className="flex flex-col items-center w-full max-w-sm gap-4">
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-2">
                     <Check className="w-3 h-3 text-emerald-400" />
                     <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Full Analysis Unlocked</span>
                   </div>
+                  
+                  <button
+                    onClick={() => {
+                      const shareText = `I scored ${overallScore?.toFixed(1) || '9.0'}/10 on the VisageX AI Face Analysis (Top ${topPercentile}% globally).`;
+                      const shareUrl = `${window.location.origin}?ref=${userData?.referralCode || ''}`;
+                      if ((window as any).posthog) {
+                        (window as any).posthog.capture('viral_share_clicked', { source: 'hero_card', score: overallScore.toFixed(1) });
+                      }
+                      if (navigator.share) {
+                        navigator.share({ title: 'My VisageX AI Score', text: shareText, url: shareUrl });
+                      } else {
+                        navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                        alert("Copied share link to clipboard!");
+                      }
+                    }}
+                    className="w-full relative group px-8 py-5 rounded-[2rem] bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-black text-xs md:text-sm uppercase tracking-[0.15em] transition-all hover:scale-[1.03] active:scale-[0.97] shadow-[0_10px_30px_rgba(6,182,212,0.4)] overflow-hidden flex items-center justify-center gap-3 border border-cyan-400/50"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                    <Share2 className="w-5 h-5 relative z-10" />
+                    <span className="relative z-10">Brag About Score</span>
+                  </button>
                 </div>
               )}
 

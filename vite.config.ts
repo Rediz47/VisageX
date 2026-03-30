@@ -37,7 +37,10 @@ export default defineConfig(({ mode }) => {
           '/blog/best-ai-face-analysis-tool',
           '/blog/what-is-canthal-tilt',
           '/blog/how-to-fix-recessed-jawline',
-          '/blog/does-gua-sha-work'
+          '/blog/does-gua-sha-work',
+          '/blog/free-ai-face-analysis',
+          '/blog/complete-mewing-guide',
+          '/blog/looksmaxxing-routine-for-beginners'
         ],
       })
     ],

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Sparkles, Brain, Trophy, Eye, MoveDown, Feather, ImagePlus } from 'lucide-react';
+import { BookOpen, Sparkles, Brain, Trophy, Eye, MoveDown, Feather, ImagePlus, Search, Layers, Star } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -63,7 +63,31 @@ export default function BlogIndexPage() {
       color: "purple",
       link: "/blog/does-gua-sha-work",
       thumbnail: "" 
-    }
+    },
+    {
+      title: "Free AI Face Analysis — What Actually Works",
+      description: "We tested every free AI face analysis tool. Here's what actually measures your facial geometry vs what's just a random number generator.",
+      icon: Search,
+      color: "indigo",
+      link: "/blog/free-ai-face-analysis",
+      thumbnail: ""
+    },
+    {
+      title: "The Complete Mewing Guide 2026",
+      description: "No-BS technique, realistic expectations, and how to build the habit. The definitive guide to mewing properly.",
+      icon: Layers,
+      color: "emerald",
+      link: "/blog/complete-mewing-guide",
+      thumbnail: ""
+    },
+    {
+      title: "Looksmaxxing Routine for Beginners",
+      description: "6 compounding pillars ranked by ROI: body composition, skincare, grooming, jaw training, sleep, and style.",
+      icon: Star,
+      color: "rose",
+      link: "/blog/looksmaxxing-routine-for-beginners",
+      thumbnail: ""
+    },
   ];
 
   return (

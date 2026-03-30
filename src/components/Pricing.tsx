@@ -4,16 +4,12 @@ import {
   Check, Shield, CreditCard, Lock, X,
   ChevronLeft, Zap, ArrowRight, Star, Sparkles as SparklesIcon
 } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import { AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import { usePostHog } from '@posthog/react';
 import { auth } from '../firebase';
+import { cn } from '../lib/utils';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 // ─── Countdown Timer ──────────────────────────────────────────────────────────
 const CountdownTimer = () => {

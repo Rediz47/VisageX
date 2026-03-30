@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { usePostHog } from '@posthog/react';
 import { FaceAnalyzer } from '../components/FaceAnalyzer/FaceAnalyzer';
 import { Hero, Features, ExampleResult, Testimonials } from '../components/LandingSections';
 import { ResultDashboard } from '../components/ResultDashboard';
@@ -22,6 +23,7 @@ export default function Landing({
   const { isDarkMode } = useTheme();
   const { user } = useAuth();
   const { credits, userData } = useCredits();
+  const posthog = usePostHog();
 
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [analyzedImageUrl, setAnalyzedImageUrl] = useState<string | null>(null);
@@ -31,6 +33,11 @@ export default function Landing({
     setAnalysisResult(result);
     setAnalyzedImageUrl(imageUrl);
     setIsLocked(locked);
+    posthog.capture('analysis_completed', {
+      score: result?.overallScore,
+      is_locked: locked,
+      has_gemini: !!result?.visionAnalysis,
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -70,8 +77,8 @@ export default function Landing({
   return (
     <>
       <SEO 
-        title="VisageX | The Ultimate Glow-Up AI & Facial Analysis"
-        description="Get a professional facial analysis and personalized aesthetic routine powered by advanced AI neural networks. Discover your facial symmetry and skin health today."
+        title="Free AI Face Analysis — Get Your Score Instantly | VisageX"
+        description="Get a free AI face analysis in seconds. Test your facial symmetry, discover your skin health score, and get a personalized glow-up guide powered by 468 neural landmarks."
         canonical="https://visagex.online"
         type="website"
       />

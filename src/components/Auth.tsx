@@ -16,7 +16,8 @@ import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
@@ -31,11 +32,17 @@ interface AuthProps {
 
 export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', initialReferralCode = '' }: AuthProps) {
   const [isSignUp, setIsSignUp] = useState(initialMode === 'signup');
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSent, setResetSent] = useState(false);
 
   // Sync state with initialMode when modal opens
   React.useEffect(() => {
     if (isOpen) {
       setIsSignUp(initialMode === 'signup');
+      setIsForgotPassword(false);
+      setResetSent(false);
+      setResetEmail('');
     }
   }, [isOpen, initialMode]);
   const [email, setEmail] = useState('');
@@ -43,6 +50,20 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetSent(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -150,6 +171,103 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
 
   if (!isOpen) return null;
 
+  // --- FORGOT PASSWORD VIEW ---
+  if (isForgotPassword) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          className={`relative w-full max-w-md overflow-hidden rounded-[2.5rem] border shadow-2xl ${
+            isDarkMode ? 'bg-black border-white/10' : 'bg-white border-zinc-200'
+          }`}
+        >
+          <button
+            onClick={onClose}
+            className={`absolute top-6 right-6 p-2 rounded-full transition-colors ${
+              isDarkMode ? 'hover:bg-white/10 text-white/40' : 'hover:bg-black/5 text-[#86868b]'
+            }`}
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <div className="p-8 md:p-12">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 mb-6 shadow-lg">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
+              <h2 className={`text-3xl font-display font-bold tracking-tight mb-2 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+                {resetSent ? 'Check your email' : 'Reset Password'}
+              </h2>
+              <p className={`text-sm ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>
+                {resetSent
+                  ? 'A password reset link has been sent. Check your inbox (and spam folder).'
+                  : 'Enter your email and we\'ll send a reset link.'}
+              </p>
+            </div>
+            {!resetSent ? (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="relative group">
+                  <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${isDarkMode ? 'text-white/20 group-focus-within:text-white' : 'text-zinc-500 group-focus-within:text-black'}`}>
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    required
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className={`w-full pl-12 pr-6 py-4 rounded-2xl border outline-none transition-all duration-300 text-sm ${
+                      isDarkMode
+                        ? 'bg-white/5 border-white/10 text-white focus:border-white/50 focus:bg-white/10'
+                        : 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:border-black/50 focus:bg-white'
+                    }`}
+                  />
+                </div>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs"
+                  >
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    {error}
+                  </motion.div>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-sm transition-all duration-500 ${
+                    isDarkMode ? 'bg-white text-black hover:bg-zinc-200' : 'bg-zinc-900 text-white hover:bg-black'
+                  }`}
+                >
+                  {loading ? 'Sending...' : 'Send Reset Link'}
+                  {!loading && <ArrowRight className="w-4 h-4" />}
+                </button>
+              </form>
+            ) : (
+              <button
+                onClick={() => { setIsForgotPassword(false); setResetSent(false); }}
+                className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-sm transition-all duration-500 ${
+                  isDarkMode ? 'bg-white text-black hover:bg-zinc-200' : 'bg-zinc-900 text-white hover:bg-black'
+                }`}
+              >
+                Back to Sign In
+              </button>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
       <motion.div 
@@ -255,6 +373,7 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
                 }`}
               />
             </div>
+            {/* Password field + forgot password link */}
             <div className="relative group">
               <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${isDarkMode ? 'text-white/20 group-focus-within:text-white' : 'text-zinc-500 group-focus-within:text-black'}`}>
                 <Lock className="w-4 h-4" />
@@ -272,6 +391,19 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
                 }`}
               />
             </div>
+            {!isSignUp && (
+              <div className="flex justify-end -mt-1">
+                <button
+                  type="button"
+                  onClick={() => { setIsForgotPassword(true); setError(null); }}
+                  className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                    isDarkMode ? 'text-white/30 hover:text-white' : 'text-zinc-400 hover:text-zinc-800'
+                  }`}
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
 
             {isSignUp && (
               <div className="relative group">

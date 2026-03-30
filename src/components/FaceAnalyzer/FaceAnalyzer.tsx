@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Upload, Camera, Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { usePostHog } from '@posthog/react';
 import { FaceAnalyzerProps } from './types';
 import { useFaceModel } from './hooks/useFaceModel';
 import { useImageProcessing } from './hooks/useImageProcessing';
@@ -19,9 +20,16 @@ console.log = (...args) => {
 };
 
 export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: FaceAnalyzerProps) {
+  const posthog = usePostHog();
   const { faceLandmarker, isModelLoading, error: modelError, setError: setModelError } = useFaceModel();
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [scanHistory, setScanHistory] = useState<string[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile once on mount
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
   
   const progressTargetRef = useRef(0);
   const progressValueRef = useRef(0);
@@ -30,6 +38,7 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
   const requestRef = useRef<number>();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const updateProgress = (target: number) => {
@@ -100,14 +109,19 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setModelError("Please upload a valid image file (JPG/PNG).");
+      setModelError('Please upload a valid image file (JPG/PNG).');
       return;
     }
+
+    posthog.capture('photo_uploaded', { source: event.target === cameraInputRef.current ? 'camera' : 'upload' });
 
     if (uploadedImageUrl) URL.revokeObjectURL(uploadedImageUrl);
     const imageUrl = URL.createObjectURL(file);
     setUploadedImageUrl(imageUrl);
     processImage(imageUrl, canvasRef).catch(() => setUploadedImageUrl(null));
+    // Reset inputs so same file can be selected again
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
   };
 
   return (
@@ -155,11 +169,21 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
             <div className={`relative border rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 text-center transition-all cursor-pointer backdrop-blur-sm overflow-hidden ${isDarkMode ? 'border-white/5 hover:border-white/10 bg-black/80' : 'border-black/5 hover:border-black/10 bg-white/80 shadow-2xl shadow-indigo-500/5'}`}
               onClick={() => !isModelLoading && !isProcessing && fileInputRef.current?.click()}
             >
+              {/* File input — hidden, used by both click-to-upload and camera button */}
               <input
                 type="file"
                 ref={fileInputRef}
                 className="hidden"
+                accept="image/jpeg, image/png, image/webp"
+                onChange={handleImageUpload}
+              />
+              {/* Separate camera input for mobile — uses front camera */}
+              <input
+                type="file"
+                ref={cameraInputRef}
+                className="hidden"
                 accept="image/jpeg, image/png"
+                capture="user"
                 onChange={handleImageUpload}
               />
 
@@ -229,6 +253,22 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
                   </div>
                   <p className={`font-display italic text-2xl md:text-3xl ${isDarkMode ? 'text-white/90' : 'text-zinc-900'}`}>Upload your portrait</p>
                   <p className={`text-xs md:text-sm mt-3 md:mt-4 font-light ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>High-quality JPG or PNG, max 5MB</p>
+
+                  {/* Mobile camera button — only visible on mobile viewports */}
+                  {isMobile && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}
+                      className={`mt-6 flex items-center gap-2 px-6 py-3 rounded-full border font-bold text-sm transition-all duration-300 ${
+                        isDarkMode
+                          ? 'border-white/20 text-white/70 bg-white/5 hover:bg-white/10 hover:text-white'
+                          : 'border-zinc-300 text-zinc-700 bg-zinc-50 hover:bg-zinc-100'
+                      }`}
+                    >
+                      <Camera className="w-4 h-4" />
+                      Take Selfie
+                    </button>
+                  )}
                 </div>
               )}
             </div>

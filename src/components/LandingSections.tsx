@@ -81,7 +81,7 @@ export function Hero({ isDarkMode, onNavigateMethodology }: { isDarkMode: boolea
               </h1>
               <div className="flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-12 ml-6 md:ml-12 lg:ml-24">
                 <p className={`text-lg max-w-xs font-light leading-relaxed ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-900/70'}`}>
-                  Our neural networks decode 468 facial landmarks to reveal your unique structural profile and skin health insights.
+                  Free AI face analysis. Our neural networks decode 468 facial landmarks to reveal your unique structural profile and skin health insights.
                 </p>
                 
                 <div className="flex flex-col gap-4">
@@ -168,15 +168,7 @@ export function Hero({ isDarkMode, onNavigateMethodology }: { isDarkMode: boolea
           </div>
         </div>
 
-        {/* Feature Highlights Row */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-        </motion.div>
+
       </div>
 
       {/* Background Decorative Text */}
@@ -398,9 +390,9 @@ export function Footer({ isDarkMode, onNavigatePrivacy, onNavigateTerms }: { isD
           <div className="grid grid-cols-2 md:grid-cols-3 gap-16">
             <div>
               <h4 className={`text-[10px] font-bold uppercase tracking-[0.3em] mb-6 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Legal</h4>
-              <ul className={`space-y-4 text-sm font-light ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
-                <li onClick={onNavigatePrivacy} className={`cursor-pointer transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Privacy Policy</li>
-                <li onClick={onNavigateTerms} className={`cursor-pointer transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Terms of Service</li>
+              <ul className={`space-y-4 text-sm font-light flex flex-col ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
+                <li><Link to="/privacy" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Privacy Policy</Link></li>
+                <li><Link to="/terms" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Terms of Service</Link></li>
               </ul>
             </div>
             <div>
@@ -430,8 +422,8 @@ export function Footer({ isDarkMode, onNavigatePrivacy, onNavigateTerms }: { isD
             © 2026 VISAGEX NEURAL SYSTEMS. ALL RIGHTS RESERVED.
           </p>
           <div className="flex gap-8">
-            <span className={`text-[10px] font-bold uppercase tracking-[0.3em] cursor-pointer transition-colors ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Twitter</span>
-            <span className={`text-[10px] font-bold uppercase tracking-[0.3em] cursor-pointer transition-colors ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Instagram</span>
+            <a href="https://twitter.com/visagex" target="_blank" rel="noopener noreferrer" className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Twitter</a>
+            <a href="https://instagram.com/visagex" target="_blank" rel="noopener noreferrer" className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Instagram</a>
           </div>
         </div>
       </div>

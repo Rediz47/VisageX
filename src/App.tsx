@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { usePostHog } from '@posthog/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Lenis from 'lenis';
 
@@ -29,11 +30,15 @@ const BlogIndexPage = lazy(() => import('./pages/BlogIndexPage'));
 const BlogCanthalTiltPage = lazy(() => import('./pages/BlogCanthalTiltPage'));
 const BlogRecessedJawPage = lazy(() => import('./pages/BlogRecessedJawPage'));
 const BlogGuaShaPage = lazy(() => import('./pages/BlogGuaShaPage'));
+const BlogFreeAIFacePage = lazy(() => import('./pages/BlogFreeAIFacePage'));
+const BlogMewingGuidePage = lazy(() => import('./pages/BlogMewingGuidePage'));
+const BlogLooksmaxRoutinePage = lazy(() => import('./pages/BlogLooksmaxRoutinePage'));
 
 // A small inner app component to access contexts for Modals and internal features
 function InnerApp() {
   const { isDarkMode } = useTheme();
-  
+  const posthog = usePostHog();
+
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [pricingModalOpen, setPricingModalOpen] = useState(false);
@@ -94,15 +99,21 @@ function InnerApp() {
       </div>
 
       <GlobalHeader 
-        onOpenAuth={(mode) => { setAuthMode(mode); setAuthModalOpen(true); }}
-        onOpenPricing={() => setPricingModalOpen(true)}
+        onOpenAuth={(mode) => { setAuthMode(mode); setAuthModalOpen(true); posthog.capture('auth_modal_opened', { mode }); }}
+        onOpenPricing={() => { setPricingModalOpen(true); posthog.capture('pricing_modal_opened'); }}
       />
 
       {/* Main Content */}
       <main className="relative z-10 pt-20">
         <Suspense fallback={
-          <div className="min-h-screen pt-24 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-900 dark:border-white"></div>
+          <div className={`min-h-screen pt-24 flex flex-col items-center justify-center gap-6 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
+            <div className="relative">
+              <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
+                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white/60' : 'text-zinc-400'}`} fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9S16.97 3 12 3zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
+              </div>
+              <div className="absolute -inset-1 rounded-2xl border border-indigo-500/20 animate-ping opacity-40" />
+            </div>
+            <p className={`text-xs font-bold uppercase tracking-[0.3em] ${isDarkMode ? 'text-white/20' : 'text-zinc-400'}`}>Initializing VisageX</p>
           </div>
         }>
           <Routes>
@@ -123,6 +134,9 @@ function InnerApp() {
             <Route path="/blog/what-is-canthal-tilt" element={<BlogCanthalTiltPage />} />
             <Route path="/blog/how-to-fix-recessed-jawline" element={<BlogRecessedJawPage />} />
             <Route path="/blog/does-gua-sha-work" element={<BlogGuaShaPage />} />
+            <Route path="/blog/free-ai-face-analysis" element={<BlogFreeAIFacePage />} />
+            <Route path="/blog/complete-mewing-guide" element={<BlogMewingGuidePage />} />
+            <Route path="/blog/looksmaxxing-routine-for-beginners" element={<BlogLooksmaxRoutinePage />} />
             
             {/* Protected Routes */}
             <Route path="/profile" element={
@@ -141,8 +155,8 @@ function InnerApp() {
 
       <Footer 
         isDarkMode={isDarkMode} 
-        onNavigatePrivacy={() => {}} 
-        onNavigateTerms={() => {}} 
+        onNavigatePrivacy={() => {}}
+        onNavigateTerms={() => {}}
       />
 
       <Auth
