@@ -59,7 +59,7 @@ export function Hero({ isDarkMode, onNavigateMethodology }: { isDarkMode: boolea
   return (
     <section className={`relative min-h-screen flex items-center pt-20 overflow-hidden transition-colors duration-700 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
       <div className="container mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center -mt-16 lg:-mt-24">
           {/* Left Side: Creative Typography & CTA */}
           <div className="lg:col-span-7">
             <motion.div
@@ -391,15 +391,15 @@ export function Footer({ isDarkMode, onNavigatePrivacy, onNavigateTerms }: { isD
             <div>
               <h4 className={`text-[10px] font-bold uppercase tracking-[0.3em] mb-6 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Legal</h4>
               <ul className={`space-y-4 text-sm font-light flex flex-col ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
-                <li><Link to="/privacy" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Privacy Policy</Link></li>
-                <li><Link to="/terms" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Terms of Service</Link></li>
+                <li><Link to="/privacy" className={`transition-colors duration-300 ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Privacy Policy</Link></li>
+                <li><Link to="/terms" className={`transition-colors duration-300 ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Terms of Service</Link></li>
               </ul>
             </div>
             <div>
               <h4 className={`text-[10px] font-bold uppercase tracking-[0.3em] mb-6 ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Product</h4>
               <ul className={`space-y-4 text-sm font-light flex flex-col ${isDarkMode ? 'text-zinc-100/30' : 'text-zinc-500'}`}>
-                <Link to="/methodology" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Methodology</Link>
-                <Link to="/" className={`transition-colors ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Neural Scan</Link>
+                <Link to="/methodology" className={`transition-colors duration-300 ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Methodology</Link>
+                <Link to="/" className={`transition-colors duration-300 ${isDarkMode ? 'hover:text-white' : 'hover:text-black'}`}>Neural Scan</Link>
               </ul>
             </div>
             <div>
@@ -422,8 +422,8 @@ export function Footer({ isDarkMode, onNavigatePrivacy, onNavigateTerms }: { isD
             © 2026 VISAGEX NEURAL SYSTEMS. ALL RIGHTS RESERVED.
           </p>
           <div className="flex gap-8">
-            <a href="https://twitter.com/visagex" target="_blank" rel="noopener noreferrer" className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Twitter</a>
-            <a href="https://instagram.com/visagex" target="_blank" rel="noopener noreferrer" className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Instagram</a>
+            <a href="https://twitter.com/visagex" target="_blank" rel="noopener noreferrer" className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors duration-300 ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Twitter</a>
+            <a href="https://instagram.com/visagex" target="_blank" rel="noopener noreferrer" className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors duration-300 ${isDarkMode ? 'text-white/20 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>Instagram</a>
           </div>
         </div>
       </div>

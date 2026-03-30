@@ -50,13 +50,13 @@ export function GlobalHeader({
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/90 hover:text-white' : 'text-zinc-900/80 hover:text-black'}`}>
+            <Link to="/" className={`text-sm font-medium transition-colors duration-300 ${isDarkMode ? 'text-zinc-100/90 hover:text-white' : 'text-zinc-900/80 hover:text-black'}`}>
               Analyzer
             </Link>
-            <Link to="/methodology" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
+            <Link to="/methodology" className={`text-sm font-medium transition-colors duration-300 ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
               Methodology
             </Link>
-            <Link to="/blog" className={`text-sm font-medium transition-colors ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
+            <Link to="/blog" className={`text-sm font-medium transition-colors duration-300 ${isDarkMode ? 'text-zinc-100/50 hover:text-white' : 'text-zinc-500 hover:text-black'}`}>
               The Hub
             </Link>
 
@@ -73,7 +73,7 @@ export function GlobalHeader({
                 <Link to="/history" title="View History" className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white hover:bg-white/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-900/10'}`}>
                   <HistoryIcon className="w-5 h-5" />
                 </Link>
-                <Link to="/profile" className={`flex items-center gap-3 px-4 py-2 rounded-xl border transition-colors ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-zinc-900/5 border-zinc-200 hover:bg-zinc-900/10'}`}>
+                <Link to="/profile" className={`flex items-center gap-3 px-4 py-2 rounded-xl border transition-colors duration-300 ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-zinc-900/5 border-zinc-200 hover:bg-zinc-900/10'}`}>
                   {user.photoURL ? (
                     <img src={user.photoURL} alt={user.displayName || ''} className="w-6 h-6 rounded-full" />
                   ) : (
@@ -89,7 +89,7 @@ export function GlobalHeader({
               </div>
             ) : (
               <div className="flex items-center gap-6">
-                <button onClick={() => onOpenAuth('signin')} className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors ${isDarkMode ? 'text-white/40 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}>
+                <button onClick={() => onOpenAuth('signin')} className={`text-[10px] font-bold uppercase tracking-[0.3em] transition-colors duration-300 ${isDarkMode ? 'text-white/40 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}>
                   Sign In
                 </button>
                 <button onClick={() => onOpenAuth('signup')} className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${isDarkMode ? 'bg-white text-black hover:bg-zinc-200' : 'bg-zinc-900 text-white hover:bg-black'}`}>
@@ -107,10 +107,10 @@ export function GlobalHeader({
                 <span className="text-xs font-bold">{credits}</span>
               </button>
             )}
-            <button onClick={toggleTheme} className={`p-2 rounded-xl transition-colors ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900'}`}>
+            <button onClick={toggleTheme} className={`p-2 rounded-xl transition-colors duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900'}`}>
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <button className={`p-2 transition-colors ${isDarkMode ? 'text-zinc-100/70 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className={`p-2 transition-colors duration-300 ${isDarkMode ? 'text-zinc-100/70 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
