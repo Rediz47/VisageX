@@ -56,14 +56,9 @@ export default function BlogGuaShaPage() {
             </p>
           </header>
 
-          {/* HERO IMAGE DROP-ZONE */}
-          <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
-            {/* If you have a photo, delete this entire <div> block and replace with: 
-                <img src="/my-gua-sha-cover.jpg" className="w-full h-full object-cover" /> 
-            */}
-            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
-            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Tutorial Photo ]</p>
-            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/gua-sha-tutorial.jpg" /&gt;</p>
+          {/* HERO IMAGE */}
+          <div className="w-full aspect-[21/9] rounded-[3rem] overflow-hidden transition-all shadow-xl hover:shadow-2xl">
+            <img src="/gua_sha.webp" alt="Gua Sha Tutorial" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
           </div>
 
           <div className="space-y-8">

@@ -29,24 +29,33 @@ body {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #d2d2d7;
   border-radius: 4px;
 }
+
 .dark ::-webkit-scrollbar-thumb {
   background: #333;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #86868b;
 }
 
 /* Custom Animations */
 @keyframes shimmer {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(100%); }
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }
 
 .animate-shimmer {
@@ -61,19 +70,28 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
   animation: shimmer 2s infinite;
 }
 
 @keyframes pulse-subtle {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.02); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.02);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .animate-pulse-subtle {
@@ -82,38 +100,109 @@ body {
 
 /* Scanning line for hero section */
 @keyframes scanLine {
-  0%   { top: 0%; }
-  50%  { top: 100%; }
-  100% { top: 0%; }
+  0% {
+    top: 0%;
+  }
+
+  50% {
+    top: 100%;
+  }
+
+  100% {
+    top: 0%;
+  }
 }
 
 /* Floating card animations — GPU optimized via translate3d */
 @keyframes floatUp {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(0, -20px, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -20px, 0);
+  }
 }
 
 @keyframes floatDown {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(0, 20px, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, 20px, 0);
+  }
 }
 
 /* Respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
+/* Premium Global Interactive Transitions - Silky Smooth Feel */
+a, 
+button, 
+input, 
+select, 
+textarea,
+[role="button"],
+.group,
+.clickable,
+.btn,
+.nav-link {
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Override Tailwind's default snappy durations for a more deliberate, high-end feel */
+.transition-all,
+.transition,
+.transition-colors,
+.transition-transform,
+.duration-75,
+.duration-100,
+.duration-150,
+.duration-200,
+.duration-300,
+.duration-500 {
+  transition-duration: 600ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.duration-700,
+.duration-1000 {
+  transition-duration: 1000ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* Slow down hover expansion/scale effects significantly */
+.hover\:scale-105:hover,
+.group:hover .group-hover\:scale-105,
+.hover\:scale-110:hover,
+.group:hover .group-hover\:scale-110 {
+  transition-duration: 1000ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
 /* Mobile performance: reduce backdrop-blur intensity */
 @media (max-width: 767px) {
+
   .backdrop-blur-xl,
   .backdrop-blur-2xl {
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
   }
+
   .backdrop-blur-md {
     backdrop-filter: blur(4px) !important;
     -webkit-backdrop-filter: blur(4px) !important;

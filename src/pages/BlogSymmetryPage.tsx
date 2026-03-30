@@ -26,7 +26,7 @@ export default function BlogSymmetryPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-700 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
-      <SEO 
+      <SEO
         title="How to Improve Face Symmetry | The Ultimate Guide"
         description="Learn how to fix asymmetrical facial features, perform facial exercises, and use an AI face analysis test to track your glow up journey."
         canonical="https://visagex.online/blog/how-to-improve-face-symmetry"
@@ -56,11 +56,9 @@ export default function BlogSymmetryPage() {
             </p>
           </header>
 
-          {/* HERO IMAGE DROP-ZONE */}
-          <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
-            <ImagePlus className={`w-12 h-12 mb-4 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`} />
-            <p className={`text-lg font-bold tracking-widest uppercase ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>[ Insert Asymmetry Photo ]</p>
-            <p className={`text-sm mt-2 font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>&lt;img src="/symmetry.jpg" /&gt;</p>
+          {/* HERO IMAGE */}
+          <div className="w-full aspect-[21/9] rounded-[3rem] overflow-hidden transition-all shadow-xl hover:shadow-2xl">
+            <img src="/asymmetry.png" alt="Facial Symmetry" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
           </div>
 
           {/* Intro block */}
@@ -89,10 +87,10 @@ export default function BlogSymmetryPage() {
             </div>
           </div>
 
-           {/* Solutions */}
-           <div className={`p-10 md:p-14 rounded-[3rem] border ${isDarkMode ? 'bg-white/[0.02] border-white/10' : 'bg-white border-zinc-200'}`}>
+          {/* Solutions */}
+          <div className={`p-10 md:p-14 rounded-[3rem] border ${isDarkMode ? 'bg-white/[0.02] border-white/10' : 'bg-white border-zinc-200'}`}>
             <h2 className={`text-3xl md:text-4xl font-display mb-10 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>3 Ways to Fix It</h2>
-            
+
             <div className="space-y-12">
               <div>
                 <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>1. Balance Your Chewing Ratio</h3>
@@ -118,7 +116,7 @@ export default function BlogSymmetryPage() {
           </div>
 
           {/* Giant CTA Conversion Block */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -126,7 +124,7 @@ export default function BlogSymmetryPage() {
           >
             {/* Background Glow */}
             <div className={`absolute inset-0 opacity-50 transition-opacity duration-700 group-hover:opacity-100 ${isDarkMode ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-500/20 via-transparent to-transparent' : 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent'}`} />
-            
+
             <div className="relative z-10 max-w-2xl mx-auto space-y-8">
               <h2 className={`text-4xl md:text-5xl font-display font-medium ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
                 Check your exact symmetry score
@@ -135,8 +133,8 @@ export default function BlogSymmetryPage() {
                 Upload a selfie and let our neural network scan 468 facial points to reveal any hidden asymmetries.
               </p>
               <div className="pt-4 flex justify-center">
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className={`inline-flex items-center gap-3 px-10 py-5 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-2xl hover:scale-105 duration-300 ${isDarkMode ? 'bg-white text-black hover:bg-emerald-400 hover:text-white shadow-white/10' : 'bg-zinc-900 text-white hover:bg-black shadow-black/20'}`}
                 >
                   Start Face Analysis <ArrowRight className="w-5 h-5" />

@@ -26,7 +26,7 @@ export default function BlogBestToolPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-700 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
-      <SEO 
+      <SEO
         title="Best AI Face Analysis Tool in 2026 | Free Online Scanner"
         description="Looking for the best AI face analysis tool? Discover why VisageX's 468-point neural mesh is the most accurate online face rater and symmetry tester."
         canonical="https://visagex.online/blog/best-ai-face-analysis-tool"
@@ -90,7 +90,7 @@ export default function BlogBestToolPage() {
           {/* FAQ */}
           <div className={`p-10 md:p-14 rounded-[3rem] border ${isDarkMode ? 'bg-white/[0.02] border-white/10' : 'bg-white border-zinc-200'}`}>
             <h2 className={`text-3xl md:text-4xl font-display mb-10 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>Common Questions</h2>
-            
+
             <div className="space-y-8">
               <div>
                 <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>Can I use it on my phone?</h3>
@@ -109,7 +109,7 @@ export default function BlogBestToolPage() {
           </div>
 
           {/* Giant CTA Conversion Block */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -117,7 +117,7 @@ export default function BlogBestToolPage() {
           >
             {/* Background Glow */}
             <div className={`absolute inset-0 opacity-50 transition-opacity duration-700 group-hover:opacity-100 ${isDarkMode ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-500/20 via-transparent to-transparent' : 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent'}`} />
-            
+
             <div className="relative z-10 max-w-2xl mx-auto space-y-8">
               <h2 className={`text-4xl md:text-5xl font-display font-medium ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
                 Try the AI Tool
@@ -126,8 +126,8 @@ export default function BlogBestToolPage() {
                 Test your face instantly. Stop guessing what you need to fix and let the clinical algorithm give you your exact attractiveness blueprint.
               </p>
               <div className="pt-4 flex justify-center">
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className={`inline-flex items-center gap-3 px-10 py-5 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-2xl hover:scale-105 duration-300 ${isDarkMode ? 'bg-white text-black hover:bg-amber-400 hover:text-white shadow-white/10' : 'bg-zinc-900 text-white hover:bg-black shadow-black/20'}`}
                 >
                   Start Face Analysis <ArrowRight className="w-5 h-5" />

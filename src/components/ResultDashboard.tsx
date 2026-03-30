@@ -958,7 +958,7 @@ export function ResultDashboard({
                     <Check className="w-3 h-3 text-emerald-400" />
                     <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Full Analysis Unlocked</span>
                   </div>
-                  
+
                   <button
                     onClick={() => {
                       const shareText = `I scored ${overallScore?.toFixed(1) || '9.0'}/10 on the VisageX AI Face Analysis (Top ${topPercentile}% globally).`;
@@ -1080,7 +1080,7 @@ export function ResultDashboard({
                           </p>
 
                           {!isItemLocked && TRAIT_GUIDE_MAP[item.subject] && (
-                            <Link 
+                            <Link
                               to={TRAIT_GUIDE_MAP[item.subject]}
                               className={cn(
                                 "inline-flex items-center text-[10px] font-bold uppercase tracking-widest mt-auto transition-all duration-300",

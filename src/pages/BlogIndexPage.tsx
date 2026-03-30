@@ -131,8 +131,8 @@ export default function BlogIndexPage() {
             <Link
               to={featuredArticle.link}
               className={`group block rounded-[3rem] overflow-hidden border transition-all duration-500 hover:-translate-y-2 ${isDarkMode
-                  ? 'bg-zinc-900/50 border-white/5 hover:border-white/10 hover:bg-zinc-800/50'
-                  : 'bg-white border-zinc-200 shadow-xl hover:shadow-2xl'
+                ? 'bg-zinc-900/50 border-white/5 hover:border-white/10 hover:bg-zinc-800/50'
+                : 'bg-white border-zinc-200 shadow-xl hover:shadow-2xl'
                 }`}
             >
               <div className="flex flex-col lg:flex-row">
@@ -158,7 +158,7 @@ export default function BlogIndexPage() {
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 duration-500 ${isDarkMode
                     ? `bg-${featuredArticle.color}-500/20 text-${featuredArticle.color}-400`
                     : `bg-${featuredArticle.color}-50 text-${featuredArticle.color}-600`
-                  }`}>
+                    }`}>
                     <featuredArticle.icon className="w-7 h-7" />
                   </div>
                   <h3 className={`text-3xl md:text-5xl font-display font-medium mb-6 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
@@ -186,14 +186,14 @@ export default function BlogIndexPage() {
                   key={i}
                   to={article.link}
                   className={`group rounded-[2.5rem] overflow-hidden border transition-all duration-500 hover:-translate-y-2 flex flex-col h-full p-10 ${isDarkMode
-                      ? 'bg-zinc-900/50 border-white/5 hover:bg-white/[0.05] hover:border-white/10'
-                      : 'bg-white border-zinc-200 shadow-lg hover:shadow-xl'
+                    ? 'bg-zinc-900/50 border-white/5 hover:bg-white/[0.05] hover:border-white/10'
+                    : 'bg-white border-zinc-200 shadow-lg hover:shadow-xl'
                     }`}
                 >
                   <div className="flex-grow flex flex-col">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 duration-500 ${isDarkMode
-                        ? `bg-${article.color}-500/20 text-${article.color}-400`
-                        : `bg-${article.color}-50 text-${article.color}-600`
+                      ? `bg-${article.color}-500/20 text-${article.color}-400`
+                      : `bg-${article.color}-50 text-${article.color}-600`
                       }`}>
                       <article.icon className="w-6 h-6" />
                     </div>

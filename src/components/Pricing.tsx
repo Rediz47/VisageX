@@ -179,6 +179,7 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
           {/* ─── SUCCESS ──────────────────────────────────────────────── */}
           {loading === 'success' ? (
             <motion.div key="su" initial={{ opacity:0, scale:0.9, y:20 }} animate={{ opacity:1, scale:1, y:0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className={cn('w-full max-w-lg p-14 rounded-[2.5rem] border shadow-2xl text-center', bg, border)}>
               <motion.div initial={{ scale:0 }} animate={{ scale:1 }} transition={{ type:'spring', stiffness:220, damping:16, delay:0.1 }}
                 className="w-24 h-24 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-10">
@@ -211,7 +212,7 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
           ) : selectedPlan ? (
             <motion.div key="checkout"
               initial={{ opacity:0, x:40 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-40 }}
-              transition={{ duration:0.35, ease:[0.22,1,0.36,1] }}
+              transition={{ duration:0.8, ease:[0.22,1,0.36,1] }}
               className={cn('relative w-full max-w-5xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[2rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row border', bg, border)}>
 
               {/* Nav buttons */}
@@ -319,7 +320,7 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
           ) : (
             <motion.div key="selection"
               initial={{ opacity:0, scale:0.97 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0, scale:0.97 }}
-              transition={{ duration:0.3, ease:[0.22,1,0.36,1] }}
+              transition={{ duration:0.7, ease:[0.22,1,0.36,1] }}
               className={cn('w-full max-w-7xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border', bg, border)}>
 
               {/* Header */}
@@ -357,7 +358,7 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
                   {PLANS.map((plan, i) => (
                     <motion.div key={plan.id}
                       initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }}
-                      transition={{ delay: i * 0.09, ease:[0.22,1,0.36,1] }}
+                      transition={{ delay: i * 0.12, duration: 0.8, ease:[0.22,1,0.36,1] }}
                       className={cn(
                         'group relative flex flex-col rounded-[1.5rem] border p-6 transition-all duration-500 cursor-pointer',
                         plan.popular

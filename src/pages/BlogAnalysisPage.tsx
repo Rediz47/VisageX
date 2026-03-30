@@ -26,7 +26,7 @@ export default function BlogAnalysisPage() {
 
   return (
     <div className={`min-h-screen transition-colors duration-700 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
-      <SEO 
+      <SEO
         title="AI Face Analysis Explained: How Looksmaxxing Bots Work"
         description="Discover the science behind AI face analysis, facial symmetry tests, and how neural networks scan your face to provide glow-up routines."
         canonical="https://visagex.online/blog/ai-face-analysis-explained"
@@ -94,7 +94,7 @@ export default function BlogAnalysisPage() {
           </div>
 
           {/* Giant CTA Conversion Block */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -102,7 +102,7 @@ export default function BlogAnalysisPage() {
           >
             {/* Background Glow */}
             <div className={`absolute inset-0 opacity-50 transition-opacity duration-700 group-hover:opacity-100 ${isDarkMode ? 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/20 via-transparent to-transparent' : 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent'}`} />
-            
+
             <div className="relative z-10 max-w-2xl mx-auto space-y-8">
               <h2 className={`text-4xl md:text-5xl font-display font-medium ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
                 Test your face instantly
@@ -111,8 +111,8 @@ export default function BlogAnalysisPage() {
                 Experience the 468-point neural mesh yourself. Discover your symmetry score, skin health metrics, and personalized glow-up routine.
               </p>
               <div className="pt-4 flex justify-center">
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className={`inline-flex items-center gap-3 px-10 py-5 rounded-full font-bold uppercase tracking-widest text-sm transition-all shadow-2xl hover:scale-105 duration-300 ${isDarkMode ? 'bg-white text-black hover:bg-indigo-400 hover:text-white shadow-white/10' : 'bg-zinc-900 text-white hover:bg-black shadow-black/20'}`}
                 >
                   Start Face Analysis <ArrowRight className="w-5 h-5" />

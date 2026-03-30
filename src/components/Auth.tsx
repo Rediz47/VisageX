@@ -179,6 +179,7 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
           onClick={onClose}
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         />
@@ -186,6 +187,7 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className={`relative w-full max-w-md overflow-hidden rounded-[2.5rem] border shadow-2xl ${
             isDarkMode ? 'bg-black border-white/10' : 'bg-white border-zinc-200'
           }`}
@@ -274,6 +276,7 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        transition={{ duration: 0.8 }}
         onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
@@ -282,6 +285,7 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className={`relative w-full max-w-md overflow-hidden rounded-[2.5rem] border shadow-2xl ${
           isDarkMode ? 'bg-black border-white/10' : 'bg-white border-zinc-200'
         }`}
@@ -299,8 +303,8 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
         <div className="p-8 md:p-12">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 mb-6 shadow-lg">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 mb-6 shadow-lg overflow-hidden">
+              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-cover" />
             </div>
             <h2 className={`text-3xl font-display font-bold tracking-tight mb-2 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
               {isSignUp ? 'Create Account' : 'Welcome Back'}

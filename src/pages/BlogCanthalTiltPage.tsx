@@ -58,10 +58,10 @@ export default function BlogCanthalTiltPage() {
 
           {/* NAKED IMAGE (PERFECT FIT) */}
           <div className="max-w-lg mx-auto">
-            <img 
-              src="/canthil.png" 
-              className={`w-full h-auto rounded-[2.5rem] shadow-2xl border ${isDarkMode ? 'border-white/10' : 'border-zinc-200'}`} 
-              alt="Canthal Tilt Guide" 
+            <img
+              src="/canthil.png"
+              className={`w-full h-auto rounded-[2.5rem] shadow-2xl border ${isDarkMode ? 'border-white/10' : 'border-zinc-200'}`}
+              alt="Canthal Tilt Guide"
             />
           </div>
 

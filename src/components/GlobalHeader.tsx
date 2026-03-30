@@ -8,10 +8,10 @@ import { useCredits } from '../context/CreditsProvider';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 
-export function GlobalHeader({ 
-  onOpenAuth, 
-  onOpenPricing 
-}: { 
+export function GlobalHeader({
+  onOpenAuth,
+  onOpenPricing
+}: {
   onOpenAuth: (mode: 'signin' | 'signup') => void;
   onOpenPricing: () => void;
 }) {
@@ -40,9 +40,9 @@ export function GlobalHeader({
     <>
       <header className={`fixed top-0 inset-x-0 z-50 border-b backdrop-blur-xl transition-all duration-500 ${isDarkMode ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/40'}`}>
         <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-24 flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-4 group" onClick={handleLogoClick}>
-            <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
-              <Sparkles className="w-5 h-5 text-white" />
+          <Link to="/" className="flex items-center space-x-3 group" onClick={handleLogoClick}>
+            <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-cover" />
             </div>
             <span className={`font-display font-bold text-2xl tracking-tighter ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
               VISAGE<span className={isDarkMode ? 'text-white/20' : 'text-zinc-900/10'}>X</span>
@@ -82,7 +82,7 @@ export function GlobalHeader({
                   <span className={`text-xs font-bold uppercase tracking-widest hidden lg:block ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
                     {user.displayName?.split(' ')[0] || 'User'}
                   </span>
-             </Link>
+                </Link>
                 <button onClick={handleSignOut} className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-rose-400 hover:bg-rose-500/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-rose-600 hover:bg-rose-50'}`}>
                   <LogOut className="w-5 h-5" />
                 </button>
@@ -124,6 +124,7 @@ export function GlobalHeader({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className={`fixed inset-x-0 top-20 z-40 border-b md:hidden ${isDarkMode ? 'bg-black border-white/5' : 'bg-white border-zinc-200'}`}
           >
             <div className="flex flex-col p-6 space-y-4">

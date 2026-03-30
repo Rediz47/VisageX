@@ -101,7 +101,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
 
     return (
       <div className={`min-h-screen pt-12 pb-20 px-6 lg:px-8 max-w-[1600px] mx-auto ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
-        <button 
+        <button
           onClick={() => setIsComparing(false)}
           className={`flex items-center gap-2 mb-12 transition-colors ${isDarkMode ? 'text-white/50 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
         >
@@ -136,7 +136,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                     <p className="text-sm font-medium">{formatDate(scan.createdAt)}</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   {Object.entries(data.breakdown).map(([key, value]: [string, any]) => (
                     <div key={key}>
@@ -145,8 +145,8 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                         <span className="font-bold">{value.toFixed(1)}</span>
                       </div>
                       <div className={`w-full h-1.5 rounded-full ${isDarkMode ? 'bg-white/5' : 'bg-zinc-100'}`}>
-                        <div 
-                          className="h-full bg-cyan-400 rounded-full" 
+                        <div
+                          className="h-full bg-cyan-400 rounded-full"
                           style={{ width: `${(value / 10) * 100}%` }}
                         />
                       </div>
@@ -161,7 +161,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
         <div className={`mt-12 p-8 rounded-[2.5rem] border text-center ${isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50 border-emerald-100'}`}>
           <h3 className="text-2xl font-display font-bold mb-2">Progress Analysis</h3>
           <p className={`text-lg ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
-            {scan2.overallScore > scan1.overallScore 
+            {scan2.overallScore > scan1.overallScore
               ? `You've improved your score by ${(scan2.overallScore - scan1.overallScore).toFixed(1)} points! Keep up the glow-up journey.`
               : `Your score is consistent. Focus on the recommended improvements in your roadmap to see further gains.`}
           </p>
@@ -173,7 +173,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
   return (
     <div className={`min-h-screen pt-12 pb-20 px-6 lg:px-8 max-w-[1600px] mx-auto ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-        <button 
+        <button
           onClick={onBack}
           className={`flex items-center gap-2 transition-colors ${isDarkMode ? 'text-white/50 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
         >
@@ -194,7 +194,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
               {selectedForComparison.length}/2 Selected
             </p>
             {selectedForComparison.length === 2 && (
-              <button 
+              <button
                 onClick={() => setIsComparing(true)}
                 className="px-6 py-2.5 rounded-full bg-cyan-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-cyan-600 transition-colors flex items-center gap-2"
               >
@@ -202,7 +202,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                 Compare Scans
               </button>
             )}
-            <button 
+            <button
               onClick={() => setSelectedForComparison([])}
               className={`p-2 rounded-full transition-colors ${isDarkMode ? 'bg-white/5 hover:bg-white/10' : 'bg-zinc-100 hover:bg-zinc-200'}`}
             >
@@ -225,7 +225,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
         <div className="space-y-12">
           {/* Skeleton Chart */}
           <div className={`w-full h-64 rounded-3xl border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-zinc-100 border-zinc-200'}`} />
-          
+
           {/* Skeleton Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {[1, 2, 3, 4].map(i => (
@@ -247,7 +247,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
         <div className="space-y-12">
           {/* Progress Chart */}
           {scans.length > 1 && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className={`p-6 md:p-8 rounded-3xl border ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}
@@ -261,38 +261,38 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                   <p className={`text-sm ${isDarkMode ? 'text-white/50' : 'text-zinc-500'}`}>Your overall score trajectory</p>
                 </div>
               </div>
-              
+
               <div className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#818cf8" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} />
-                    <XAxis 
-                      dataKey="date" 
-                      axisLine={false} 
-                      tickLine={false} 
+                    <XAxis
+                      dataKey="date"
+                      axisLine={false}
+                      tickLine={false}
                       tick={{ fill: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)', fontSize: 12 }}
                       dy={10}
                     />
-                    <YAxis 
-                      domain={['dataMin - 0.5', 'dataMax + 0.5']} 
-                      axisLine={false} 
-                      tickLine={false} 
+                    <YAxis
+                      domain={['dataMin - 0.5', 'dataMax + 0.5']}
+                      axisLine={false}
+                      tickLine={false}
                       tick={{ fill: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)', fontSize: 12 }}
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Area 
-                      type="monotone" 
-                      dataKey="score" 
-                      stroke="#22d3ee" 
+                    <Area
+                      type="monotone"
+                      dataKey="score"
+                      stroke="#22d3ee"
                       strokeWidth={3}
-                      fillOpacity={1} 
-                      fill="url(#colorScore)" 
+                      fillOpacity={1}
+                      fill="url(#colorScore)"
                       activeDot={{ r: 6, fill: "#818cf8", stroke: "#fff", strokeWidth: 2 }}
                     />
                   </AreaChart>
@@ -312,10 +312,10 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                 } catch (e) {
                   console.error("Failed to parse scan data", e);
                 }
-                
-                const imageUrlToUse = parsedData.historyImage || 
-                                     (scan.imageUrl === "base64-stored-in-analysisData" ? undefined : scan.imageUrl) || 
-                                     scan.imageBase64;
+
+                const imageUrlToUse = parsedData.historyImage ||
+                  (scan.imageUrl === "base64-stored-in-analysisData" ? undefined : scan.imageUrl) ||
+                  scan.imageBase64;
 
                 return (
                   <motion.div
@@ -324,50 +324,50 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => onSelectScan(parsedData, imageUrlToUse)}
-                  className={`group cursor-pointer rounded-3xl border overflow-hidden transition-all duration-500 hover:-translate-y-2 ${isDarkMode ? 'bg-black border-white/5 hover:border-white/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]' : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-xl'}`}
-                >
-                  <div className="aspect-[4/5] relative overflow-hidden bg-black/5">
-                    <img 
-                      src={imageUrlToUse} 
-                      alt="Scan thumbnail" 
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    
-                    {/* Compare Button Overlay */}
-                    <div className="absolute top-4 right-4 z-20">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleComparison(scan);
-                        }}
-                        className={cn(
-                          "p-2.5 rounded-xl border backdrop-blur-md transition-all",
-                          selectedForComparison.find(s => s.id === scan.id)
-                            ? "bg-cyan-500 border-cyan-400 text-white shadow-[0_0_15px_rgba(34,211,238,0.5)]"
-                            : "bg-white/10 border-white/20 text-white/70 hover:bg-white/20 hover:text-white"
-                        )}
-                      >
-                        <Columns className="w-4 h-4" />
-                      </button>
-                    </div>
+                    className={`group cursor-pointer rounded-3xl border overflow-hidden transition-all duration-500 hover:-translate-y-2 ${isDarkMode ? 'bg-black border-white/5 hover:border-white/20 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]' : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-xl'}`}
+                  >
+                    <div className="aspect-[4/5] relative overflow-hidden bg-black/5">
+                      <img
+                        src={imageUrlToUse}
+                        alt="Scan thumbnail"
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2 text-white/80">
-                          <Calendar className="w-4 h-4" />
-                          <span className="text-xs font-medium uppercase tracking-wider">{formatDate(scan.createdAt)}</span>
+                      {/* Compare Button Overlay */}
+                      <div className="absolute top-4 right-4 z-20">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleComparison(scan);
+                          }}
+                          className={cn(
+                            "p-2.5 rounded-xl border backdrop-blur-md transition-all",
+                            selectedForComparison.find(s => s.id === scan.id)
+                              ? "bg-cyan-500 border-cyan-400 text-white shadow-[0_0_15px_rgba(34,211,238,0.5)]"
+                              : "bg-white/10 border-white/20 text-white/70 hover:bg-white/20 hover:text-white"
+                          )}
+                        >
+                          <Columns className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2 text-white/80">
+                            <Calendar className="w-4 h-4" />
+                            <span className="text-xs font-medium uppercase tracking-wider">{formatDate(scan.createdAt)}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-end gap-3">
+                          <span className="text-4xl font-display font-bold text-white leading-none">
+                            {scan.overallScore.toFixed(1)}
+                          </span>
+                          <span className="text-white/60 text-sm font-medium mb-1">/ 10</span>
                         </div>
                       </div>
-                      <div className="flex items-end gap-3">
-                        <span className="text-4xl font-display font-bold text-white leading-none">
-                          {scan.overallScore.toFixed(1)}
-                        </span>
-                        <span className="text-white/60 text-sm font-medium mb-1">/ 10</span>
-                      </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
                 );
               })}
             </div>

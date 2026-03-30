@@ -217,7 +217,7 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
                               initial={{ opacity: 0, x: -10, height: 0 }}
                               animate={{ opacity: isCurrent ? 1 : 0.5, x: 0, height: 'auto' }}
                               exit={{ opacity: 0, scale: 0.95, height: 0 }}
-                              transition={{ duration: 0.3 }}
+                              transition={{ duration: 0.6 }}
                               className={`flex items-center gap-3 text-sm md:text-base font-mono w-full ${isCurrent ? (isDarkMode ? 'text-indigo-400' : 'text-indigo-600') : (isDarkMode ? 'text-zinc-500' : 'text-zinc-400')}`}
                             >
                               {isCurrent ? (
