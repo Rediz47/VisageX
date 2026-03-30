@@ -39,11 +39,14 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if ((window as any).lenis) {
-      (window as any).lenis.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
-    }
+    // Small delay to let React finish rendering before scrolling
+    requestAnimationFrame(() => {
+      if ((window as any).lenis) {
+        (window as any).lenis.scrollTo(0, { duration: 0.6 });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
   }, [pathname]);
 
   return null;

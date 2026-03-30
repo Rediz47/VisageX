@@ -106,7 +106,7 @@ export default function Landing({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <Hero isDarkMode={isDarkMode} onNavigateMethodology={() => navigate('/methodology')} />
           <motion.div
@@ -132,7 +132,7 @@ export default function Landing({
           initial={{ opacity: 0, scale: 0.98, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.98, y: -10 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="pt-12 pb-20 px-6 lg:px-8 max-w-[1600px] mx-auto min-h-screen"
         >
           <ResultDashboard
