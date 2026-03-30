@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
 import { FaceAnalyzer } from '../components/FaceAnalyzer/FaceAnalyzer';
 import { Hero, Features, ExampleResult, Testimonials } from '../components/LandingSections';
@@ -24,6 +25,7 @@ export default function Landing({
   const { user } = useAuth();
   const { credits, userData } = useCredits();
   const posthog = usePostHog();
+  const navigate = useNavigate();
 
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [analyzedImageUrl, setAnalyzedImageUrl] = useState<string | null>(null);
@@ -106,7 +108,7 @@ export default function Landing({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Hero isDarkMode={isDarkMode} onNavigateMethodology={() => {}} />
+          <Hero isDarkMode={isDarkMode} onNavigateMethodology={() => navigate('/methodology')} />
           <motion.div
             id="analyzer-section"
             className="py-16"
