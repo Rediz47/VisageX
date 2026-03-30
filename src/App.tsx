@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { usePostHog } from '@posthog/react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 
 // Global State Providers
@@ -33,6 +33,21 @@ const BlogGuaShaPage = lazy(() => import('./pages/BlogGuaShaPage'));
 const BlogFreeAIFacePage = lazy(() => import('./pages/BlogFreeAIFacePage'));
 const BlogMewingGuidePage = lazy(() => import('./pages/BlogMewingGuidePage'));
 const BlogLooksmaxRoutinePage = lazy(() => import('./pages/BlogLooksmaxRoutinePage'));
+
+// Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if ((window as any).lenis) {
+      (window as any).lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname]);
+
+  return null;
+}
 
 // A small inner app component to access contexts for Modals and internal features
 function InnerApp() {
@@ -99,6 +114,7 @@ function InnerApp() {
         <div className={`absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full will-change-transform transition-colors duration-1000 ${isDarkMode ? 'bg-zinc-900/5' : 'bg-zinc-300/[0.03]'}`} style={{ background: isDarkMode ? 'radial-gradient(circle, rgba(24,24,27,0.08) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(212,212,216,0.04) 0%, transparent 70%)' }} />
       </div>
 
+      <ScrollToTop />
       <GlobalHeader 
         onOpenAuth={(mode) => { setAuthMode(mode); setAuthModalOpen(true); posthog.capture('auth_modal_opened', { mode }); }}
         onOpenPricing={() => { setPricingModalOpen(true); posthog.capture('pricing_modal_opened'); }}
