@@ -303,10 +303,10 @@ export function Auth({ isOpen, onClose, isDarkMode, initialMode = 'signin', init
         <div className="p-8 md:p-12">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 mb-6 shadow-lg overflow-hidden">
-              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-cover" />
+            <div className="inline-flex items-center justify-center w-20 h-20 mb-6">
+              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-contain drop-shadow-xl" />
             </div>
-            <h2 className={`text-3xl font-display font-bold tracking-tight mb-2 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+            <h2 className={`text-3xl font-display font-extrabold tracking-tight mb-2 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
               {isSignUp ? 'Create Account' : 'Welcome Back'}
             </h2>
             <p className={`text-sm ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>

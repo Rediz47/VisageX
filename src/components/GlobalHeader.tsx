@@ -41,10 +41,10 @@ export function GlobalHeader({
       <header className={`fixed top-0 inset-x-0 z-50 border-b backdrop-blur-xl transition-all duration-500 ${isDarkMode ? 'border-white/5 bg-black/40' : 'border-zinc-200 bg-white/40'}`}>
         <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-24 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3 group" onClick={handleLogoClick}>
-            <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
-              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-cover" />
+            <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-contain drop-shadow-lg" />
             </div>
-            <span className={`font-display font-bold text-2xl tracking-tighter ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+            <span className={`font-display font-extrabold text-3xl tracking-tighter ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
               VISAGE<span className={isDarkMode ? 'text-white/20' : 'text-zinc-900/10'}>X</span>
             </span>
           </Link>

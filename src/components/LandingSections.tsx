@@ -377,10 +377,10 @@ export function Footer({ isDarkMode, onNavigatePrivacy, onNavigateTerms }: { isD
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start gap-12">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center overflow-hidden">
-              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-cover" />
+            <div className="w-16 h-16 flex items-center justify-center">
+              <img src="/logo.png" alt="VisageX Logo" className="w-full h-full object-contain drop-shadow-lg" />
             </div>
-            <span className={`font-display font-bold text-2xl tracking-tighter ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+            <span className={`font-display font-extrabold text-3xl tracking-tighter ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
               VISAGE<span className={isDarkMode ? 'text-white/20' : 'text-zinc-900/10'}>X</span>
             </span>
           </div>
