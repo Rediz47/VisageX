@@ -57,11 +57,26 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3, baseDe
 // Helper: call Vertex AI REST API directly (SDK doesn't support API key auth for Vertex)
 async function callVertexAI(model: string, apiKey: string, requestBody: any): Promise<any> {
   const url = `${VERTEX_BASE}/${model}:generateContent?key=${apiKey}`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestBody),
-  });
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+  
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+      signal: controller.signal
+    });
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      throw new Error(`Vertex AI request to ${model} timed out after 45s`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -223,8 +238,23 @@ router.post('/celebrity-lookalike', celebrityLimiter, requireAuth, async (req, r
       return res.status(500).json({ error: 'Vertex AI API key not configured' });
     }
 
-    const base64Data = image.includes(',') ? image.split(',')[1] : image;
-    const mimeType = image.includes('data:') ? image.split(';')[0].split(':')[1] : 'image/jpeg';
+    let base64Data = '';
+    let mimeType = 'image/jpeg';
+
+    if (image.startsWith('http')) {
+      // Fetch image from URL (e.g. Firebase Storage for History Page)
+      const imgRes = await fetch(image);
+      if (!imgRes.ok) return res.status(400).json({ error: 'Failed to retrieve image from history URL' });
+      const arrayBuffer = await imgRes.arrayBuffer();
+      base64Data = Buffer.from(arrayBuffer).toString('base64');
+      mimeType = imgRes.headers.get('content-type') || 'image/jpeg';
+    } else if (image.startsWith('blob:')) {
+      return res.status(400).json({ error: 'Cannot process blob URLs directly on the server' });
+    } else {
+      // Parse data URL or raw base64
+      base64Data = image.includes(',') ? image.split(',')[1] : image;
+      mimeType = image.includes('data:') ? image.split(';')[0].split(':')[1] : 'image/jpeg';
+    }
 
     const resultText = await callVertexAI('gemini-3-flash-preview', apiKey, {
       contents: [
