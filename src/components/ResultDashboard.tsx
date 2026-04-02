@@ -190,7 +190,11 @@ export function ResultDashboard({
   }, [isAnalyzingCelebrity]);
 
   const findCelebrityLookalikes = async () => {
-    if (!result.visionAnalysis?.cleanImage) return;
+    if (!imageUrl) {
+      setCelebError('No image available to analyze.');
+      setIsAnalyzingCelebrity(false);
+      return;
+    }
 
     setIsAnalyzingCelebrity(true);
     setCelebError(null);
@@ -211,7 +215,7 @@ export function ResultDashboard({
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${idToken}`
         },
-        body: JSON.stringify({ image: result.visionAnalysis.cleanImage })
+        body: JSON.stringify({ image: imageUrl })
       });
 
       if (!response.ok) throw new Error("Celebrity analysis failed on server.");
