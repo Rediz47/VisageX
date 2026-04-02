@@ -60,7 +60,11 @@ export function GlobalHeader({
               The Hub
             </Link>
 
-            <button onClick={toggleTheme} className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white hover:bg-white/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-900/10'}`}>
+            <button 
+              onClick={toggleTheme} 
+              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+              className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white hover:bg-white/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-900/10'}`}
+            >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
@@ -83,7 +87,11 @@ export function GlobalHeader({
                     {user.displayName?.split(' ')[0] || 'User'}
                   </span>
                 </Link>
-                <button onClick={handleSignOut} className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-rose-400 hover:bg-rose-500/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-rose-600 hover:bg-rose-50'}`}>
+                <button 
+                  onClick={handleSignOut} 
+                  aria-label="Sign out"
+                  className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-rose-400 hover:bg-rose-500/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-rose-600 hover:bg-rose-50'}`}
+                >
                   <LogOut className="w-5 h-5" />
                 </button>
               </div>
@@ -107,10 +115,18 @@ export function GlobalHeader({
                 <span className="text-xs font-bold">{credits}</span>
               </button>
             )}
-            <button onClick={toggleTheme} className={`p-2 rounded-xl transition-colors duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900'}`}>
+            <button 
+              onClick={toggleTheme} 
+              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+              className={`p-2 rounded-xl transition-colors duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900'}`}
+            >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <button className={`p-2 transition-colors duration-300 ${isDarkMode ? 'text-zinc-100/70 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button 
+              aria-label="Toggle mobile menu"
+              className={`p-2 transition-colors duration-300 ${isDarkMode ? 'text-zinc-100/70 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`} 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>

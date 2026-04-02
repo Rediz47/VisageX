@@ -1,11 +1,22 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { getResend } from '../services/email.service.js';
 import { getAdminDb } from '../services/firebase.service.js';
 
 const router = Router();
 
+// Email rate limiter: 3 emails per 10 minutes
+const emailLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Please wait before requesting another email.', code: 'RATE_LIMITED' },
+  skip: (req) => req.method === 'OPTIONS',
+});
+
 // Welcome Email Endpoint
-router.post('/welcome', async (req, res) => {
+router.post('/welcome', emailLimiter, async (req, res) => {
   try {
     const { email, name, userId } = req.body;
     if (!email) {
@@ -27,10 +38,10 @@ router.post('/welcome', async (req, res) => {
       subject: 'Welcome to Visage AI',
       html: `
         <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto;">
-          <h2>Welcome to Visage AI, ${name || 'there'}!</h2>
+          <h2>Welcome to VisageX, ${name || 'there'}!</h2>
           <p>We're thrilled to have you on board. Your journey to unlocking your true facial potential starts now.</p>
-          <p>You have <strong>1 free credit</strong> to run your first clinical facial analysis.</p>
-          <p>Log in to <a href="${process.env.APP_URL || '#'}">Visage AI</a> to get started.</p>
+          <p>Upload a selfie to get your <strong>free facial analysis preview</strong> — then unlock the full report to see your complete breakdown.</p>
+          <p>Log in to <a href="${process.env.APP_URL || '#'}">VisageX</a> to get started.</p>
         </div>
       `
     });

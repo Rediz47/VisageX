@@ -1,11 +1,22 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { getAdminDb } from '../services/firebase.service.js';
 import { FieldValue } from 'firebase-admin/firestore';
 
 const router = Router();
 
-router.post('/init-user', requireAuth, async (req, res) => {
+// Auth rate limiter: 5 requests per 15 minutes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many auth requests. Please try again later.', code: 'RATE_LIMITED' },
+  skip: (req) => req.method === 'OPTIONS',
+});
+
+router.post('/init-user', authLimiter, requireAuth, async (req, res) => {
   try {
     const userId = req.user!.uid;
     const db = getAdminDb();

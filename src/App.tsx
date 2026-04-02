@@ -14,6 +14,7 @@ import { GlobalHeader } from './components/GlobalHeader';
 import { Auth } from './components/Auth';
 import { Pricing } from './components/Pricing';
 import { Footer } from './components/LandingSections';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { AnimatePresence } from 'motion/react';
 
 // Lazy Loaded Pages
@@ -33,6 +34,7 @@ const BlogGuaShaPage = lazy(() => import('./pages/BlogGuaShaPage'));
 const BlogFreeAIFacePage = lazy(() => import('./pages/BlogFreeAIFacePage'));
 const BlogMewingGuidePage = lazy(() => import('./pages/BlogMewingGuidePage'));
 const BlogLooksmaxRoutinePage = lazy(() => import('./pages/BlogLooksmaxRoutinePage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -125,6 +127,7 @@ function InnerApp() {
 
       {/* Main Content */}
       <main className="relative z-10 pt-20">
+        <ErrorBoundary>
         <Suspense fallback={
           <div className={`min-h-screen pt-24 flex flex-col items-center justify-center gap-6 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
             <div className="relative">
@@ -169,8 +172,12 @@ function InnerApp() {
                 <HistoryPage />
               </ProtectedRoute>
             } />
+
+            {/* 404 catch-all */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </main>
 
       <Footer 
@@ -196,7 +203,7 @@ function InnerApp() {
 }
 
 // Wrapper for Modals requiring deeper Contexts safely
-function PricingModalManager({ pricingModalOpen, setPricingModalOpen, isDarkMode }: any) {
+function PricingModalManager({ pricingModalOpen, setPricingModalOpen, isDarkMode }: { pricingModalOpen: boolean; setPricingModalOpen: (v: boolean) => void; isDarkMode: boolean }) {
   const { user } = useAuth();
   return (
     <AnimatePresence>

@@ -7,3 +7,12 @@ coverage/
 .env*
 !.env.example
 serviceAccountKey.json
+
+# Debug output files
+*.txt
+!robots.txt
+!README.md
+out.*
+ts-output.*
+check-scans.*
+test-import.*

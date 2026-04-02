@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { Tooltip } from './Tooltip';
 import { toPng } from 'html-to-image';
 import { cn } from '../lib/utils';
+import { fireConfetti } from '../lib/confetti';
 
 // Mapping identifying which traits have educational articles in the /blog library.
 const TRAIT_GUIDE_MAP: Record<string, string> = {
@@ -113,45 +114,6 @@ export function ResultDashboard({
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [userData]);
-
-  // Confetti dopamine burst
-  const fireConfetti = () => {
-    const canvas = document.createElement('canvas');
-    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999';
-    document.body.appendChild(canvas);
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const ctx2 = canvas.getContext('2d')!;
-    const pieces: { x: number; y: number; vx: number; vy: number; color: string; r: number; alpha: number }[] = [];
-    const colors = ['#6366f1', '#f43f5e', '#f59e0b', '#10b981', '#22d3ee'];
-    for (let i = 0; i < 120; i++) {
-      pieces.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height * 0.5,
-        vx: (Math.random() - 0.5) * 6,
-        vy: Math.random() * 4 + 2,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        r: Math.random() * 6 + 3,
-        alpha: 1,
-      });
-    }
-    let frame = 0;
-    const animate = () => {
-      ctx2.clearRect(0, 0, canvas.width, canvas.height);
-      pieces.forEach(p => {
-        p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.alpha -= 0.012;
-        ctx2.globalAlpha = Math.max(0, p.alpha);
-        ctx2.fillStyle = p.color;
-        ctx2.beginPath();
-        ctx2.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx2.fill();
-      });
-      frame++;
-      if (frame < 120) requestAnimationFrame(animate);
-      else { canvas.remove(); }
-    };
-    animate();
-  };
 
   // Fire confetti when invitedCount increases
   const prevInvitedCount = React.useRef(userData?.invitedCount || 0);

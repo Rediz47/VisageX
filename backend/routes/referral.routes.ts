@@ -1,12 +1,23 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { getAdminDb } from '../services/firebase.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { FieldValue } from 'firebase-admin/firestore';
 
 const router = Router();
 
+// Referral rate limiter: 5 redeems/completions per 15 minutes
+const referralLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many referral attempts. Please try again later.', code: 'RATE_LIMITED' },
+  skip: (req) => req.method === 'OPTIONS',
+});
+
 // Referral Redeem Endpoint (Secure)
-router.post('/redeem', requireAuth, async (req, res) => {
+router.post('/redeem', referralLimiter, requireAuth, async (req, res) => {
   try {
     const { referralCode, fingerprint } = req.body;
     const userId = req.user!.uid; // Securely get from token
@@ -95,11 +106,25 @@ router.post('/redeem', requireAuth, async (req, res) => {
   }
 });
 
-// Leaderboard: Top 5 inviters (Public)
+// Leaderboard: Top 5 inviters (Public, optional auth for isCurrentUser)
 router.get('/leaderboard', async (req, res) => {
   try {
     const db = getAdminDb();
     if (!db) return res.status(500).json({ error: 'Database error' });
+
+    // Optionally verify auth token to securely identify current user
+    let authenticatedUserId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const { getAdminAuth } = await import('../services/firebase.service.js');
+        const auth = getAdminAuth();
+        if (auth) {
+          const decoded = await auth.verifyIdToken(authHeader.split('Bearer ')[1]);
+          authenticatedUserId = decoded.uid;
+        }
+      } catch { /* ignore auth errors for public endpoint */ }
+    }
 
     const snap = await db.collection('users')
       .orderBy('invitedCount', 'desc')
@@ -112,28 +137,27 @@ router.get('/leaderboard', async (req, res) => {
       .map((doc, i) => {
         const data = doc.data();
         const name: string = data.displayName || data.email || 'Anonymous';
-        const parts = name.split(/[\\s@]/);
+        const parts = name.split(/[\s@]/);
         const display = parts[0].charAt(0).toUpperCase() + parts[0].slice(1, 4) + '***';
         return {
           rank: i + 1,
           name: display,
           invites: data.invitedCount || 0,
-          isCurrentUser: req.query.userId === doc.id,
+          isCurrentUser: authenticatedUserId === doc.id,
         };
       });
 
     return res.json({ leaderboard: entries });
   } catch (err: any) {
     console.error('Leaderboard error:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Failed to load leaderboard' });
   }
 });
 
 // Scan Completion Endpoint: Trigger referral rewards for the inviter
-router.post('/scan/complete', async (req, res) => {
+router.post('/scan/complete', referralLimiter, requireAuth, async (req, res) => {
   try {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+    const userId = req.user!.uid;
 
     const db = getAdminDb();
     if (!db) return res.status(500).json({ error: 'Database error' });
@@ -153,7 +177,7 @@ router.post('/scan/complete', async (req, res) => {
     return res.json({ success: true, message: 'Scan completion reward triggered' });
   } catch (error: any) {
     console.error('Scan complete error:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: 'Failed to process scan completion' });
   }
 });
 

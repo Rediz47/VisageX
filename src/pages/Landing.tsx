@@ -5,6 +5,7 @@ import { usePostHog } from '@posthog/react';
 import { FaceAnalyzer } from '../components/FaceAnalyzer/FaceAnalyzer';
 import { Hero, Features, ExampleResult, Testimonials } from '../components/LandingSections';
 import { ResultDashboard } from '../components/ResultDashboard';
+import { ViralShareOverlay } from '../components/ViralShareOverlay';
 import { useTheme } from '../context/ThemeProvider';
 import { useAuth } from '../context/AuthProvider';
 import { useCredits } from '../context/CreditsProvider';
@@ -30,6 +31,8 @@ export default function Landing({
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [analyzedImageUrl, setAnalyzedImageUrl] = useState<string | null>(null);
   const [isLocked, setIsLocked] = useState(false);
+  const [showShareOverlay, setShowShareOverlay] = useState(false);
+  const [isGeneratingCard, setIsGeneratingCard] = useState(false);
 
   const handleAnalysisComplete = (result: any, imageUrl: string, locked: boolean) => {
     setAnalysisResult(result);
@@ -41,12 +44,15 @@ export default function Landing({
       has_gemini: !!result?.visionAnalysis,
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Show viral share overlay after a short delay for emotional impact
+    setTimeout(() => setShowShareOverlay(true), 2500);
   };
 
   const handleReset = () => {
     setAnalysisResult(null);
     setAnalyzedImageUrl(null);
     setIsLocked(false);
+    setShowShareOverlay(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -150,6 +156,22 @@ export default function Landing({
             onOpenPricing={onOpenPricing}
             onUnlock={handleUnlock}
             isLocked={isLocked}
+          />
+          {/* Viral Share Overlay — emotional trigger after result */}
+          <ViralShareOverlay
+            isVisible={showShareOverlay}
+            onClose={() => setShowShareOverlay(false)}
+            isDarkMode={isDarkMode}
+            overallScore={analysisResult?.overallScore || 7}
+            topPercentile={Math.max(2, Math.round(25 - ((analysisResult?.overallScore || 7) * 2.2)))}
+            referralCode={userData?.referralCode}
+            onGenerateCard={() => setIsGeneratingCard(false)}
+            isGeneratingCard={isGeneratingCard}
+            user={user}
+            onOpenAuth={(mode) => {
+              setAuthMode(mode);
+              onOpenAuth();
+            }}
           />
         </motion.div>
       )}

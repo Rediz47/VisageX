@@ -118,11 +118,45 @@ router.post('/capture-order', requireAuth, async (req, res) => {
   }
 });
 
-// PayPal Webhook (Public)
+// PayPal Webhook (Public — signature verified)
 router.post('/webhook', async (req, res) => {
   try {
     const event = req.body;
     console.log('PayPal Webhook received:', event.event_type);
+
+    // Verify webhook signature to prevent spoofed events
+    const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+    if (webhookId) {
+      try {
+        const accessToken = await getPayPalAccessToken();
+        const verifyResponse = await fetch(`${PAYPAL_API}/v1/notifications/verify-webhook-signature`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            auth_algo: req.headers['paypal-auth-algo'],
+            cert_url: req.headers['paypal-cert-url'],
+            transmission_id: req.headers['paypal-transmission-id'],
+            transmission_sig: req.headers['paypal-transmission-sig'],
+            transmission_time: req.headers['paypal-transmission-time'],
+            webhook_id: webhookId,
+            webhook_event: event,
+          }),
+        });
+        const verifyData = await verifyResponse.json();
+        if (verifyData.verification_status !== 'SUCCESS') {
+          console.error('PayPal webhook signature verification FAILED');
+          return res.status(403).send('Invalid webhook signature');
+        }
+      } catch (verifyErr) {
+        console.error('PayPal webhook verification error:', verifyErr);
+        return res.status(403).send('Webhook verification failed');
+      }
+    } else {
+      console.warn('PAYPAL_WEBHOOK_ID not set — skipping signature verification (NOT SAFE FOR PRODUCTION)');
+    }
 
     if (event.event_type === 'CHECKOUT.ORDER.APPROVED' || event.event_type === 'PAYMENT.CAPTURE.COMPLETED') {
       const resource = event.resource;

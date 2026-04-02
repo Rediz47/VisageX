@@ -6,18 +6,6 @@ import { FaceAnalyzerProps } from './types';
 import { useFaceModel } from './hooks/useFaceModel';
 import { useImageProcessing } from './hooks/useImageProcessing';
 
-// Suppress MediaPipe's internal TFLite logs
-const originalInfo = console.info;
-console.info = (...args) => {
-  if (typeof args[0] === 'string' && args[0].includes('TensorFlow Lite XNNPACK delegate')) return;
-  originalInfo(...args);
-};
-
-const originalLog = console.log;
-console.log = (...args) => {
-  if (typeof args[0] === 'string' && args[0].includes('TensorFlow Lite XNNPACK delegate')) return;
-  originalLog(...args);
-};
 
 export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: FaceAnalyzerProps) {
   const posthog = usePostHog();

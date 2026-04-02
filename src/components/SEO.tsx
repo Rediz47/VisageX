@@ -13,7 +13,7 @@ interface SEOProps {
 const SEO: React.FC<SEOProps> = ({
   title = "VisageX — Free AI Face Analysis & Symmetry Score",
   description = "Get your AI face score in seconds. VisageX scans 468 facial landmarks to rate symmetry, jawline, skin health & more. Free online tool — no download needed.",
-  image = "https://visagex.online/og-default.jpg",
+  image = "https://visagex.online/og-default.png",
   canonical = "https://visagex.online",
   type = "website",
   noindex = false,

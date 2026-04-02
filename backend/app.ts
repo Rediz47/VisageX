@@ -30,7 +30,7 @@ export async function configureApp() {
     res.json({
       status: 'ok',
       env: {
-        hasGeminiKey: !!process.env.GEMINI_API_KEY,
+        hasVertexKey: !!process.env.VERTEX_API_KEY,
         hasFirebaseAccount: !!process.env.FIREBASE_SERVICE_ACCOUNT,
         nodeEnv: process.env.NODE_ENV,
         isNetlify: !!process.env.NETLIFY
@@ -51,7 +51,6 @@ export async function configureApp() {
     console.error('Unhandled server error:', err);
     res.status(500).json({ 
       error: "Internal server error",
-      message: err.message,
       path: req.path
     });
   });

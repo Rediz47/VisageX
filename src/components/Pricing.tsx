@@ -9,6 +9,7 @@ import { AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import { usePostHog } from '@posthog/react';
 import { auth } from '../firebase';
 import { cn } from '../lib/utils';
+import { fireConfetti } from '../lib/confetti';
 
 
 // ─── Countdown Timer ──────────────────────────────────────────────────────────
@@ -151,20 +152,6 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
       fireConfetti(); setLoading('success');
     } else { alert('Payment failed.'); setLoading(null); }
   }, [userId, posthog]);
-
-  const fireConfetti = () => {
-    const c = document.createElement('canvas');
-    c.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999';
-    document.body.appendChild(c);
-    c.width = window.innerWidth; c.height = window.innerHeight;
-    const ctx = c.getContext('2d')!;
-    const ps: any[] = [];
-    const cols = ['#6366f1','#f43f5e','#f59e0b','#10b981','#22d3ee'];
-    for (let i = 0; i < 160; i++) ps.push({ x: Math.random()*c.width, y: Math.random()*c.height*0.5, vx:(Math.random()-.5)*9, vy:Math.random()*7+2, color:cols[~~(Math.random()*cols.length)], r:Math.random()*6+3, a:1 });
-    let f=0;
-    const go=()=>{ ctx.clearRect(0,0,c.width,c.height); ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.a-=0.009;ctx.globalAlpha=Math.max(0,p.a);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}); f++; if(f<130)requestAnimationFrame(go);else c.remove(); };
-    go();
-  };
 
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   if (!paypalClientId) return null;

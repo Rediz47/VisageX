@@ -77,7 +77,7 @@ export function Hero({ isDarkMode, onNavigateMethodology }: { isDarkMode: boolea
               <h1 className={`text-5xl md:text-7xl lg:text-[110px] font-sans leading-[1.0] tracking-tight mb-4 md:mb-6 pb-2 md:pb-4 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
                 <span className="block">AI rates</span>
                 <span className="block ml-6 md:ml-12 lg:ml-24 font-display italic">your face</span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 to-zinc-500">from 1–10</span>
+                <span className={`block text-transparent bg-clip-text bg-gradient-to-r ${isDarkMode ? 'from-zinc-100 to-zinc-500' : 'from-zinc-900 to-zinc-400'}`}>from 1–10</span>
               </h1>
               <div className="flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-12 ml-6 md:ml-12 lg:ml-24">
                 <p className={`text-lg max-w-xs font-light leading-relaxed ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-900/70'}`}>

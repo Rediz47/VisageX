@@ -7,10 +7,22 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+const THEME_KEY = 'visagex_theme';
 
-  const toggleTheme = () => setIsDarkMode(prev => !prev);
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check localStorage for persisted preference
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored !== null) return stored === 'dark';
+    // Default to dark mode (the premium aesthetic)
+    return true;
+  });
+
+  const toggleTheme = () => setIsDarkMode(prev => {
+    const next = !prev;
+    localStorage.setItem(THEME_KEY, next ? 'dark' : 'light');
+    return next;
+  });
 
   useEffect(() => {
     if (isDarkMode) {
