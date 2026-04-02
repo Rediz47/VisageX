@@ -6,7 +6,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 
 const router = Router();
 
-const VERTEX_BASE = 'https://aiplatform.googleapis.com/v1/publishers/google/models';
+const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 // Rate limiters — per IP, returns JSON so frontend can handle gracefully
 const analysisLimiter = rateLimit({
@@ -54,9 +54,9 @@ async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3, baseDe
   throw lastError;
 }
 
-// Helper: call Vertex AI REST API directly (SDK doesn't support API key auth for Vertex)
-async function callVertexAI(model: string, apiKey: string, requestBody: any): Promise<any> {
-  const url = `${VERTEX_BASE}/${model}:generateContent?key=${apiKey}`;
+// Helper: call Gemini REST API with API key auth
+async function callGeminiAI(model: string, apiKey: string, requestBody: any): Promise<any> {
+  const url = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -65,17 +65,17 @@ async function callVertexAI(model: string, apiKey: string, requestBody: any): Pr
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`Vertex AI ${model} error (${response.status}):`, errorText);
-    throw new Error(`Vertex AI returned ${response.status}: ${errorText}`);
+    console.error(`Gemini ${model} error (${response.status}):`, errorText);
+    throw new Error(`Gemini API returned ${response.status}: ${errorText}`);
   }
 
   const data = await response.json();
 
-  // Extract text from Vertex AI response format
+  // Extract text from Gemini response format
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) {
-    console.error('Unexpected Vertex AI response structure:', JSON.stringify(data).slice(0, 500));
-    throw new Error('No text in Vertex AI response');
+    console.error('Unexpected Gemini response structure:', JSON.stringify(data).slice(0, 500));
+    throw new Error('No text in Gemini response');
   }
 
   return text;
@@ -150,8 +150,8 @@ Also provide:
 Respond ONLY with valid JSON matching the exact keys listed above. No markdown, no explanation.`;
 
     try {
-      // Retry the Vertex AI call up to 3 times to handle transient failures
-      const resultText = await withRetry(() => callVertexAI('gemini-3.0-flash-preview', apiKey, {
+      // Retry the Gemini call up to 3 times to handle transient failures
+      const resultText = await withRetry(() => callGeminiAI('gemini-3.0-flash-preview', apiKey, {
         contents: [
           {
             role: 'user',
@@ -171,11 +171,11 @@ Respond ONLY with valid JSON matching the exact keys listed above. No markdown, 
       try {
         aiResult = JSON.parse(resultText);
       } catch (parseError) {
-        console.error('Failed to parse Vertex AI response:', resultText);
+        console.error('Failed to parse Gemini response:', resultText);
         return res.status(500).json({ error: 'Failed to parse AI response' });
       }
 
-      console.log('Vertex AI analysis completed successfully for user', userId);
+      console.log('Gemini analysis completed successfully for user', userId);
 
       // Deduct credit securely ONLY AFTER successful generation
       try {
@@ -186,12 +186,12 @@ Respond ONLY with valid JSON matching the exact keys listed above. No markdown, 
 
       return res.json(aiResult);
     } catch (aiError) {
-      console.error('Vertex AI call error:', aiError);
+      console.error('Gemini call error:', aiError);
       return res.status(500).json({ error: 'AI analysis failed during processing' });
     }
 
   } catch (error: any) {
-    console.error('Vertex AI analysis error:', error);
+    console.error('Gemini analysis error:', error);
     return res.status(500).json({ error: error.message || 'AI analysis failed' });
   }
 });
@@ -226,7 +226,7 @@ router.post('/celebrity-lookalike', celebrityLimiter, requireAuth, async (req, r
     const base64Data = image.includes(',') ? image.split(',')[1] : image;
     const mimeType = image.includes('data:') ? image.split(';')[0].split(':')[1] : 'image/jpeg';
 
-    const resultText = await callVertexAI('gemini-3.0-flash-preview', apiKey, {
+    const resultText = await callGeminiAI('gemini-3.0-flash-preview', apiKey, {
       contents: [
         {
           role: 'user',
@@ -319,7 +319,7 @@ router.post('/glow-coach', coachLimiter, requireAuth, async (req, res) => {
       { role: 'user', parts: [{ text: message }] }
     ];
 
-    const resultText = await callVertexAI('gemini-3.0-flash-preview', apiKey, {
+    const resultText = await callGeminiAI('gemini-3.0-flash-preview', apiKey, {
       contents,
       systemInstruction: { parts: [{ text: systemInstruction }] },
       generationConfig: {
