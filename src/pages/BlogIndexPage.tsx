@@ -32,14 +32,7 @@ export default function BlogIndexPage() {
       link: "/blog/how-to-improve-face-symmetry",
       thumbnail: "" // e.g., "/images/symmetry-thumb.jpg"
     },
-    {
-      title: "AI Face Analysis Explained",
-      description: "Discover the science behind the 468-point neural mesh, golden ratio, and how algorithms rate your face.",
-      icon: Brain,
-      color: "indigo",
-      link: "/blog/ai-face-analysis-explained",
-      thumbnail: ""
-    },
+
     {
       title: "What is Canthal Tilt?",
       description: "The secret to 'Hunter Eyes'. Learn the geometry behind eye attractiveness.",
