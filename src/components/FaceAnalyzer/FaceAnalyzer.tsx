@@ -63,8 +63,8 @@ export function FaceAnalyzer({ onAnalysisComplete, isDarkMode, userCredits }: Fa
     const animate = () => {
       if (progressValueRef.current < progressTargetRef.current) {
         progressValueRef.current += 1.2;
-      } else if (progressValueRef.current < 99 && progressTargetRef.current > 0 && progressTargetRef.current !== 100) {
-        progressValueRef.current += 0.05;
+      } else if (progressValueRef.current < 90 && progressTargetRef.current > 0 && progressTargetRef.current !== 100) {
+        progressValueRef.current += 0.02;
       }
 
       if (progressValueRef.current > 100) progressValueRef.current = 100;

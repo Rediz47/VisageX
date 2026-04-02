@@ -145,13 +145,14 @@ export function useImageProcessing(
       await new Promise(resolve => setTimeout(resolve, 800));
 
       setScanStep("Finalizing results...");
-      updateProgress(95);
+      updateProgress(100);
       
       const finalImageUrl = canvas.toDataURL('image/jpeg', 0.8);
       const isLocked = userCredits <= 0;
       
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       onAnalysisComplete(analysisResult, finalImageUrl, isLocked);
-      updateProgress(100);
 
       const thumbCanvas = document.createElement('canvas');
       const MAX_THUMB_SIZE = 400;

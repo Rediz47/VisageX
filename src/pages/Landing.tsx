@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
 import { FaceAnalyzer } from '../components/FaceAnalyzer/FaceAnalyzer';
 import { Hero, Features, ExampleResult, Testimonials } from '../components/LandingSections';
@@ -28,8 +28,9 @@ export default function Landing({
   const posthog = usePostHog();
   const navigate = useNavigate();
 
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [analyzedImageUrl, setAnalyzedImageUrl] = useState<string | null>(null);
+  const location = useLocation();
+  const [analysisResult, setAnalysisResult] = useState<any>(location.state?.analysisResult || null);
+  const [analyzedImageUrl, setAnalyzedImageUrl] = useState<string | null>(location.state?.analyzedImageUrl || null);
   const [isLocked, setIsLocked] = useState(false);
   const [showShareOverlay, setShowShareOverlay] = useState(false);
   const [isGeneratingCard, setIsGeneratingCard] = useState(false);
@@ -44,8 +45,6 @@ export default function Landing({
       has_gemini: !!result?.visionAnalysis,
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Show viral share overlay after a short delay for emotional impact
-    setTimeout(() => setShowShareOverlay(true), 2500);
   };
 
   const handleReset = () => {
@@ -157,22 +156,7 @@ export default function Landing({
             onUnlock={handleUnlock}
             isLocked={isLocked}
           />
-          {/* Viral Share Overlay — emotional trigger after result */}
-          <ViralShareOverlay
-            isVisible={showShareOverlay}
-            onClose={() => setShowShareOverlay(false)}
-            isDarkMode={isDarkMode}
-            overallScore={analysisResult?.overallScore || 7}
-            topPercentile={Math.max(2, Math.round(25 - ((analysisResult?.overallScore || 7) * 2.2)))}
-            referralCode={userData?.referralCode}
-            onGenerateCard={() => setIsGeneratingCard(false)}
-            isGeneratingCard={isGeneratingCard}
-            user={user}
-            onOpenAuth={(mode) => {
-              setAuthMode(mode);
-              onOpenAuth();
-            }}
-          />
+
         </motion.div>
       )}
       </AnimatePresence>

@@ -22,8 +22,8 @@ export default function HistoryPage() {
         <History
           onBack={() => navigate('/')}
           isDarkMode={isDarkMode}
-          onSelectScan={() => {
-            navigate('/');
+          onSelectScan={(result, imageUrl) => {
+            navigate('/', { state: { analysisResult: result, analyzedImageUrl: imageUrl } });
           }}
         />
       </motion.div>

@@ -254,7 +254,7 @@ Respond ONLY with valid JSON in this format:
         temperature: 0.3,
         responseMimeType: 'application/json',
       },
-      tools: [{ googleSearchRetrieval: {} }]
+      tools: [{ googleSearch: {} }]
     });
 
     let parsed;
