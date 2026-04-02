@@ -204,9 +204,13 @@ export function ResultDashboard({
 
       setCelebScanStep("Searching global celebrity database...");
 
+      const idToken = await user.getIdToken();
       const response = await fetch('/api/celebrity-lookalike', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
         body: JSON.stringify({ image: result.visionAnalysis.cleanImage })
       });
 
@@ -244,24 +248,11 @@ export function ResultDashboard({
       return;
     }
 
-    // Deduct credit first securely via backend
+    // Deduct credit securely via backend endpoint directly
     setIsAnalyzingCelebrity(true);
     setCelebScanStep("Verifying credits...");
     try {
-      const response = await fetch('/api/consume-credit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.uid }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to process credit');
-      }
-
-      // If credit deduction succeeds, run the analysis
+      // If backend validation succeeds, it will run analysis and deduct credit properly
       await findCelebrityLookalikes();
     } catch (error) {
       console.error("Failed to spend credit for celebrity analysis:", error);

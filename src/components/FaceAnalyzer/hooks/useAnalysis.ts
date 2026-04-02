@@ -131,9 +131,13 @@ export function useAnalysis(userCredits: number) {
       console.log("Scan saved to Firebase successfully.");
 
       try {
+        const idToken = await auth.currentUser.getIdToken();
         await fetch('/api/referral/scan/complete', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
           body: JSON.stringify({ userId: auth.currentUser.uid })
         });
       } catch (e) {
