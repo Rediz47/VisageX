@@ -900,13 +900,29 @@ export function ResultDashboard({
               {isLocked ? (
                 <button
                   onClick={scrollToPricing}
-                  className="w-full max-w-sm group relative px-8 py-6 rounded-[2rem] bg-indigo-500 text-white font-black text-xs md:text-sm uppercase tracking-[0.2em] transition-all duration-300 hover:scale-[1.03] active:scale-[0.97] shadow-[0_20px_40px_rgba(99,102,241,0.3)] hover:shadow-[0_25px_50px_rgba(99,102,241,0.4)] overflow-hidden"
+                  className="w-full max-w-sm relative group p-0.5 rounded-[2rem] transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
                 >
-                  {/* Glowing Pulse Animation */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  <div className="flex items-center justify-center gap-3">
-                    <Lock className="w-4 h-4 md:w-5 md:h-5" />
-                    Unlock Full Report
+                  {/* Glowing Backdrop */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 rounded-[2rem] blur-md opacity-40 group-hover:opacity-80 transition-opacity duration-500 animate-pulse" />
+                  
+                  {/* Gradient Border */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 rounded-[2rem]" />
+                  
+                  {/* Inner Button Canvas */}
+                  <div className={cn(
+                    "relative w-full h-full rounded-[2rem] px-8 py-5 md:py-6 flex items-center justify-center gap-3 overflow-hidden",
+                    isDarkMode ? "bg-zinc-950" : "bg-white"
+                  )}>
+                    {/* Hover Shimmer */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                    
+                    <Lock className={cn("w-4 h-4 md:w-5 md:h-5", isDarkMode ? "text-cyan-400" : "text-cyan-600")} />
+                    <span className={cn(
+                      "font-black text-xs md:text-sm uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r",
+                      isDarkMode ? "from-cyan-400 to-purple-400" : "from-cyan-600 to-purple-600"
+                    )}>
+                      Unlock Full Report
+                    </span>
                   </div>
                 </button>
               ) : (
