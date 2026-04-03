@@ -129,7 +129,7 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
   const overlay = isDarkMode ? 'bg-black/90' : 'bg-zinc-900/70';
 
   return (
-    <PayPalScriptProvider options={{ 'client-id': paypalClientId, 'disable-funding': 'card' }}>
+    <PayPalScriptProvider options={{ 'client-id': paypalClientId, 'enable-funding': 'card' }}>
       <div className={cn('fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 backdrop-blur-md', overlay)}>
         <AnimatePresence mode="wait">
 
