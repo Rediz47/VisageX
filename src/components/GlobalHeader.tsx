@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Menu, X, Sun, Moon, LogOut, User as UserIcon, History as HistoryIcon, Coins } from 'lucide-react';
+import { Sparkles, Sun, Moon, LogOut, User as UserIcon, History as HistoryIcon, Coins, BookOpen } from 'lucide-react';
 import { useTheme } from '../context/ThemeProvider';
 import { useAuth } from '../context/AuthProvider';
 import { useCredits } from '../context/CreditsProvider';
@@ -19,16 +19,12 @@ export function GlobalHeader({
   const { user } = useAuth();
   const { credits } = useCredits();
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const handleSignOut = () => {
     signOut(auth);
-    setMobileMenuOpen(false);
     navigate('/');
   };
 
   const handleLogoClick = () => {
-    setMobileMenuOpen(false);
     if ((window as any).lenis) {
       (window as any).lenis.scrollTo(0);
     } else {
@@ -107,79 +103,54 @@ export function GlobalHeader({
             )}
           </nav>
 
-          {/* Mobile Menu Toggle */}
-          <div className="flex items-center space-x-4 md:hidden">
-            {user && (
+          {/* Mobile Actions Container (Top Right) */}
+          <div className="flex items-center space-x-3 md:hidden">
+            {user ? (
               <button onClick={onOpenPricing} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-300 ${isDarkMode ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}>
                 <Coins className="w-3.5 h-3.5" />
-                <span className="text-xs font-bold">{credits}</span>
+                <span className="text-[10px] font-bold">{credits}</span>
+              </button>
+            ) : (
+              <button onClick={() => onOpenAuth('signup')} className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${isDarkMode ? 'bg-white text-black hover:bg-zinc-200' : 'bg-zinc-900 text-white hover:bg-black'}`}>
+                Sign Up
               </button>
             )}
-            <button 
-              onClick={toggleTheme} 
-              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-              className={`p-2 rounded-xl transition-colors duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900'}`}
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-            <button 
-              aria-label="Toggle mobile menu"
-              className={`p-2 transition-colors duration-300 ${isDarkMode ? 'text-zinc-100/70 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`} 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className={`fixed inset-x-0 top-20 z-40 border-b md:hidden ${isDarkMode ? 'bg-black border-white/5' : 'bg-white border-zinc-200'}`}
-          >
-            <div className="flex flex-col p-6 space-y-4">
-              <Link to="/" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/90' : 'text-zinc-900'}`}>
-                Analyzer
-              </Link>
-              <Link to="/methodology" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
-                Methodology
-              </Link>
-              <Link to="/blog" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
-                The Hub
-              </Link>
-              {user ? (
-                <>
-                  <Link to="/history" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
-                    History
-                  </Link>
-                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium text-left ${isDarkMode ? 'text-zinc-100/50' : 'text-zinc-500'}`}>
-                    Profile
-                  </Link>
-                  <button onClick={handleSignOut} className="mt-4 px-5 py-3 rounded-xl bg-rose-500/10 text-rose-500 font-bold flex items-center justify-center gap-2">
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </button>
-                </>
+      {/* Modern Mobile Bottom Navigation Bar */}
+      <div className={`md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center justify-between w-[90%] max-w-[400px] px-6 py-3 rounded-[2rem] shadow-2xl border backdrop-blur-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/80 border-white/10' : 'bg-white/90 border-zinc-200'}`}>
+        <Link to="/" className={`flex flex-col items-center gap-1 p-2 ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}>
+          <Sparkles className="w-5 h-5" />
+          <span className="text-[9px] font-bold tracking-widest uppercase">Scan</span>
+        </Link>
+        <Link to="/blog" className={`flex flex-col items-center gap-1 p-2 ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}>
+          <BookOpen className="w-5 h-5" />
+          <span className="text-[9px] font-bold tracking-widest uppercase">Hub</span>
+        </Link>
+        {user ? (
+          <>
+            <Link to="/history" className={`flex flex-col items-center gap-1 p-2 ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}>
+              <HistoryIcon className="w-5 h-5" />
+              <span className="text-[9px] font-bold tracking-widest uppercase">Past</span>
+            </Link>
+            <Link to="/profile" className={`flex flex-col items-center gap-1 p-2 ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}>
+              {user.photoURL ? (
+                <img src={user.photoURL} alt={user.displayName || ''} className="w-5 h-5 rounded-full ring-2 ring-transparent" />
               ) : (
-                <div className="flex flex-col gap-3 mt-4">
-                  <button onClick={() => { onOpenAuth('signin'); setMobileMenuOpen(false); }} className={`w-full py-3 rounded-xl font-bold text-sm border ${isDarkMode ? 'border-white/10 text-zinc-100' : 'border-zinc-200 text-zinc-900'}`}>
-                    Sign In
-                  </button>
-                  <button onClick={() => { onOpenAuth('signup'); setMobileMenuOpen(false); }} className={`w-full py-3 rounded-xl font-bold text-sm ${isDarkMode ? 'bg-white text-black' : 'bg-zinc-900 text-white'}`}>
-                    Sign Up
-                  </button>
-                </div>
+                <UserIcon className="w-5 h-5" />
               )}
-            </div>
-          </motion.div>
+              <span className="text-[9px] font-bold tracking-widest uppercase">Me</span>
+            </Link>
+          </>
+        ) : (
+          <button onClick={() => onOpenAuth('signin')} className={`flex flex-col items-center gap-1 p-2 ${isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}>
+            <UserIcon className="w-5 h-5" />
+            <span className="text-[9px] font-bold tracking-widest uppercase">Log In</span>
+          </button>
         )}
-      </AnimatePresence>
+      </div>
     </>
   );
 }

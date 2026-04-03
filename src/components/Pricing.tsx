@@ -12,35 +12,6 @@ import { cn } from '../lib/utils';
 import { fireConfetti } from '../lib/confetti';
 
 
-// ─── Countdown Timer ──────────────────────────────────────────────────────────
-const CountdownTimer = () => {
-  const [timeLeft, setTimeLeft] = useState<string>('23:59:59');
-  useEffect(() => {
-    const KEY = 'visage_offer_expiry';
-    let expiry = localStorage.getItem(KEY);
-    if (!expiry) {
-      expiry = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-      localStorage.setItem(KEY, expiry);
-    }
-    const tick = () => {
-      const dist = new Date(expiry!).getTime() - Date.now();
-      if (dist <= 0) { setTimeLeft('00:00:00'); return; }
-      const h = Math.floor(dist / 3_600_000).toString().padStart(2, '0');
-      const m = Math.floor((dist % 3_600_000) / 60_000).toString().padStart(2, '0');
-      const s = Math.floor((dist % 60_000) / 1_000).toString().padStart(2, '0');
-      setTimeLeft(`${h}:${m}:${s}`);
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-      ⏳ {timeLeft}
-    </span>
-  );
-};
-
 // ─── PayPal button wrapper ────────────────────────────────────────────────────
 const PayPalBtn = ({ planId, createOrder, onApprove }: any) => {
   const [{ isPending, isRejected }] = usePayPalScriptReducer();
@@ -101,7 +72,6 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState<'capturing' | 'success' | null>(null);
   const selectedPlanRef = React.useRef<string | null>(null);
-  const topPercentile = Math.max(2, Math.round(25 - (overallScore * 2.2)));
 
   // Shorthand theme helpers
   const bg    = isDarkMode ? 'bg-black'        : 'bg-white';
@@ -160,7 +130,7 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
 
   return (
     <PayPalScriptProvider options={{ 'client-id': paypalClientId, 'enable-funding': 'card' }}>
-      <div className={cn('fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 backdrop-blur-2xl', overlay)}>
+      <div className={cn('fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 backdrop-blur-md', overlay)}>
         <AnimatePresence mode="wait">
 
           {/* ─── SUCCESS ──────────────────────────────────────────────── */}
@@ -200,7 +170,8 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
             <motion.div key="checkout"
               initial={{ opacity:0, x:40 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-40 }}
               transition={{ duration:0.8, ease:[0.22,1,0.36,1] }}
-              className={cn('relative w-full max-w-5xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[2rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row border', bg, border)}>
+              data-lenis-prevent="true"
+              className={cn('relative w-full max-w-5xl max-h-[calc(100vh-2rem)] overflow-y-auto overscroll-contain rounded-[2rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row border', bg, border)}>
 
               {/* Nav buttons */}
               <div className="absolute top-6 left-6 z-20">
@@ -308,7 +279,8 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
             <motion.div key="selection"
               initial={{ opacity:0, scale:0.97 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0, scale:0.97 }}
               transition={{ duration:0.7, ease:[0.22,1,0.36,1] }}
-              className={cn('w-full max-w-7xl max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border', bg, border)}>
+              data-lenis-prevent="true"
+              className={cn('w-full max-w-7xl max-h-[calc(100vh-2rem)] overflow-y-auto overscroll-contain rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border', bg, border)}>
 
               {/* Header */}
               <div className={cn('relative px-8 md:px-12 pt-8 pb-7 border-b', borderSub)}>
@@ -322,7 +294,6 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
                     <span className="px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 text-[10px] font-black uppercase tracking-widest">
                       ✦ AI Face Analysis
                     </span>
-                    <CountdownTimer />
                   </div>
 
                   <h1 className={cn('text-3xl md:text-4xl font-black tracking-tighter leading-none', text)}>
@@ -333,7 +304,7 @@ export function Pricing({ isDarkMode, userId, onClose, overallScore = 8.6 }: Pri
                   </h1>
 
                   <p className={cn('text-sm md:text-base max-w-xl leading-relaxed', textSub)}>
-                    You're already Top {topPercentile}%. Discover exactly what's holding you back
+                    Discover exactly what's holding you back
                     from <span className="whitespace-nowrap"><strong className={text}>Top 1%</strong></span> — and fix it step-by-step.
                   </p>
                 </div>

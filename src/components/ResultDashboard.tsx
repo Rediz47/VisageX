@@ -593,7 +593,7 @@ export function ResultDashboard({
         className={cn(
           "w-full max-w-5xl mx-auto rounded-[2.5rem] p-6 md:p-12 border shadow-xl relative overflow-hidden pointer-events-auto",
           isGlassy
-            ? (isDarkMode ? "bg-zinc-900/40 border-white/10 backdrop-blur-2xl" : "bg-white/70 border-zinc-200 backdrop-blur-2xl")
+            ? (isDarkMode ? "bg-zinc-900/40 border-white/10 backdrop-blur-md" : "bg-white/70 border-zinc-200 backdrop-blur-md")
             : (isDarkMode ? "bg-zinc-900 border-white/5" : "bg-white border-zinc-100 shadow-indigo-500/5")
         )}
       >
@@ -974,7 +974,7 @@ export function ResultDashboard({
             <div className="relative flex-1">
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 h-full">
                 {radarData.map((item, index) => {
-                  const isItemLocked = isLocked && item.subject !== 'Eyes' && item.subject !== 'Skin Health' && item.subject !== 'Symmetry';
+                  const isItemLocked = isLocked && item.subject !== 'Symmetry' && item.subject !== 'Jawline' && item.subject !== 'Eyes';
                   return (
                     <motion.div
                       key={item.subject}
