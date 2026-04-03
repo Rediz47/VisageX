@@ -1139,11 +1139,30 @@ export function ResultDashboard({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onUnlock}
-                    className="w-full py-5 rounded-2xl bg-indigo-600 text-white font-black text-xs uppercase tracking-[0.2em] shadow-[0_20px_40px_rgba(79,70,229,0.3)] hover:shadow-[0_25px_50px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group/btn"
+                    className="w-full relative group p-0.5 rounded-2xl transition-all duration-300"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
-                    <Sparkles className="w-4 h-4" />
-                    ⚡ See Your Full Potential
+                    {/* Glowing Backdrop */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 rounded-2xl blur-md opacity-40 group-hover:opacity-80 transition-opacity duration-500 animate-pulse" />
+                    
+                    {/* Gradient Border */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 rounded-2xl" />
+                    
+                    {/* Inner Button Canvas */}
+                    <div className={cn(
+                      "relative w-full h-full rounded-2xl px-8 py-5 flex items-center justify-center gap-3 overflow-hidden",
+                      isDarkMode ? "bg-zinc-950" : "bg-white"
+                    )}>
+                      {/* Hover Shimmer */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                      
+                      <Sparkles className={cn("w-4 h-4", isDarkMode ? "text-cyan-400" : "text-cyan-600")} />
+                      <span className={cn(
+                        "font-black text-[10px] md:text-xs uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r",
+                        isDarkMode ? "from-cyan-400 to-purple-400" : "from-cyan-600 to-purple-600"
+                      )}>
+                        See Your Full Potential
+                      </span>
+                    </div>
                   </motion.button>
 
                   <div className="flex items-center gap-2 opacity-40 text-[9px] font-bold uppercase tracking-widest">
