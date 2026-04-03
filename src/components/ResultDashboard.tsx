@@ -906,7 +906,7 @@ export function ResultDashboard({
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   <div className="flex items-center justify-center gap-3">
                     <Lock className="w-4 h-4 md:w-5 md:h-5" />
-                    🚀 See How to Reach {potentialScore.toFixed(1)}+
+                    Unlock Full Report
                   </div>
                 </button>
               ) : (
