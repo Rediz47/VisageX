@@ -57,8 +57,8 @@ export default function BlogRecessedJawPage() {
           </header>
 
           {/* HERO IMAGE */}
-          <div className="w-full aspect-[21/9] rounded-[3rem] overflow-hidden transition-all shadow-xl hover:shadow-2xl">
-            <img src="/jawline.jpg" alt="Jawline Profile" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+          <div className="w-full w-full max-h-[400px] md:max-h-[500px] flex items-center justify-center transition-all hover:scale-[1.02] duration-700">
+            <img src="/jawline.jpg" alt="Jawline Profile" className="max-w-full max-h-full object-contain rounded-[2rem] md:rounded-[3rem] shadow-xl hover:shadow-2xl" />
           </div>
 
           <div className="space-y-8">

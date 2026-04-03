@@ -26,6 +26,9 @@ router.post('/create-order', requireAuth, async (req, res) => {
       },
       body: JSON.stringify({
         intent: 'CAPTURE',
+        application_context: {
+          shipping_preference: 'NO_SHIPPING',
+        },
         purchase_units: [
           {
             amount: {

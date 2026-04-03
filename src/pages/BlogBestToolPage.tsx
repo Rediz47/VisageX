@@ -57,8 +57,8 @@ export default function BlogBestToolPage() {
           </header>
 
           {/* HERO IMAGE DROP-ZONE */}
-          <div className={`w-full aspect-[21/9] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
-            <img src="/main-hero.png" className="w-full h-full object-cover" alt="Face Tesselation" />
+          <div className={`w-full aspect-video bg-zinc-100 dark:bg-black/20 rounded-[3rem] overflow-hidden flex flex-col items-center justify-center border-2 border-dashed ${isDarkMode ? 'border-white/10 bg-white/[0.02]' : 'border-zinc-300 bg-zinc-100'} transition-all hover:border-zinc-500`}>
+            <img src="/main-hero.png" className="w-full h-full object-contain" alt="Face Tesselation" />
           </div>
 
           {/* Intro block */}
