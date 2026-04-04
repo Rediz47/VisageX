@@ -29,7 +29,16 @@ export const createSharedRateLimiter = (maxRequests: number, windowStr: any, err
     if (!identifier) identifier = 'anonymous';
 
     try {
-      const { success, limit, remaining, reset } = await ratelimit.limit(identifier);
+      // Add a 2-second timeout to the rate limit check
+      const timeoutPromise = new Promise<{ success: boolean; limit: number; remaining: number; reset: number }>(
+        (_, reject) => setTimeout(() => reject(new Error('Rate limit check timed out')), 2000)
+      );
+
+      const { success, limit, remaining, reset } = await Promise.race([
+        ratelimit.limit(identifier),
+        timeoutPromise
+      ]);
+
       res.setHeader('X-RateLimit-Limit', limit);
       res.setHeader('X-RateLimit-Remaining', remaining);
       res.setHeader('X-RateLimit-Reset', reset);
@@ -39,9 +48,10 @@ export const createSharedRateLimiter = (maxRequests: number, windowStr: any, err
         return;
       }
       next();
-    } catch (e) {
-      console.error("Rate limit error", e);
-      next(); // Fail open on Redis error
+    } catch (e: any) {
+      console.error("Rate limit error or timeout:", e.message || e);
+      // Failsafe: if Redis is slow or down, we allow the request to proceed
+      next();
     }
   };
 };

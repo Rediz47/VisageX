@@ -776,6 +776,34 @@ export function ResultDashboard({
       animate={{ opacity: 1, y: 0 }}
       className="w-full mx-auto p-4 md:p-6 max-w-[1400px]"
     >
+      <AnimatePresence>
+        {isGeneratingCard && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/60 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="flex flex-col items-center gap-6 text-center"
+            >
+              <div className="relative">
+                <div className="w-24 h-24 rounded-full border-4 border-white/5 border-t-indigo-500 animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Sparkles className="w-8 h-8 text-indigo-400" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-display italic text-white">Generating Neural Card</h3>
+                <p className="text-zinc-400 text-sm font-medium tracking-widest uppercase">Analyzing 468 landmarks...</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 mb-8 md:mb-10">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
