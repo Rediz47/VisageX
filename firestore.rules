@@ -79,7 +79,7 @@ service cloud.firestore {
              data.createdAt is string &&
              data.overallScore is number &&
              data.imageUrl is string && // Allow base64 string
-             data.analysisData is string && data.analysisData.size() < 1048576;
+             data.analysisData is string && data.analysisData.size() < 1000000;
     }
 
     // ===============================================================

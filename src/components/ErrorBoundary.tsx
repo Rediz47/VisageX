@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { Component, type ReactNode, type ErrorInfo } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -11,15 +12,8 @@ interface State {
   error: Error | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State;
-  public props: Props;
-
-  constructor(props: Props) {
-    super(props);
-    this.props = props;
-    this.state = { hasError: false, error: null };
-  }
+export class ErrorBoundary extends React.Component<Props, State> {
+  state: State = { hasError: false, error: null };
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };

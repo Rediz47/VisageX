@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
+import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { getAdminDb } from '../services/firebase.service.js';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -7,14 +7,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 const router = Router();
 
 // Auth rate limiter: 5 requests per 15 minutes
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many auth requests. Please try again later.', code: 'RATE_LIMITED' },
-  skip: (req) => req.method === 'OPTIONS',
-});
+const authLimiter = createSharedRateLimiter(5, "15 m", 'Too many auth requests. Please try again later.');
 
 router.post('/init-user', authLimiter, requireAuth, async (req, res) => {
   try {

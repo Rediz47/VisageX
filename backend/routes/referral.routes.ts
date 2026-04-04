@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
+import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
 import { getAdminDb } from '../services/firebase.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -7,14 +7,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 const router = Router();
 
 // Referral rate limiter: 5 redeems/completions per 15 minutes
-const referralLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many referral attempts. Please try again later.', code: 'RATE_LIMITED' },
-  skip: (req) => req.method === 'OPTIONS',
-});
+const referralLimiter = createSharedRateLimiter(5, "15 m", 'Too many referral attempts. Please try again later.');
 
 // Referral Redeem Endpoint (Secure)
 router.post('/redeem', referralLimiter, requireAuth, async (req, res) => {

@@ -1,19 +1,12 @@
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
+import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
 import { getResend } from '../services/email.service.js';
 import { getAdminDb } from '../services/firebase.service.js';
 
 const router = Router();
 
 // Email rate limiter: 3 emails per 10 minutes
-const emailLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 3,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Please wait before requesting another email.', code: 'RATE_LIMITED' },
-  skip: (req) => req.method === 'OPTIONS',
-});
+const emailLimiter = createSharedRateLimiter(3, "10 m", 'Please wait before requesting another email.');
 
 // Welcome Email Endpoint
 router.post('/welcome', emailLimiter, async (req, res) => {

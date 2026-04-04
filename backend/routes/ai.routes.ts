@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
+import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
 import { getAdminDb } from '../services/firebase.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -8,33 +8,9 @@ const router = Router();
 
 const VERTEX_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-// Rate limiters — per IP, returns JSON so frontend can handle gracefully
-const analysisLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many analysis requests. Please wait before trying again.', code: 'RATE_LIMITED' },
-  skip: (req) => req.method === 'OPTIONS',
-});
-
-const celebrityLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 3,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many celebrity scan requests. Please wait before trying again.', code: 'RATE_LIMITED' },
-  skip: (req) => req.method === 'OPTIONS',
-});
-
-const coachLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many coach requests. Please slow down.', code: 'RATE_LIMITED' },
-  skip: (req) => req.method === 'OPTIONS',
-});
+const analysisLimiter = createSharedRateLimiter(5, "10 m", 'Too many analysis requests. Please wait before trying again.');
+const celebrityLimiter = createSharedRateLimiter(3, "10 m", 'Too many celebrity scan requests. Please wait before trying again.');
+const coachLimiter = createSharedRateLimiter(20, "10 m", 'Too many coach requests. Please slow down.');
 
 // Retry helper: retries a function up to maxRetries times with exponential backoff
 async function withRetry<T>(fn: () => Promise<T>, maxRetries: number = 3, baseDelayMs: number = 1000): Promise<T> {
