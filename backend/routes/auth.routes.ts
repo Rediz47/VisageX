@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { randomBytes } from 'crypto';
 import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { getAdminDb } from '../services/firebase.service.js';
@@ -21,7 +22,7 @@ router.post('/init-user', authLimiter, requireAuth, async (req, res) => {
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) {
-      const myReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const myReferralCode = randomBytes(3).toString('hex').toUpperCase();
       
       await userRef.set({
         uid: userId,

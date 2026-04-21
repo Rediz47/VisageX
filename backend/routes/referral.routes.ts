@@ -3,6 +3,9 @@ import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
 import { getAdminDb } from '../services/firebase.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { FieldValue } from 'firebase-admin/firestore';
+import { validate, referralRedeemSchema } from '../utils/validation.js';
+import { recordLedgerEntry } from '../services/ledger.service.js';
+import { checkMultiAccountAbuse, checkReferralAbuse, generateDeviceFingerprint } from '../services/fraud.service.js';
 
 const router = Router();
 
@@ -10,20 +13,25 @@ const router = Router();
 const referralLimiter = createSharedRateLimiter(5, "15 m", 'Too many referral attempts. Please try again later.');
 
 // Referral Redeem Endpoint (Secure)
-router.post('/redeem', referralLimiter, requireAuth, async (req, res) => {
+router.post('/redeem', referralLimiter, requireAuth, validate(referralRedeemSchema), async (req, res) => {
   try {
     const { referralCode, fingerprint } = req.body;
     const userId = req.user!.uid; // Securely get from token
 
-    if (!referralCode) {
-      return res.status(400).json({ error: 'Missing referralCode' });
-    }
-
-    const clientIp = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    let clientIp: any = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    if (Array.isArray(clientIp)) clientIp = clientIp[0];
+    const deviceFp = generateDeviceFingerprint(req.headers, fingerprint);
 
     const db = getAdminDb();
     if (!db) {
       return res.status(500).json({ error: 'Database not initialized' });
+    }
+
+    // Fraud check: multi-account abuse detection
+    const { suspicious } = await checkMultiAccountAbuse(userId, clientIp, deviceFp);
+    if (suspicious) {
+      console.warn(`[Fraud] Multi-account abuse suspected for referral: user=${userId} ip=${clientIp}`);
+      return res.status(403).json({ error: 'Suspicious activity detected. Please contact support.' });
     }
 
     const inviterSnapshot = await db.collection('users').where('referralCode', '==', referralCode).limit(1).get();
@@ -36,6 +44,13 @@ router.post('/redeem', referralLimiter, requireAuth, async (req, res) => {
 
     if (inviterId === userId) {
       return res.status(400).json({ error: 'Cannot use your own referral code' });
+    }
+
+    // Fraud check: referral abuse (same IP as inviter, velocity check)
+    const { blocked, reason } = await checkReferralAbuse(userId, inviterId, clientIp);
+    if (blocked) {
+      console.warn(`[Fraud] Referral abuse blocked: ${reason}`);
+      return res.status(403).json({ error: reason || 'Referral abuse detected' });
     }
 
     await db.runTransaction(async (t) => {
@@ -92,6 +107,9 @@ router.post('/redeem', referralLimiter, requireAuth, async (req, res) => {
       }
     });
 
+    // Record ledger entries for both parties
+    recordLedgerEntry(userId, 1, 'referral_invitee', { inviterId, referralCode }, clientIp).catch(() => {});
+
     return res.status(200).json({ success: true, message: 'Referral applied! You received +1 bonus credit.' });
   } catch (error: any) {
     console.error('Referral redeem error:', error);
@@ -119,58 +137,65 @@ router.get('/leaderboard', async (req, res) => {
       } catch { /* ignore auth errors for public endpoint */ }
     }
 
-    const snap = await db.collection('users')
-      .orderBy('invitedCount', 'desc')
-      .limit(10)
-      .get();
+    // Try Redis cache first (60s TTL)
+    let entries: any[] | null = null;
+    let redis: any = null;
+    try {
+      if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+        const { Redis } = await import('@upstash/redis');
+        redis = Redis.fromEnv();
+        const cached = await redis.get('leaderboard:top5');
+        if (cached && typeof cached === 'string') {
+          entries = JSON.parse(cached);
+        } else if (cached && Array.isArray(cached)) {
+          entries = cached;
+        }
+      }
+    } catch { /* Redis miss — fall through to Firestore */ }
 
-    const entries = snap.docs
-      .filter(d => (d.data().invitedCount || 0) > 0)
-      .slice(0, 5)
-      .map((doc, i) => {
-        const data = doc.data();
-        const name: string = data.displayName || data.email || 'Anonymous';
-        const parts = name.split(/[\s@]/);
-        const display = parts[0].charAt(0).toUpperCase() + parts[0].slice(1, 4) + '***';
-        return {
-          rank: i + 1,
-          name: display,
-          invites: data.invitedCount || 0,
-          isCurrentUser: authenticatedUserId === doc.id,
-        };
-      });
+    if (!entries) {
+      const snap = await db.collection('users')
+        .orderBy('invitedCount', 'desc')
+        .limit(10)
+        .get();
 
-    return res.json({ leaderboard: entries });
+      const rawEntries = snap.docs
+        .filter(d => (d.data().invitedCount || 0) > 0)
+        .slice(0, 5)
+        .map((doc, i) => {
+          const data = doc.data();
+          const name: string = data.displayName || data.email || 'Anonymous';
+          const parts = name.split(/[\s@]/);
+          const display = parts[0].charAt(0).toUpperCase() + parts[0].slice(1, 4) + '***';
+          return {
+            rank: i + 1,
+            name: display,
+            invites: data.invitedCount || 0,
+            _docId: doc.id, // internal only — stripped before caching
+          };
+        });
+
+      // Cache in Redis WITHOUT internal _docId to avoid leaking Firestore IDs
+      if (redis && rawEntries) {
+        const cacheSafe = rawEntries.map(({ _docId, ...rest }) => rest);
+        try { await redis.set('leaderboard:top5', JSON.stringify(cacheSafe), { ex: 60 }); } catch { /* ignore */ }
+      }
+
+      entries = rawEntries;
+    }
+
+    // Tag current user (done after cache since it's per-request)
+    const tagged = entries!.map((e: any) => ({
+      rank: e.rank,
+      name: e.name,
+      invites: e.invites,
+      isCurrentUser: authenticatedUserId ? authenticatedUserId === e._docId : false,
+    }));
+
+    return res.json({ leaderboard: tagged });
   } catch (err: any) {
     console.error('Leaderboard error:', err);
     return res.status(500).json({ error: 'Failed to load leaderboard' });
-  }
-});
-
-// Scan Completion Endpoint: Trigger referral rewards for the inviter
-router.post('/scan/complete', referralLimiter, requireAuth, async (req, res) => {
-  try {
-    const userId = req.user!.uid;
-
-    const db = getAdminDb();
-    if (!db) return res.status(500).json({ error: 'Database error' });
-
-    const userDoc = await db.collection('users').doc(userId).get();
-    if (!userDoc.exists) return res.status(404).json({ error: 'User not found' });
-
-    const inviterId = userDoc.data()?.referredBy;
-    if (!inviterId) return res.json({ success: true, message: 'No referral found' });
-
-    // Mark current user as having completed a scan
-    await db.collection('users').doc(userId).update({
-      referralRewardTriggered: true
-    });
-
-    console.log(`Scan completion recorded for user ${userId}. Inviter: ${inviterId}`);
-    return res.json({ success: true, message: 'Scan completion reward triggered' });
-  } catch (error: any) {
-    console.error('Scan complete error:', error);
-    return res.status(500).json({ error: 'Failed to process scan completion' });
   }
 });
 

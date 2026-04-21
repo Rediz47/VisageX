@@ -16,6 +16,7 @@ export function useImageProcessing(
   const [isProcessing, setIsProcessing] = useState(false);
   const [scanStep, setScanStep] = useState<string>("");
   const [errorProcessing, setError] = useState<string | null>(null);
+  const [faceLandmarks, setFaceLandmarks] = useState<Landmark[] | null>(null);
 
   const { analyzeImageServerSide, getGeminiAnalysis, saveToHistory, saveStatus } = useAnalysis(userCredits);
 
@@ -61,6 +62,7 @@ export function useImageProcessing(
       }
 
       const landmarks = result.faceLandmarks[0] as unknown as Landmark[];
+      setFaceLandmarks(landmarks);
       const blendshapes = result.faceBlendshapes?.[0];
 
       setScanStep("Analyzing facial expression...");
@@ -136,22 +138,43 @@ export function useImageProcessing(
 
       setScanStep("AI Skin & Texture Analysis...");
       updateProgress(65);
-      
-      analysisResult = await getGeminiAnalysis(croppedImageBase64, analysisResult);
+
+      // Gemini can take 5-15s. Pump intermediate milestones on a timer so the
+      // bar keeps ticking forward during the await. Cleared as soon as Gemini
+      // resolves (we then jump to 90 anyway).
+      let geminiTick = 66;
+      const geminiPump = setInterval(() => {
+        if (geminiTick < 85) {
+          geminiTick += 1;
+          updateProgress(geminiTick);
+        }
+      }, 450);
+      try {
+        analysisResult = await getGeminiAnalysis(croppedImageBase64, analysisResult);
+      } finally {
+        clearInterval(geminiPump);
+      }
+
+      // Attach landmark data for the animated face mesh overlay in the dashboard
+      analysisResult.landmarks = landmarks;
+      analysisResult.cropInfo = { cropX, cropY, imgWidth: img.width, imgHeight: img.height, cropW, cropH };
 
       setScanStep("Generating aesthetic report...");
-      updateProgress(90);
+      updateProgress(92);
 
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Short visual beat so the user registers the "report" step, then finish.
+      await new Promise(resolve => setTimeout(resolve, 250));
 
       setScanStep("Finalizing results...");
       updateProgress(100);
-      
+
       const finalImageUrl = canvas.toDataURL('image/jpeg', 0.8);
       const isLocked = userCredits <= 0;
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      // Just long enough for the bar to visibly hit 100, then proceed. No
+      // artificial waiting at the end.
+      await new Promise(resolve => setTimeout(resolve, 250));
+
       onAnalysisComplete(analysisResult, finalImageUrl, isLocked);
 
       const thumbCanvas = document.createElement('canvas');
@@ -180,5 +203,5 @@ export function useImageProcessing(
     }
   };
 
-  return { processImage, isProcessing, scanStep, errorProcessing, setError, saveStatus };
+  return { processImage, isProcessing, scanStep, errorProcessing, setError, saveStatus, faceLandmarks };
 }

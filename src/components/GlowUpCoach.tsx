@@ -136,7 +136,7 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-none">
               {messages.map((msg, i) => (
                 <motion.div
                   key={i}

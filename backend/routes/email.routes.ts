@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
+import { requireAuth } from '../middleware/auth.middleware.js';
 import { getResend } from '../services/email.service.js';
 import { getAdminDb } from '../services/firebase.service.js';
+import { validate, emailWelcomeSchema } from '../utils/validation.js';
 
 const router = Router();
 
@@ -9,12 +11,9 @@ const router = Router();
 const emailLimiter = createSharedRateLimiter(3, "10 m", 'Please wait before requesting another email.');
 
 // Welcome Email Endpoint
-router.post('/welcome', emailLimiter, async (req, res) => {
+router.post('/welcome', emailLimiter, requireAuth, validate(emailWelcomeSchema), async (req, res) => {
   try {
     const { email, name, userId } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
-    }
 
     const clientIp = req.ip || req.headers['x-forwarded-for'] || 'unknown';
     if (userId && clientIp !== 'unknown') {

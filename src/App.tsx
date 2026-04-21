@@ -24,6 +24,7 @@ const HistoryPage = lazy(() => import('./pages/HistoryPage'));
 const MethodologyPage = lazy(() => import('./pages/MethodologyPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
+const RefundPage = lazy(() => import('./pages/RefundPage'));
 const BlogSymmetryPage = lazy(() => import('./pages/BlogSymmetryPage'));
 const BlogAnalysisPage = lazy(() => import('./pages/BlogAnalysisPage'));
 const BlogBestToolPage = lazy(() => import('./pages/BlogBestToolPage'));
@@ -112,15 +113,31 @@ function InnerApp() {
   }, [pricingModalOpen, authModalOpen]);
 
   return (
-    <div className={`min-h-screen font-sans transition-colors duration-700 ${isDarkMode ? 'bg-black text-zinc-100 selection:bg-cyan-500/30 selection:text-cyan-200' : 'bg-zinc-50 text-zinc-900 selection:bg-indigo-500/10 selection:text-indigo-900'} overflow-x-hidden`}>
+    <div className={`min-h-screen font-sans transition-colors duration-700 ${isDarkMode ? 'text-zinc-100 selection:bg-cyan-500/30 selection:text-cyan-200' : 'bg-[#f8f8fc] text-zinc-900 selection:bg-indigo-500/10 selection:text-indigo-900'} overflow-x-hidden`}
+      style={isDarkMode ? { backgroundColor: '#050508' } : undefined}
+    >
       {/* Ambient Background Glow — uses opacity+radial-gradient instead of blur for perf */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className={`absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full will-change-transform transition-colors duration-1000 ${isDarkMode ? 'bg-zinc-800/5' : 'bg-zinc-400/[0.03]'}`} style={{ background: isDarkMode ? 'radial-gradient(circle, rgba(39,39,42,0.08) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(161,161,170,0.04) 0%, transparent 70%)' }} />
-        <div className={`absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full will-change-transform transition-colors duration-1000 ${isDarkMode ? 'bg-zinc-900/5' : 'bg-zinc-300/[0.03]'}`} style={{ background: isDarkMode ? 'radial-gradient(circle, rgba(24,24,27,0.08) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(212,212,216,0.04) 0%, transparent 70%)' }} />
+        <div
+          className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full will-change-transform"
+          style={{
+            background: isDarkMode
+              ? 'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)'
+              : 'radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%)',
+          }}
+        />
+        <div
+          className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full will-change-transform"
+          style={{
+            background: isDarkMode
+              ? 'radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%)'
+              : 'radial-gradient(circle, rgba(34,211,238,0.04) 0%, transparent 70%)',
+          }}
+        />
       </div>
 
       <ScrollToTop />
-      <GlobalHeader 
+      <GlobalHeader
         onOpenAuth={(mode) => { setAuthMode(mode); setAuthModalOpen(true); posthog.capture('auth_modal_opened', { mode }); }}
         onOpenPricing={() => { setPricingModalOpen(true); posthog.capture('pricing_modal_opened'); }}
       />
@@ -128,62 +145,63 @@ function InnerApp() {
       {/* Main Content */}
       <main className="relative z-10 pt-20">
         <ErrorBoundary>
-        <Suspense fallback={
-          <div className={`min-h-screen pt-24 flex flex-col items-center justify-center gap-6 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
-            <div className="relative">
-              <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
-                <svg className={`w-6 h-6 ${isDarkMode ? 'text-white/60' : 'text-zinc-400'}`} fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9S16.97 3 12 3zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
+          <Suspense fallback={
+            <div className={`min-h-screen pt-24 flex flex-col items-center justify-center gap-6 ${isDarkMode ? 'bg-black' : 'bg-zinc-50'}`}>
+              <div className="relative">
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
+                  <svg className={`w-6 h-6 ${isDarkMode ? 'text-white/60' : 'text-zinc-400'}`} fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9S16.97 3 12 3zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" /></svg>
+                </div>
+                <div className="absolute -inset-1 rounded-2xl border border-indigo-500/20 animate-ping opacity-40" />
               </div>
-              <div className="absolute -inset-1 rounded-2xl border border-indigo-500/20 animate-ping opacity-40" />
+              <p className={`text-xs font-bold uppercase tracking-[0.3em] ${isDarkMode ? 'text-white/20' : 'text-zinc-400'}`}>Initializing VisageX</p>
             </div>
-            <p className={`text-xs font-bold uppercase tracking-[0.3em] ${isDarkMode ? 'text-white/20' : 'text-zinc-400'}`}>Initializing VisageX</p>
-          </div>
-        }>
-          <Routes>
-            <Route path="/" element={
-              <Landing 
-                onOpenPricing={() => setPricingModalOpen(true)}
-                onOpenAuth={() => setAuthModalOpen(true)}
-                setAuthMode={setAuthMode}
-              />
-            } />
-            <Route path="/methodology" element={<MethodologyPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/blog/how-to-improve-face-symmetry" element={<BlogSymmetryPage />} />
-            <Route path="/blog/ai-face-analysis-explained" element={<BlogAnalysisPage />} />
-            <Route path="/blog/best-ai-face-analysis-tool" element={<BlogBestToolPage />} />
-            <Route path="/blog" element={<BlogIndexPage />} />
-            <Route path="/blog/what-is-canthal-tilt" element={<BlogCanthalTiltPage />} />
-            <Route path="/blog/how-to-fix-recessed-jawline" element={<BlogRecessedJawPage />} />
-            <Route path="/blog/does-gua-sha-work" element={<BlogGuaShaPage />} />
-            <Route path="/blog/free-ai-face-analysis" element={<BlogFreeAIFacePage />} />
-            <Route path="/blog/complete-mewing-guide" element={<BlogMewingGuidePage />} />
-            <Route path="/blog/looksmaxxing-routine-for-beginners" element={<BlogLooksmaxRoutinePage />} />
-            
-            {/* Protected Routes */}
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/history" element={
-              <ProtectedRoute>
-                <HistoryPage />
-              </ProtectedRoute>
-            } />
+          }>
+            <Routes>
+              <Route path="/" element={
+                <Landing
+                  onOpenPricing={() => setPricingModalOpen(true)}
+                  onOpenAuth={() => setAuthModalOpen(true)}
+                  setAuthMode={setAuthMode}
+                />
+              } />
+              <Route path="/methodology" element={<MethodologyPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/refund" element={<RefundPage />} />
+              <Route path="/blog/how-to-improve-face-symmetry" element={<BlogSymmetryPage />} />
+              <Route path="/blog/ai-face-analysis-explained" element={<BlogAnalysisPage />} />
+              <Route path="/blog/best-ai-face-analysis-tool" element={<BlogBestToolPage />} />
+              <Route path="/blog" element={<BlogIndexPage />} />
+              <Route path="/blog/what-is-canthal-tilt" element={<BlogCanthalTiltPage />} />
+              <Route path="/blog/how-to-fix-recessed-jawline" element={<BlogRecessedJawPage />} />
+              <Route path="/blog/does-gua-sha-work" element={<BlogGuaShaPage />} />
+              <Route path="/blog/free-ai-face-analysis" element={<BlogFreeAIFacePage />} />
+              <Route path="/blog/complete-mewing-guide" element={<BlogMewingGuidePage />} />
+              <Route path="/blog/looksmaxxing-routine-for-beginners" element={<BlogLooksmaxRoutinePage />} />
 
-            {/* 404 catch-all */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
+              {/* Protected Routes */}
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/history" element={
+                <ProtectedRoute>
+                  <HistoryPage />
+                </ProtectedRoute>
+              } />
+
+              {/* 404 catch-all */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
         </ErrorBoundary>
       </main>
 
-      <Footer 
-        isDarkMode={isDarkMode} 
-        onNavigatePrivacy={() => {}}
-        onNavigateTerms={() => {}}
+      <Footer
+        isDarkMode={isDarkMode}
+        onNavigatePrivacy={() => { }}
+        onNavigateTerms={() => { }}
       />
 
       <Auth
@@ -193,7 +211,7 @@ function InnerApp() {
         initialMode={authMode}
         initialReferralCode={initialReferralCode}
       />
-      <PricingModalManager 
+      <PricingModalManager
         pricingModalOpen={pricingModalOpen}
         setPricingModalOpen={setPricingModalOpen}
         isDarkMode={isDarkMode}

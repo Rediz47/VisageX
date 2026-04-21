@@ -10,6 +10,11 @@
 [functions."api"]
   timeout = 26
 
+[functions."api".processing]
+  # Vertex AI calls can take 20-25s for complex analyses.
+  # Keep the function timeout at 26s (Netlify max for sync functions on most plans).
+  # The backend AbortController timeout is set to 25s to finish before the 26s cutoff.
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"

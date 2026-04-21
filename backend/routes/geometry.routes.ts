@@ -1,15 +1,15 @@
 import { Router } from 'express';
+import { createSharedRateLimiter } from '../middleware/ratelimit.middleware.js';
 import { calculateEAR, alignLandmarks, analyzeSymmetry, calculateMetrics } from '../utils/geometry.js';
+import { validate, geometryAnalyzeSchema } from '../utils/validation.js';
 
 const router = Router();
 
-router.post('/analyze', async (req, res) => {
+const geometryLimiter = createSharedRateLimiter(15, "10 m", 'Too many geometry requests. Please slow down.');
+
+router.post('/analyze', geometryLimiter, validate(geometryAnalyzeSchema), async (req, res) => {
   try {
     const { landmarks } = req.body;
-
-    if (!landmarks || landmarks.length === 0) {
-      return res.status(400).json({ error: 'No landmarks provided' });
-    }
 
     // --- 1. PHOTO QUALITY CHECKS ---
     const { leftEAR, rightEAR } = calculateEAR(landmarks);

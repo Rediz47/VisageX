@@ -56,8 +56,8 @@ export function GlobalHeader({
               The Hub
             </Link>
 
-            <button 
-              onClick={toggleTheme} 
+            <button
+              onClick={toggleTheme}
               aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
               className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white hover:bg-white/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-900/10'}`}
             >
@@ -83,8 +83,8 @@ export function GlobalHeader({
                     {user.displayName?.split(' ')[0] || 'User'}
                   </span>
                 </Link>
-                <button 
-                  onClick={handleSignOut} 
+                <button
+                  onClick={handleSignOut}
                   aria-label="Sign out"
                   className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-rose-400 hover:bg-rose-500/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-rose-600 hover:bg-rose-50'}`}
                 >

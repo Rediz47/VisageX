@@ -1,22 +1,33 @@
 import { Router } from 'express';
+import { createSharedRateLimiter, getRedis } from '../middleware/ratelimit.middleware.js';
 import { getPayPalAccessToken, PAYPAL_API } from '../services/paypal.service.js';
+import { PLANS, getPlanCredits, getPlanPrice, getPlanName } from '../services/plans.service.js';
 import { getAdminDb } from '../services/firebase.service.js';
 import { getResend } from '../services/email.service.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { FieldValue } from 'firebase-admin/firestore';
+import { validate, paypalCreateOrderSchema, paypalCaptureOrderSchema } from '../utils/validation.js';
+import { addCreditsWithLedger } from '../services/ledger.service.js';
 
 const router = Router();
 
 // PayPal Create Order (Secure)
-router.post('/create-order', requireAuth, async (req, res) => {
+const orderLimiter = createSharedRateLimiter(10, "10 m", 'Too many order requests. Please slow down.');
+
+router.post('/create-order', orderLimiter, requireAuth, validate(paypalCreateOrderSchema), async (req, res) => {
   try {
     const { planId } = req.body;
     const userId = req.user!.uid;
 
+    // Reject unknown plan IDs
+    if (!PLANS[planId]) {
+      return res.status(400).json({ error: 'Invalid plan ID' });
+    }
+
     const accessToken = await getPayPalAccessToken();
 
-    const price = planId === 'price_single' ? '1.49' : planId === 'price_basic' ? '4.99' : planId === 'price_pro' ? '12.99' : '29.99';
-    const name = planId === 'price_single' ? 'Trial' : planId === 'price_basic' ? 'Explorer' : planId === 'price_pro' ? 'Max Potential' : 'Elite';
+    const price = getPlanPrice(planId);
+    const name = getPlanName(planId);
 
     const response = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
       method: 'POST',
@@ -51,7 +62,7 @@ router.post('/create-order', requireAuth, async (req, res) => {
 });
 
 // PayPal Capture Order (Secure)
-router.post('/capture-order', requireAuth, async (req, res) => {
+router.post('/capture-order', requireAuth, validate(paypalCaptureOrderSchema), async (req, res) => {
   try {
     const { orderID } = req.body;
     const authenticatedUserId = req.user!.uid; 
@@ -92,10 +103,7 @@ router.post('/capture-order', requireAuth, async (req, res) => {
         return res.json(data);
       }
 
-      const credits = planId === 'price_single' ? 1
-        : planId === 'price_basic' ? 5
-          : planId === 'price_pro' ? 15
-            : 50;
+      const credits = getPlanCredits(planId);
 
       const db = getAdminDb();
       if (db) {
@@ -103,9 +111,7 @@ router.post('/capture-order', requireAuth, async (req, res) => {
         const orderDoc = await orderRef.get();
 
         if (!orderDoc.exists) {
-          await db.collection('users').doc(authenticatedUserId).update({
-            credits: FieldValue.increment(credits)
-          });
+          await addCreditsWithLedger(authenticatedUserId, credits, 'purchase', { orderId: orderID, planId, source: 'capture' });
           await orderRef.set({ processedAt: new Date().toISOString(), planId, userId: authenticatedUserId, source: 'capture' });
           console.log(`Server-side credit update: User ${authenticatedUserId} gets ${credits} credits.`);
         } else {
@@ -121,11 +127,26 @@ router.post('/capture-order', requireAuth, async (req, res) => {
   }
 });
 
-// PayPal Webhook (Public — signature verified)
+// PayPal Webhook (Public — signature verified + replay protection)
 router.post('/webhook', async (req, res) => {
   try {
     const event = req.body;
     console.log('PayPal Webhook received:', event.event_type);
+
+    // Replay attack protection: reject duplicate event IDs
+    const eventId = event.id;
+    if (eventId) {
+      const redis = getRedis();
+      if (redis) {
+        const alreadyProcessed = await redis.get(`webhook:${eventId}`);
+        if (alreadyProcessed) {
+          console.log(`Webhook replay blocked: ${eventId}`);
+          return res.status(200).send('OK (duplicate)');
+        }
+        // Mark as processed with 72h TTL
+        await redis.set(`webhook:${eventId}`, '1', { ex: 259200 });
+      }
+    }
 
     // Verify webhook signature to prevent spoofed events
     const webhookId = process.env.PAYPAL_WEBHOOK_ID;
@@ -158,7 +179,11 @@ router.post('/webhook', async (req, res) => {
         return res.status(403).send('Webhook verification failed');
       }
     } else {
-      console.warn('PAYPAL_WEBHOOK_ID not set — skipping signature verification (NOT SAFE FOR PRODUCTION)');
+      if (process.env.NODE_ENV === 'production' || process.env.NETLIFY) {
+        console.error('PAYPAL_WEBHOOK_ID not set in production — rejecting webhook');
+        return res.status(403).send('Webhook misconfigured');
+      }
+      console.warn('PAYPAL_WEBHOOK_ID not set — skipping signature verification (DEV ONLY)');
     }
 
     if (event.event_type === 'CHECKOUT.ORDER.APPROVED' || event.event_type === 'PAYMENT.CAPTURE.COMPLETED') {
@@ -177,10 +202,7 @@ router.post('/webhook', async (req, res) => {
       }
 
       if (userId && planId) {
-        const credits = planId === 'price_single' ? 1
-          : planId === 'price_basic' ? 5
-            : planId === 'price_pro' ? 15
-              : 50;
+        const credits = getPlanCredits(planId);
         const db = getAdminDb();
         if (db) {
           const orderId = resource.id;
@@ -188,9 +210,7 @@ router.post('/webhook', async (req, res) => {
           const orderDoc = await orderRef.get();
 
           if (!orderDoc.exists) {
-            await db.collection('users').doc(userId).update({
-              credits: FieldValue.increment(credits)
-            });
+            await addCreditsWithLedger(userId, credits, 'purchase', { orderId, planId, source: 'webhook' });
             await orderRef.set({ processedAt: new Date().toISOString(), planId, userId, source: 'webhook' });
             console.log(`Webhook: Added ${credits} credits to user ${userId}`);
 
@@ -205,7 +225,7 @@ router.post('/webhook', async (req, res) => {
                     to: userData.email,
                     subject: 'Receipt for Visage AI Credits',
                     html: `
-                      <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto;">
+                      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                         <h2>Thank you for your purchase!</h2>
                         <p>We've successfully added <strong>${credits} credits</strong> to your account.</p>
                         <p>You can now run more clinical facial analyses.</p>

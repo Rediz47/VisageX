@@ -27,17 +27,20 @@ app.use(express.json());
 app.use('/api', geometryRouter);
 
 describe('Geometry API', () => {
+    // Generate mock 468-landmark array
+    const mockLandmarks = () => Array.from({ length: 468 }, () => ({ x: 0, y: 0, z: 0 }));
+
     it('should return 400 if no landmarks are provided', async () => {
         const res = await request(app).post('/api/analyze').send({});
         expect(res.status).toBe(400);
-        expect(res.body.error).toBe('No landmarks provided');
+        expect(res.body.error).toBe('Validation failed');
     });
 
     it('should return 400 if eyes are closed (low EAR)', async () => {
         const { calculateEAR } = await import('../utils/geometry.js');
         (calculateEAR as any).mockReturnValue({ leftEAR: 0.1, rightEAR: 0.1 });
 
-        const res = await request(app).post('/api/analyze').send({ landmarks: [{ x: 0, y: 0 }] });
+        const res = await request(app).post('/api/analyze').send({ landmarks: mockLandmarks() });
         expect(res.status).toBe(400);
         expect(res.body.error).toContain('Eyes appear to be closed');
     });
@@ -46,7 +49,7 @@ describe('Geometry API', () => {
         const { calculateEAR } = await import('../utils/geometry.js');
         (calculateEAR as any).mockReturnValue({ leftEAR: 0.2, rightEAR: 0.2 });
 
-        const res = await request(app).post('/api/analyze').send({ landmarks: [{ x: 0, y: 0 }] });
+        const res = await request(app).post('/api/analyze').send({ landmarks: mockLandmarks() });
         
         expect(res.status).toBe(200);
         expect(res.body.overallScore).toBe(8.5);

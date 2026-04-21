@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { auth } from '../firebase';
+import { getCaptchaToken } from './captcha';
 
 const api = axios.create({
   baseURL: '/api',
@@ -16,6 +17,13 @@ api.interceptors.request.use(async (config) => {
       console.error('Error fetching Firebase token:', error);
     }
   }
+
+  // Attach Turnstile CAPTCHA token if available
+  const captchaToken = getCaptchaToken();
+  if (captchaToken && config.headers) {
+    config.headers['x-captcha-token'] = captchaToken;
+  }
+
   return config;
 }, (error) => {
   return Promise.reject(error);

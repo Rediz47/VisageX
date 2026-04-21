@@ -1,16 +1,32 @@
 import React, { useEffect } from 'react';
-import { motion, useSpring, useTransform } from 'motion/react';
+import { useSpring, useTransform, motion } from 'motion/react';
 
-export function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
-  const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
-  const display = useTransform(spring, (current) => Math.round(current * 10) / 10);
+interface AnimatedCounterProps {
+  value: number;
+  duration?: number;
+  delay?: number;
+  maxDecimals?: number;
+}
+
+export const AnimatedCounter = React.memo(function AnimatedCounter({ 
+  value, 
+  duration = 1.5, 
+  delay = 0, 
+  maxDecimals = 1 
+}: AnimatedCounterProps) {
+  const springValue = useSpring(0, {
+    duration: duration * 1000,
+    bounce: 0,
+  });
+  
+  const displayValue = useTransform(springValue, (latest) => latest.toFixed(maxDecimals));
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      spring.set(value);
+    const timeout = setTimeout(() => {
+      springValue.set(value);
     }, delay * 1000);
-    return () => clearTimeout(timer);
-  }, [value, delay, spring]);
+    return () => clearTimeout(timeout);
+  }, [value, delay, springValue]);
 
-  return <motion.span>{display}</motion.span>;
-}
+  return <motion.span>{displayValue}</motion.span>;
+});

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { auth, db } from '../../../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { AnalysisResult, Landmark, SaveStatus } from '../types';
+import { getCaptchaToken } from '../../../lib/captcha';
 
 export function useAnalysis(userCredits: number) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus | null>(null);
@@ -31,12 +32,16 @@ export function useAnalysis(userCredits: number) {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const idToken = await auth.currentUser!.getIdToken(attempt > 1); // Force refresh on retry
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        };
+        const captchaToken = getCaptchaToken();
+        if (captchaToken) headers['x-captcha-token'] = captchaToken;
+
         const aiResponse = await fetch('/api/gemini-analysis', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`
-          },
+          headers,
           body: JSON.stringify({ image: croppedImageBase64 })
         });
 
@@ -46,7 +51,18 @@ export function useAnalysis(userCredits: number) {
         }
 
         if (!aiResponse.ok) {
-          throw new Error(`AI analysis failed (status ${aiResponse.status})`);
+          // Parse backend error payload so the real reason (missing key, Vertex 429, parse failure, etc.) is visible.
+          let backendDetail = '';
+          try {
+            const errBody = await aiResponse.json();
+            backendDetail = [errBody?.error, errBody?.detail, errBody?.statusCode ? `vertex:${errBody.statusCode}` : null]
+              .filter(Boolean)
+              .join(' — ');
+          } catch {
+            try { backendDetail = (await aiResponse.text()).slice(0, 300); } catch { /* noop */ }
+          }
+          console.error(`[Gemini] ${aiResponse.status} from /api/gemini-analysis:`, backendDetail);
+          throw new Error(`AI analysis failed (status ${aiResponse.status})${backendDetail ? ': ' + backendDetail : ''}`);
         }
 
         const geminiData = await aiResponse.json();
@@ -78,6 +94,8 @@ export function useAnalysis(userCredits: number) {
             recommendedProducts: geminiData.recommendedProducts || [],
             faceShape: geminiData.faceShape,
             hairRecommendations: geminiData.hairRecommendations,
+            insightDescriptions: geminiData.insightDescriptions || {},
+            improvementPlan: geminiData.improvementPlan || [],
             dermatology: {
               skin_quality: geminiData.skin_quality,
               acne_presence: geminiData.acne_presence,
@@ -129,20 +147,6 @@ export function useAnalysis(userCredits: number) {
 
       await addDoc(collection(db, 'scans'), scanData);
       console.log("Scan saved to Firebase successfully.");
-
-      try {
-        const idToken = await auth.currentUser.getIdToken();
-        await fetch('/api/referral/scan/complete', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`
-          },
-          body: JSON.stringify({ userId: auth.currentUser.uid })
-        });
-      } catch (e) {
-        console.error("Failed to trigger scan completion reward:", e);
-      }
 
       setSaveStatus({ message: "Saved to your history!", type: 'success' });
       setTimeout(() => setSaveStatus(null), 3000);

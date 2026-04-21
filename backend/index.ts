@@ -16,7 +16,10 @@ async function startLocalServer() {
   }
 
   app.listen(Number(PORT), '0.0.0.0', () => {
+    const devBypass = process.env.NODE_ENV !== 'production' && !process.env.NETLIFY;
     console.log(`Backend Initialized. Secure Server running on http://localhost:${PORT}`);
+    console.log(`  NODE_ENV=${process.env.NODE_ENV || '(unset)'} | rate-limit bypass: ${devBypass ? 'ON (dev)' : 'OFF'}`);
+    console.log(`  VERTEX_API_KEY: ${process.env.VERTEX_API_KEY ? 'set' : 'MISSING'}`);
   });
 }
 

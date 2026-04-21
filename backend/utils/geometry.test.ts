@@ -3,8 +3,8 @@ import { dist, analyzeSymmetry, calculateEAR, calculateMetrics } from './geometr
 
 describe('Geometry Utils', () => {
     it('should calculate distance correctly', () => {
-        const p1 = { x: 0, y: 0 };
-        const p2 = { x: 3, y: 4 };
+        const p1 = { x: 0, y: 0, z: 0 };
+        const p2 = { x: 3, y: 4, z: 0 };
         expect(dist(p1, p2)).toBe(5);
     });
 
