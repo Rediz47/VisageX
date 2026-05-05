@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -249,6 +249,69 @@ interface ResultDashboardProps {
   onOpenPricing: () => void;
 }
 
+const RATIO_WEAKNESS_LABELS: Record<string, (v: number, u: string) => string> = {
+  'Facial Thirds Balance': (v) => `Unbalanced facial thirds (${v}x — ideal ≥ 0.88)`,
+  'Canthal Tilt Angle': (v) => `Below-ideal canthal tilt angle (${v}°)`,
+  'Eye Spacing Ratio': (v) =>
+    v < 0.85 ? `Close-set eye spacing ratio (${v}x)` : `Wide-set eye spacing ratio (${v}x)`,
+  'Eye-to-Face Width Ratio': (v) => `Eye-to-face width imbalance (${v}x)`,
+  'Jaw-to-Cheekbone Width': (v) => `Sub-ideal jaw-to-cheekbone ratio (${v}x)`,
+  'Nose-to-Mouth Width': (v) => `Nose-to-mouth width disproportion (${v}x)`,
+  'Mouth-to-Face Width': (v) => `Narrow mouth-to-face width (${v}x)`,
+  'Philtrum-to-Nose Length': (v) => `Long philtrum ratio (${v}x)`,
+  'Lip Thickness Ratio': (v) => `Suboptimal lip thickness ratio (${v}x)`,
+  'Lower Face Ratio': (v) =>
+    v > 0.38 ? `Long lower face ratio (${v}x)` : `Short lower face ratio (${v}x)`,
+  'Midface Ratio': (v) =>
+    v > 0.38
+      ? `Elevated midface ratio — long nose bridge (${v}x)`
+      : `Compressed midface ratio (${v}x)`,
+  'Facial Width-to-Height Ratio': (v) => `Low facial width-to-height ratio (${v}x)`,
+  'Golden Ratio Adherence': (v) => `Golden ratio deviation (φ ${v})`,
+  'Gonial Angle': (v) => `Sub-ideal gonial angle (${v}°)`,
+  'Palpebral Fissure Ratio': () => `Below-ideal palpebral fissure ratio`
+};
+
+const RATIO_STRENGTH_LABELS: Record<string, (v: number, u: string) => string> = {
+  'Facial Thirds Balance': () => 'Well-balanced facial thirds',
+  'Canthal Tilt Angle': (v) => `Strong positive canthal tilt (${v}°)`,
+  'Eye Spacing Ratio': () => 'Ideal eye spacing ratio',
+  'Jaw-to-Cheekbone Width': () => 'Ideal jaw-to-cheekbone ratio',
+  'Midface Ratio': () => 'Balanced midface ratio',
+  'Lower Face Ratio': () => 'Balanced lower face ratio',
+  'Golden Ratio Adherence': () => 'Excellent golden ratio proportions',
+  'Facial Width-to-Height Ratio': (v) => `Ideal fWHR (${v}x)`
+};
+
+// Topic-keyword index per ratio. Used to suppress contradictory insights
+// (e.g. don't add "Balanced lower face ratio" as a strength if a weakness
+// already says "Long lower face — disproportionate chin-to-nose distance").
+// First match wins on either side: whichever pipeline (server analysis,
+// ratio insights) produces the first hit "owns" that anatomy topic.
+const RATIO_TOPIC_KEYWORDS_BY_NAME: Record<string, string[]> = {
+  'Lower Face Ratio': ['lower face', 'lower facial third', 'chin-to-nose', 'chin to nose'],
+  'Midface Ratio': ['midface', 'middle facial third', 'middle third'],
+  'Facial Thirds Balance': [
+    'facial thirds',
+    'three thirds',
+    'upper third',
+    'middle third',
+    'lower third'
+  ],
+  'Golden Ratio Adherence': ['golden ratio', 'φ', 'phi ratio'],
+  'Facial Width-to-Height Ratio': ['fwhr', 'facial width-to-height', 'face width-to-height'],
+  'Jaw-to-Cheekbone Width': ['jaw-to-cheekbone', 'jaw to cheekbone', 'cheek-to-jaw'],
+  'Eye Spacing Ratio': ['eye spacing', 'interocular', 'intercanthal'],
+  'Eye-to-Face Width Ratio': ['eye-to-face', 'eye to face width'],
+  'Canthal Tilt Angle': ['canthal tilt', 'canthus'],
+  'Nose-to-Mouth Width': ['nose-to-mouth', 'nasal-to-mouth'],
+  'Mouth-to-Face Width': ['mouth-to-face', 'mouth width'],
+  'Philtrum-to-Nose Length': ['philtrum', 'philtral'],
+  'Lip Thickness Ratio': ['lip thickness', 'lip fullness', 'upper-to-lower lip'],
+  'Gonial Angle': ['gonial angle', 'jaw angle', 'mandibular angle'],
+  'Palpebral Fissure Ratio': ['palpebral', 'eye opening']
+};
+
 export function ResultDashboard({
   result,
   imageUrl,
@@ -269,10 +332,10 @@ export function ResultDashboard({
 
   // Reset screen budget whenever the user switches tabs, so the newly-mounted
   // panel's critical + secondary animations are not starved by earlier ones.
-  const handleTabChange = (tab: 'overview' | 'analysis' | 'plan') => {
+  const handleTabChange = useCallback((tab: 'overview' | 'analysis' | 'plan') => {
     resetBudget('tab');
     setActiveTab(tab);
-  };
+  }, [resetBudget]);
 
   // Wire up shared controller — single source of truth for memoized data & shared state
   const ctrl = useDashboardController(result);
@@ -302,69 +365,6 @@ export function ResultDashboard({
 
   const ratios = useRatioData(metrics, breakdown, ratioPoints);
 
-  const RATIO_WEAKNESS_LABEL: Record<string, (v: number, u: string) => string> = {
-    'Facial Thirds Balance': (v) => `Unbalanced facial thirds (${v}x — ideal ≥ 0.88)`,
-    'Canthal Tilt Angle': (v) => `Below-ideal canthal tilt angle (${v}°)`,
-    'Eye Spacing Ratio': (v) =>
-      v < 0.85 ? `Close-set eye spacing ratio (${v}x)` : `Wide-set eye spacing ratio (${v}x)`,
-    'Eye-to-Face Width Ratio': (v) => `Eye-to-face width imbalance (${v}x)`,
-    'Jaw-to-Cheekbone Width': (v) => `Sub-ideal jaw-to-cheekbone ratio (${v}x)`,
-    'Nose-to-Mouth Width': (v) => `Nose-to-mouth width disproportion (${v}x)`,
-    'Mouth-to-Face Width': (v) => `Narrow mouth-to-face width (${v}x)`,
-    'Philtrum-to-Nose Length': (v) => `Long philtrum ratio (${v}x)`,
-    'Lip Thickness Ratio': (v) => `Suboptimal lip thickness ratio (${v}x)`,
-    'Lower Face Ratio': (v) =>
-      v > 0.38 ? `Long lower face ratio (${v}x)` : `Short lower face ratio (${v}x)`,
-    'Midface Ratio': (v) =>
-      v > 0.38
-        ? `Elevated midface ratio — long nose bridge (${v}x)`
-        : `Compressed midface ratio (${v}x)`,
-    'Facial Width-to-Height Ratio': (v) => `Low facial width-to-height ratio (${v}x)`,
-    'Golden Ratio Adherence': (v) => `Golden ratio deviation (φ ${v})`,
-    'Gonial Angle': (v) => `Sub-ideal gonial angle (${v}°)`,
-    'Palpebral Fissure Ratio': (v) => `Below-ideal palpebral fissure ratio`
-  };
-
-  const RATIO_STRENGTH_LABEL: Record<string, (v: number, u: string) => string> = {
-    'Facial Thirds Balance': () => 'Well-balanced facial thirds',
-    'Canthal Tilt Angle': (v) => `Strong positive canthal tilt (${v}°)`,
-    'Eye Spacing Ratio': () => 'Ideal eye spacing ratio',
-    'Jaw-to-Cheekbone Width': () => 'Ideal jaw-to-cheekbone ratio',
-    'Midface Ratio': () => 'Balanced midface ratio',
-    'Lower Face Ratio': () => 'Balanced lower face ratio',
-    'Golden Ratio Adherence': () => 'Excellent golden ratio proportions',
-    'Facial Width-to-Height Ratio': (v) => `Ideal fWHR (${v}x)`
-  };
-
-  // Topic-keyword index per ratio. Used to suppress contradictory insights
-  // (e.g. don't add "Balanced lower face ratio" as a strength if a weakness
-  // already says "Long lower face — disproportionate chin-to-nose distance").
-  // First match wins on either side: whichever pipeline (server analysis,
-  // ratio insights) produces the first hit "owns" that anatomy topic.
-  const RATIO_TOPIC_KEYWORDS: Record<string, string[]> = {
-    'Lower Face Ratio': ['lower face', 'lower facial third', 'chin-to-nose', 'chin to nose'],
-    'Midface Ratio': ['midface', 'middle facial third', 'middle third'],
-    'Facial Thirds Balance': [
-      'facial thirds',
-      'three thirds',
-      'upper third',
-      'middle third',
-      'lower third'
-    ],
-    'Golden Ratio Adherence': ['golden ratio', 'φ', 'phi ratio'],
-    'Facial Width-to-Height Ratio': ['fwhr', 'facial width-to-height', 'face width-to-height'],
-    'Jaw-to-Cheekbone Width': ['jaw-to-cheekbone', 'jaw to cheekbone', 'cheek-to-jaw'],
-    'Eye Spacing Ratio': ['eye spacing', 'interocular', 'intercanthal'],
-    'Eye-to-Face Width Ratio': ['eye-to-face', 'eye to face width'],
-    'Canthal Tilt Angle': ['canthal tilt', 'canthus'],
-    'Nose-to-Mouth Width': ['nose-to-mouth', 'nasal-to-mouth'],
-    'Mouth-to-Face Width': ['mouth-to-face', 'mouth width'],
-    'Philtrum-to-Nose Length': ['philtrum', 'philtral'],
-    'Lip Thickness Ratio': ['lip thickness', 'lip fullness', 'upper-to-lower lip'],
-    'Gonial Angle': ['gonial angle', 'jaw angle', 'mandibular angle'],
-    'Palpebral Fissure Ratio': ['palpebral', 'eye opening']
-  };
-
   const ratioInsights = useMemo(() => {
     const existingW = analysis.weaknesses.map((w) => w.toLowerCase());
     const existingS = analysis.strengths.map((s) => s.toLowerCase());
@@ -375,7 +375,7 @@ export function ResultDashboard({
 
     // Check whether any item (in either list) already covers this ratio's topic
     const topicAlreadyCovered = (ratioName: string): boolean => {
-      const kws = RATIO_TOPIC_KEYWORDS[ratioName];
+      const kws = RATIO_TOPIC_KEYWORDS_BY_NAME[ratioName];
       if (!kws) return false;
       const all = [
         ...existingW,
@@ -389,7 +389,7 @@ export function ResultDashboard({
     for (const r of ratios) {
       const v = typeof r.value === 'number' ? r.value : parseFloat(String(r.value));
       if (r.score < 6.5) {
-        const fn = RATIO_WEAKNESS_LABEL[r.name];
+        const fn = RATIO_WEAKNESS_LABELS[r.name];
         if (fn) {
           const label = fn(v, r.unit);
           const key = label.toLowerCase();
@@ -402,7 +402,7 @@ export function ResultDashboard({
           }
         }
       } else if (r.score >= 8.5) {
-        const fn = RATIO_STRENGTH_LABEL[r.name];
+        const fn = RATIO_STRENGTH_LABELS[r.name];
         if (fn) {
           const label = fn(v, r.unit);
           const key = label.toLowerCase();
@@ -441,26 +441,37 @@ export function ResultDashboard({
     prevInvitedCount.current = count;
   }, [userData?.invitedCount]);
 
-  // Build radar data
-  const radarData = [{ subject: 'Eyes', A: breakdown.Eyes || 5, fullMark: 10 }];
-  if (breakdown['Skin Quality'] !== undefined) {
-    radarData.push({ subject: 'Skin Health', A: breakdown['Skin Quality'] || 5, fullMark: 10 });
-  }
-  radarData.push(
-    { subject: 'Symmetry', A: breakdown.Symmetry || 5, fullMark: 10 },
-    { subject: 'Jawline', A: breakdown.Jawline || 5, fullMark: 10 },
-    { subject: 'Hair', A: breakdown.Hair || 7.5, fullMark: 10 },
-    { subject: 'Dimorphism', A: breakdown.Dimorphism || 5, fullMark: 10 }
+  const radarData = useMemo(() => {
+    const data = [{ subject: 'Eyes', A: breakdown.Eyes || 5, fullMark: 10 }];
+    if (breakdown['Skin Quality'] !== undefined) {
+      data.push({ subject: 'Skin Health', A: breakdown['Skin Quality'] || 5, fullMark: 10 });
+    }
+    data.push(
+      { subject: 'Symmetry', A: breakdown.Symmetry || 5, fullMark: 10 },
+      { subject: 'Jawline', A: breakdown.Jawline || 5, fullMark: 10 },
+      { subject: 'Hair', A: breakdown.Hair || 7.5, fullMark: 10 },
+      { subject: 'Dimorphism', A: breakdown.Dimorphism || 5, fullMark: 10 }
+    );
+    if (breakdown['Grooming'] !== undefined) {
+      data.push({ subject: 'Grooming', A: breakdown['Grooming'] || 5, fullMark: 10 });
+    }
+    if (breakdown['Cheekbones'] !== undefined) {
+      data.push({ subject: 'Cheekbones', A: breakdown['Cheekbones'] || 5, fullMark: 10 });
+    }
+    if (data.length % 2 !== 0) {
+      data.push({ subject: 'Facial Balance', A: 7.5, fullMark: 10 });
+    }
+    return data;
+  }, [breakdown]);
+
+  const strengthsWithRatioInsights = useMemo(
+    () => [...analysis.strengths, ...ratioInsights.strengths],
+    [analysis.strengths, ratioInsights.strengths]
   );
-  if (breakdown['Grooming'] !== undefined) {
-    radarData.push({ subject: 'Grooming', A: breakdown['Grooming'] || 5, fullMark: 10 });
-  }
-  if (breakdown['Cheekbones'] !== undefined) {
-    radarData.push({ subject: 'Cheekbones', A: breakdown['Cheekbones'] || 5, fullMark: 10 });
-  }
-  if (radarData.length % 2 !== 0) {
-    radarData.push({ subject: 'Facial Balance', A: 7.5, fullMark: 10 });
-  }
+  const weaknessesWithRatioInsights = useMemo(
+    () => [...analysis.weaknesses, ...ratioInsights.weaknesses],
+    [analysis.weaknesses, ratioInsights.weaknesses]
+  );
 
   const generateShareCard = async () => {
     if (isGeneratingCard) return;
@@ -469,34 +480,26 @@ export function ResultDashboard({
     try {
       const canvas = document.createElement('canvas');
       canvas.width = 1080;
-      canvas.height = 1860;
+      canvas.height = 1920;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Could not get canvas context');
 
-      // Background
-      const bgGradient = ctx.createLinearGradient(0, 0, 0, 1860);
-      bgGradient.addColorStop(0, '#050505');
-      bgGradient.addColorStop(1, '#111111');
+      // 1. Premium Dark Background
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, 1920);
+      bgGradient.addColorStop(0, '#020204');
+      bgGradient.addColorStop(0.5, '#0a0a0f');
+      bgGradient.addColorStop(1, '#000000');
       ctx.fillStyle = bgGradient;
-      ctx.fillRect(0, 0, 1080, 1860);
+      ctx.fillRect(0, 0, 1080, 1920);
 
-      // Grid pattern
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.lineWidth = 2;
-      for (let i = 0; i < 1080; i += 60) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, 1860);
-        ctx.stroke();
-      }
-      for (let i = 0; i < 1860; i += 60) {
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(1080, i);
-        ctx.stroke();
-      }
+      // Ambient Glows
+      const glow1 = ctx.createRadialGradient(0, 0, 0, 0, 0, 1000);
+      glow1.addColorStop(0, 'rgba(99, 102, 241, 0.1)');
+      glow1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = glow1;
+      ctx.fillRect(0, 0, 1080, 1920);
 
-      // Load and draw image
+      // Load image
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = imageUrl;
@@ -505,145 +508,175 @@ export function ResultDashboard({
         img.onerror = reject;
       });
 
-      const imgSize = 760;
-      const imgX = (1080 - imgSize) / 2;
-      const imgY = 330;
+      // 2. Focused Image Container
+      const destW = 900;
+      const destH = 900;
+      const destX = (1080 - destW) / 2;
+      const destY = 340;
 
       ctx.save();
-      ctx.beginPath();
-      if (ctx.roundRect) {
-        ctx.roundRect(imgX, imgY, imgSize, imgSize, 60);
-      } else {
-        ctx.rect(imgX, imgY, imgSize, imgSize);
-      }
-      ctx.clip();
+      // Outer shadow for container
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowBlur = 60;
+      ctx.shadowOffsetY = 30;
 
-      const scale = Math.max(imgSize / img.width, imgSize / img.height);
-      const w = img.width * scale;
-      const h = img.height * scale;
-      const x = imgX + (imgSize - w) / 2;
-      const y = imgY + (imgSize - h) / 2;
-      ctx.drawImage(img, x, y, w, h);
+      // Rounded clip
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(destX, destY, destW, destH, 60);
+      else ctx.rect(destX, destY, destW, destH);
+      ctx.fill();
+      ctx.clip();
+      ctx.shadowBlur = 0;
+
+      const scale = Math.max(destW / img.width, destH / img.height);
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      const drawX = destX - (drawW - destW) / 2;
+      const drawY = destY - (drawH - destH) / 2;
+
+      // Draw Blurred Background (Full Face)
+      ctx.filter = 'blur(25px) brightness(0.6) saturate(0.8)';
+      ctx.drawImage(img, drawX, drawY, drawW, drawH);
+      ctx.filter = 'none';
+
+      // Draw Sharp Eyes Strip
+      if (ratioPoints && ratioPoints.length > 263) {
+        const leftEye = ratioPoints[33];
+        const rightEye = ratioPoints[263];
+        const eyeY = (leftEye.y + rightEye.y) / 2;
+        
+        const eyeStripH = 260; // Size of the sharp eye area
+        const eyeStripY = drawY + (eyeY * drawH) - (eyeStripH / 2);
+
+        ctx.save();
+        ctx.beginPath();
+        // Create a horizontal strip for the eyes
+        ctx.rect(destX, Math.max(destY, eyeStripY), destW, Math.min(eyeStripH, destH - (eyeStripY - destY)));
+        ctx.clip();
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        
+        // Add a subtle divider/glow for the sharp area
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(destX, Math.max(destY, eyeStripY), destW, Math.min(eyeStripH, destH - (eyeStripY - destY)));
+        ctx.restore();
+      } else {
+        // Fallback: Sharp center if no landmarks
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(destX, destY + destH * 0.35, destW, destH * 0.3);
+        ctx.clip();
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        ctx.restore();
+      }
+
+      // Glass overlay on bottom of image
+      const glassGrad = ctx.createLinearGradient(0, destY + destH - 200, 0, destY + destH);
+      glassGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      glassGrad.addColorStop(1, 'rgba(0,0,0,0.4)');
+      ctx.fillStyle = glassGrad;
+      ctx.fillRect(destX, destY + destH - 200, destW, 200);
+
       ctx.restore();
 
-      // Border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 4;
-      if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(imgX, imgY, imgSize, imgSize, 60);
-        ctx.stroke();
-      }
-
-      // Header
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'alphabetic';
-      ctx.fillStyle = 'rgba(34, 211, 238, 0.7)';
-      ctx.font = 'bold 30px "JetBrains Mono", monospace';
-      ctx.fillText('VISAGE AI — FACIAL ANALYSIS', 540, 100);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 84px "Inter", sans-serif';
-      ctx.fillText(`visagex.online`, 540, 195);
-
-      // Score badge label
-      const pctText = `FACIAL HARMONY SCORE`;
-      const pctWidth = 380;
-      ctx.fillStyle = 'rgba(99, 102, 241, 0.3)';
-      ctx.strokeStyle = 'rgba(99, 102, 241, 0.6)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(540 - pctWidth / 2, 250, pctWidth, 60, 30);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#a5b4fc';
-      ctx.font = 'bold 26px "JetBrains Mono", monospace';
-      ctx.fillText(pctText, 540, 290);
-
-      // Score badge
-      const badgeY = imgY + imgSize;
-      ctx.beginPath();
-      ctx.arc(540, badgeY, 140, 0, Math.PI * 2);
-      ctx.fillStyle = '#050505';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(540, badgeY, 130, 0, Math.PI * 2);
-      const scoreGradient = ctx.createLinearGradient(410, badgeY - 130, 670, badgeY + 130);
-      scoreGradient.addColorStop(0, '#22d3ee');
-      scoreGradient.addColorStop(1, '#818cf8');
-      ctx.fillStyle = scoreGradient;
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 100px "Inter", sans-serif';
+      // 3. Typography & Header
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(overallScore.toFixed(1), 540, badgeY - 10);
+      
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.8)';
+      ctx.font = 'bold 24px "JetBrains Mono", monospace';
+      ctx.letterSpacing = '8px';
+      ctx.fillText('NEURAL HARMONY REPORT', 540, 120);
 
-      ctx.font = 'bold 24px "Inter", sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,0.8)';
-      ctx.fillText('OVERALL', 540, badgeY + 60);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 86px "Inter", sans-serif';
+      ctx.letterSpacing = '-3px';
+      ctx.fillText('visagex.online', 540, 210);
 
-      // Stats grid
-      const drawStat = (label: string, value: string, sx: number, sy: number) => {
+      // 4. Score Circle
+      const badgeY = destY + destH;
+      
+      // Outer Glow
+      ctx.beginPath();
+      ctx.arc(540, badgeY, 150, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+      ctx.fill();
+
+      // Main Circle
+      ctx.beginPath();
+      ctx.arc(540, badgeY, 140, 0, Math.PI * 2);
+      const scoreGrad = ctx.createLinearGradient(400, badgeY - 140, 680, badgeY + 140);
+      scoreGrad.addColorStop(0, '#6366f1');
+      scoreGrad.addColorStop(1, '#a855f7');
+      ctx.fillStyle = scoreGrad;
+      ctx.fill();
+
+      // Inner Dark
+      ctx.beginPath();
+      ctx.arc(540, badgeY, 130, 0, Math.PI * 2);
+      ctx.fillStyle = '#050507';
+      ctx.fill();
+
+      // Score Value
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 120px "Inter", sans-serif';
+      ctx.fillText(overallScore.toFixed(1), 540, badgeY - 15);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = 'bold 22px "JetBrains Mono", monospace';
+      ctx.letterSpacing = '4px';
+      ctx.fillText('OVERALL', 540, badgeY + 65);
+
+      // 5. Stats Grid
+      const drawPremiumStat = (label: string, value: string, sx: number, sy: number) => {
+        ctx.save();
         ctx.fillStyle = 'rgba(255,255,255,0.03)';
-        if (ctx.roundRect) {
-          ctx.beginPath();
-          ctx.roundRect(sx, sy, 410, 140, 40);
-          ctx.fill();
-          ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        } else {
-          ctx.fillRect(sx, sy, 410, 140);
-        }
+        if (ctx.roundRect) ctx.roundRect(sx, sy, 420, 140, 35);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.stroke();
 
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font = '28px "JetBrains Mono", monospace';
         ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(label, sx + 50, sy + 70);
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font = 'bold 24px "JetBrains Mono", monospace';
+        ctx.fillText(label, sx + 45, sy + 70);
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 52px "Inter", sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText(value, sx + 360, sy + 70);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 60px "Inter", sans-serif';
+        ctx.fillText(value, sx + 375, sy + 70);
+        ctx.restore();
       };
 
-      const gridY = badgeY + 180;
-      drawStat('SYMMETRY', breakdown['Symmetry']?.toFixed(1) || '-', 110, gridY);
-      drawStat('JAWLINE', breakdown['Jawline']?.toFixed(1) || '-', 560, gridY);
-      drawStat('SKIN', breakdown['Skin Quality']?.toFixed(1) || '-', 110, gridY + 170);
-      drawStat('CHEEKBONES', breakdown['Cheekbones']?.toFixed(1) || '-', 560, gridY + 170);
+      const gridY = badgeY + 200;
+      drawPremiumStat('SYMMETRY', breakdown['Symmetry']?.toFixed(1) || '-', 100, gridY);
+      drawPremiumStat('JAWLINE', breakdown['Jawline']?.toFixed(1) || '-', 560, gridY);
+      drawPremiumStat('SKIN', breakdown['Skin Quality']?.toFixed(1) || '-', 100, gridY + 175);
+      drawPremiumStat('EYES', breakdown['Eyes']?.toFixed(1) || '-', 560, gridY + 175);
 
-      // Face shape & match
-      const bottomY = gridY + 380;
-      ctx.fillStyle = 'rgba(34, 211, 238, 0.1)';
-      if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(110, bottomY, 860, 100, 50);
-        ctx.fill();
-      }
+      // 6. Footer Shape Info
+      const footerY = gridY + 370;
+      ctx.fillStyle = 'rgba(255,255,255,0.03)';
+      if (ctx.roundRect) ctx.roundRect(100, footerY, 880, 100, 50);
+      ctx.fill();
 
-      ctx.fillStyle = '#22d3ee';
-      ctx.font = 'bold 32px "Inter", sans-serif';
-      ctx.textAlign = 'center';
-
+      ctx.fillStyle = '#818cf8';
+      ctx.font = 'bold 30px "Inter", sans-serif';
+      ctx.letterSpacing = '1px';
       let bottomText = `FACE SHAPE: ${result.visionAnalysis?.faceShape?.toUpperCase() || 'UNKNOWN'}`;
       if (result.visionAnalysis?.celebritySimilarity?.[0]) {
         bottomText += `  •  MATCH: ${result.visionAnalysis.celebritySimilarity[0].name.toUpperCase()}`;
       }
-      ctx.fillText(bottomText, 540, bottomY + 50);
+      ctx.fillText(bottomText, 540, footerY + 50);
 
       // Download
       const link = document.createElement('a');
-      link.download = `looksmax-card-${Date.now()}.jpg`;
+      link.download = `visagex-premium-${Date.now()}.jpg`;
       link.href = canvas.toDataURL('image/jpeg', 0.95);
       link.click();
     } catch (err) {
-      console.error('Failed to generate card:', err);
-      alert('Failed to generate trading card. Please try again.');
+      console.error('Failed to generate premium card:', err);
+      alert('Failed to generate premium card. Please try again.');
     } finally {
       setIsGeneratingCard(false);
     }

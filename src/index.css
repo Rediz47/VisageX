@@ -595,13 +595,29 @@ a, button, input, select, textarea, [role="button"], .clickable, .btn, .nav-link
    MOBILE PERFORMANCE
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  .backdrop-blur-xl, .backdrop-blur-2xl {
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+  html { scroll-behavior: auto; }
+  body {
+    overscroll-behavior-y: contain;
+    text-rendering: optimizeSpeed;
   }
-  .backdrop-blur-md {
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-md,
+  .backdrop-blur-sm,
+  .glass-card,
+  .glass-card-light {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .blur-3xl,
+  .blur-2xl,
+  .blur-xl,
+  .blur-lg,
+  .blur-md {
+    filter: none !important;
+  }
+  .transition-all {
+    transition-property: color, background-color, border-color, opacity, transform !important;
   }
 }
 

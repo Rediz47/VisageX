@@ -147,6 +147,28 @@ export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false
     [targetLines]
   );
   const total = useMemo(() => lengths.reduce((a, b) => a + b, 0), [lengths]);
+  const drawOrder = useMemo(
+    () =>
+      [...targetLines.keys()].sort(
+        (a, b) => Number(targetLines[a].alpha >= 0.7) - Number(targetLines[b].alpha >= 0.7)
+      ),
+    [targetLines]
+  );
+  const lineColors = useMemo(
+    () => targetLines.map((target) => getLineRGB(target.color ?? 'rgba(150,150,150,0.5)', display.score)),
+    [targetLines, display.score]
+  );
+  const labelTexts = useMemo(
+    () =>
+      targetLines.map((target, i) => {
+        const pct = total > 0 ? ((lengths[i] / total) * 100).toFixed(1) : '100';
+        if (isLocked) return '???';
+        return targetLines.length > 1
+          ? `${pct}%`
+          : `${typeof display.value === 'number' ? display.value.toFixed(2) : display.value}${display.unit ?? ''}`;
+      }),
+    [display.value, display.unit, isLocked, lengths, targetLines, total]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -154,7 +176,7 @@ export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.25 : 2);
     const key = display.shortName;
     const st = stateRef.current;
 
@@ -186,8 +208,12 @@ export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false
       if (!ctx || !canvas) return;
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      const nextW = Math.max(1, Math.round(w * dpr));
+      const nextH = Math.max(1, Math.round(h * dpr));
+      if (canvas.width !== nextW || canvas.height !== nextH) {
+        canvas.width = nextW;
+        canvas.height = nextH;
+      }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
@@ -232,21 +258,11 @@ export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false
         }
       }
 
-      // ── Phase 3: Draw secondaries first so primaries always render on top ──
-      const drawOrder = [...targetLines.keys()].sort((a, b) => {
-        const aAlpha = parseFloat(
-          (targetLines[a]?.color ?? '').match(/,\s*([\d.]+)\s*\)$/)?.[1] ?? '0.9'
-        );
-        const bAlpha = parseFloat(
-          (targetLines[b]?.color ?? '').match(/,\s*([\d.]+)\s*\)$/)?.[1] ?? '0.9'
-        );
-        return Number(aAlpha >= 0.7) - Number(bAlpha >= 0.7);
-      });
       drawOrder.forEach((i) => {
         const target = targetLines[i];
         const ln = st.lines[i];
         if (!ln || !target) return;
-        const rgb = getLineRGB(target.color ?? 'rgba(150,150,150,0.5)', display.score);
+        const rgb = lineColors[i];
 
         const sx1 = ln.cx1 * scaleX,
           sy1 = ln.cy1 * scaleY;
@@ -324,12 +340,7 @@ export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false
           const lx = midSx + Math.cos(perp) * labelOff;
           const ly = midSy + Math.sin(perp) * labelOff;
 
-          const pct = total > 0 ? ((lengths[i] / total) * 100).toFixed(1) : '100';
-          const labelText = isLocked
-            ? '???'
-            : targetLines.length > 1
-              ? `${pct}%`
-              : `${typeof display.value === 'number' ? display.value.toFixed(2) : display.value}${display.unit ?? ''}`;
+          const labelText = labelTexts[i];
 
           const fontSize = Math.round(14 * scaleX);
           ctx.save();
@@ -354,12 +365,28 @@ export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false
         }
       });
 
-      raf = requestAnimationFrame(draw);
+      const stillAnimating =
+        st.progress < 1 ||
+        st.labelOpacity < 1 ||
+        st.lines.some((ln, i) => {
+          const target = targetLines[i];
+          if (!target) return false;
+          return (
+            Math.abs(ln.cx1 - target.x1) > 0.25 ||
+            Math.abs(ln.cy1 - target.y1) > 0.25 ||
+            Math.abs(ln.cx2 - target.x2) > 0.25 ||
+            Math.abs(ln.cy2 - target.y2) > 0.25
+          );
+        });
+
+      if (stillAnimating) {
+        raf = requestAnimationFrame(draw);
+      }
     }
 
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [targetLines, display, viewW, viewH, lengths, total, isLocked]);
+  }, [targetLines, display, viewW, viewH, drawOrder, lineColors, labelTexts, isLocked]);
 
   return (
     <canvas

@@ -341,8 +341,7 @@ export function FaceAnalyzer({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="grid gap-6 sm:gap-8 lg:gap-12 items-center mb-12 md:mb-20"
-              style={{ gridTemplateColumns: 'minmax(260px, 0.82fr) minmax(420px, 1.18fr)' }}
+              className="grid grid-cols-1 lg:grid-cols-[minmax(260px,0.82fr)_minmax(420px,1.18fr)] gap-6 sm:gap-8 lg:gap-12 items-center mb-12 md:mb-20"
             >
               <div className="relative text-left px-1 lg:px-0">
                 <motion.div
@@ -355,7 +354,7 @@ export function FaceAnalyzer({
                   Neural Analysis
                 </motion.div>
                 <h2
-                  className={`text-5xl md:text-[64px] lg:text-[84px] font-display leading-[0.88] italic mb-6 tracking-tight ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
+                  className={`text-4xl sm:text-5xl md:text-[64px] lg:text-[84px] font-display leading-[0.94] sm:leading-[0.88] italic mb-5 sm:mb-6 tracking-tight ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
                 >
                   Discover <br />
                   <span className="not-italic opacity-50">your</span> <br />
@@ -401,7 +400,7 @@ export function FaceAnalyzer({
                   <div className="absolute -inset-2 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/25 via-cyan-500/10 to-rose-500/20 blur-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
                   <div
-                    className={`relative min-h-[300px] md:min-h-[360px] lg:min-h-[420px] border rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 text-center transition-all duration-300 cursor-pointer backdrop-blur-sm overflow-hidden flex items-center justify-center ${isDarkMode ? 'border-white/[.08] hover:border-white/[.16] bg-black/80' : 'border-zinc-200 hover:border-zinc-300 bg-white/90 shadow-xl shadow-indigo-500/5'}`}
+                    className={`relative min-h-[260px] sm:min-h-[300px] md:min-h-[360px] lg:min-h-[420px] border rounded-[2rem] md:rounded-[2.5rem] p-5 sm:p-8 md:p-12 text-center transition-all duration-300 cursor-pointer backdrop-blur-sm overflow-hidden flex items-center justify-center ${isDarkMode ? 'border-white/[.08] hover:border-white/[.16] bg-black/80' : 'border-zinc-200 hover:border-zinc-300 bg-white/90 shadow-xl shadow-indigo-500/5'}`}
                     onClick={() => {
                       if (isModelLoading || !requireAuth()) return;
                       fileInputRef.current?.click();

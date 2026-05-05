@@ -81,11 +81,11 @@ export interface MotionPreset {
 // interface remains lively instead of feeling dead.
 const DURATIONS: Record<MotionTier, { fast: number; med: number; slow: number }> = {
   low: { fast: 0.12, med: 0.2, slow: 0.3 },
-  mid: { fast: 0.25, med: 0.5, slow: 0.85 },
+  mid: { fast: 0.18, med: 0.32, slow: 0.5 },
   high: { fast: 0.35, med: 0.75, slow: 1.2 }
 };
 
-const STAGGER: Record<MotionTier, number> = { low: 0, mid: 0.04, high: 0.07 };
+const STAGGER: Record<MotionTier, number> = { low: 0, mid: 0.02, high: 0.07 };
 
 const FLAGS: Record<MotionTier, MotionFlags> = {
   low: {
@@ -99,14 +99,14 @@ const FLAGS: Record<MotionTier, MotionFlags> = {
     enableLenis: false
   },
   mid: {
-    enableParallax: true, // subtle, clamped
-    enableScrollHooks: true,
+    enableParallax: false,
+    enableScrollHooks: false,
     enableBlurAnimations: false,
-    enableAmbientGlow: true, // static radial gradients; very cheap
-    enableHoverMicro: true,
-    enableCounterTween: true,
-    enableTabLayoutSpring: true,
-    enableLenis: true
+    enableAmbientGlow: false,
+    enableHoverMicro: false,
+    enableCounterTween: false,
+    enableTabLayoutSpring: false,
+    enableLenis: false
   },
   high: {
     enableParallax: true,
@@ -201,7 +201,18 @@ export function detectDeviceTier(): MotionTier {
   }
 
   const isMobile = window.innerWidth < 768;
-  if (isMobile || (mem !== undefined && mem <= 4) || (cores !== undefined && cores <= 4)) {
+  if (isMobile) {
+    if (
+      window.innerWidth < 480 ||
+      (mem !== undefined && mem <= 4) ||
+      (cores !== undefined && cores <= 4)
+    ) {
+      return 'low';
+    }
+    return 'mid';
+  }
+
+  if ((mem !== undefined && mem <= 4) || (cores !== undefined && cores <= 4)) {
     return 'mid';
   }
 

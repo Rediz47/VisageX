@@ -9,7 +9,9 @@ import {
   User as UserIcon,
   History as HistoryIcon,
   Coins,
-  BookOpen
+  BookOpen,
+  CheckCircle2,
+  ChevronDown
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeProvider';
 import { useAuth } from '../context/AuthProvider';
@@ -47,7 +49,10 @@ export function GlobalHeader({
   // Critical-priority, throttled via scroll hook, transform-only (compositor-safe).
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const lastY = useRef(0);
+  const userName = user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'User';
+  const userInitial = userName.charAt(0).toUpperCase();
   useMotionValueEvent(scrollY, 'change', (latest) => {
     if (prefersReducedMotion) {
       setHidden(false);
@@ -65,6 +70,7 @@ export function GlobalHeader({
   });
 
   const handleSignOut = () => {
+    setAccountOpen(false);
     signOut(auth);
     navigate('/');
   };
@@ -133,46 +139,89 @@ export function GlobalHeader({
               <div className="flex items-center gap-4">
                 <button
                   onClick={onOpenPricing}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100'}`}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-300 ${isDarkMode ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20 shadow-lg shadow-amber-950/10' : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 shadow-sm'}`}
                 >
                   <Coins className="w-4 h-4" />
-                  <span className="text-xs font-bold">{credits}</span>
+                  <span className="text-xs font-black">{credits} credits</span>
                 </button>
-                <Link
-                  to="/history"
-                  title="View History"
-                  className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-white hover:bg-white/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-900/10'}`}
-                >
-                  <HistoryIcon className="w-5 h-5" />
-                </Link>
-                <Link
-                  to="/profile"
-                  className={`flex items-center gap-3 px-4 py-2 rounded-xl border transition-colors duration-300 ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-zinc-900/5 border-zinc-200 hover:bg-zinc-900/10'}`}
-                >
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt={user.displayName || ''}
-                      className="w-6 h-6 rounded-full"
-                    />
-                  ) : (
-                    <UserIcon
-                      className={`w-4 h-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
-                    />
-                  )}
-                  <span
-                    className={`text-xs font-bold uppercase tracking-widest hidden lg:block ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
+                <div className="relative">
+                  <button
+                    onClick={() => setAccountOpen((value) => !value)}
+                    className={`group flex items-center gap-3 rounded-2xl border py-2 pl-2 pr-3 transition-all duration-300 ${isDarkMode ? 'border-white/10 bg-white/[0.06] hover:bg-white/[0.1] shadow-2xl shadow-indigo-950/10' : 'border-zinc-200 bg-white/70 hover:bg-white shadow-lg shadow-zinc-200/40'}`}
                   >
-                    {user.displayName?.split(' ')[0] || 'User'}
-                  </span>
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  aria-label="Sign out"
-                  className={`p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'bg-white/5 text-zinc-100/70 hover:text-rose-400 hover:bg-rose-500/10' : 'bg-zinc-900/5 text-zinc-500 hover:text-rose-600 hover:bg-rose-50'}`}
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
+                    <div className="relative">
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt={user.displayName || ''}
+                          className="h-9 w-9 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-500 text-sm font-black text-white">
+                          {userInitial}
+                        </div>
+                      )}
+                      <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
+                    </div>
+                    <div className="hidden min-w-0 text-left lg:block">
+                      <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.22em] ${isDarkMode ? 'text-emerald-300' : 'text-emerald-600'}`}>
+                        <CheckCircle2 className="h-3 w-3" />
+                        Signed in
+                      </div>
+                      <p className={`max-w-[120px] truncate text-sm font-black ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                        {userName}
+                      </p>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${accountOpen ? 'rotate-180' : ''} ${isDarkMode ? 'text-white/40' : 'text-zinc-400'}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {accountOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                        transition={{ duration: preset.durations.fast, ease: easings.easeOutExpo }}
+                        className={`absolute right-0 top-[calc(100%+0.75rem)] w-72 overflow-hidden rounded-[1.5rem] border p-2 shadow-2xl backdrop-blur-2xl ${isDarkMode ? 'border-white/10 bg-zinc-950/95 shadow-black/40' : 'border-zinc-200 bg-white/95 shadow-zinc-300/40'}`}
+                      >
+                        <div className={`rounded-[1.25rem] p-4 ${isDarkMode ? 'bg-white/[0.04]' : 'bg-zinc-50'}`}>
+                          <p className={`text-[10px] font-black uppercase tracking-[0.25em] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                            Account active
+                          </p>
+                          <p className={`mt-1 truncate text-base font-black ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                            {user.displayName || userName}
+                          </p>
+                          <p className={`truncate text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
+                            {user.email}
+                          </p>
+                        </div>
+                        <Link
+                          to="/profile"
+                          onClick={() => setAccountOpen(false)}
+                          className={`mt-2 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${isDarkMode ? 'text-zinc-300 hover:bg-white/10 hover:text-white' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950'}`}
+                        >
+                          <UserIcon className="h-4 w-4" />
+                          Profile
+                        </Link>
+                        <Link
+                          to="/history"
+                          onClick={() => setAccountOpen(false)}
+                          className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${isDarkMode ? 'text-zinc-300 hover:bg-white/10 hover:text-white' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950'}`}
+                        >
+                          <HistoryIcon className="h-4 w-4" />
+                          Scan history
+                        </Link>
+                        <button
+                          onClick={handleSignOut}
+                          className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-bold transition-colors ${isDarkMode ? 'text-rose-300 hover:bg-rose-500/10' : 'text-rose-600 hover:bg-rose-50'}`}
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Sign out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-6">
@@ -195,13 +244,33 @@ export function GlobalHeader({
           {/* Mobile Actions Container (Top Right) */}
           <div className="flex items-center space-x-3 md:hidden">
             {user ? (
-              <button
-                onClick={onOpenPricing}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all duration-300 ${isDarkMode ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}
-              >
-                <Coins className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold">{credits}</span>
-              </button>
+              <>
+                <div className={`flex items-center gap-2 rounded-2xl border px-2 py-1.5 ${isDarkMode ? 'border-white/10 bg-white/[0.06]' : 'border-zinc-200 bg-white/80'}`}>
+                  <div className="relative">
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt={user.displayName || ''}
+                        className="h-8 w-8 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-500 text-xs font-black text-white">
+                        {userInitial}
+                      </div>
+                    )}
+                    <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
+                  </div>
+                  <div className="max-w-[82px]">
+                    <p className={`truncate text-[10px] font-black leading-none ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                      {userName}
+                    </p>
+                    <p className={`mt-1 flex items-center gap-1 text-[9px] font-bold leading-none ${isDarkMode ? 'text-amber-300' : 'text-amber-600'}`}>
+                      <Coins className="h-3 w-3" />
+                      {credits}
+                    </p>
+                  </div>
+                </div>
+              </>
             ) : (
               <button
                 onClick={() => onOpenAuth('signup')}

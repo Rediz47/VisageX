@@ -6,7 +6,7 @@ import Lenis from 'lenis';
 // Global State Providers
 import { ThemeProvider, useTheme } from './context/ThemeProvider';
 import { AuthProvider, useAuth } from './context/AuthProvider';
-import { CreditsProvider } from './context/CreditsProvider';
+import { CreditsProvider, useCredits } from './context/CreditsProvider';
 import { MotionProvider, useMotionTier } from './context/MotionProvider';
 
 // Routing & Layout
@@ -63,14 +63,47 @@ function ScrollToTop() {
 // A small inner app component to access contexts for Modals and internal features
 function InnerApp() {
   const { isDarkMode } = useTheme();
+  const { user, loading: authLoading } = useAuth();
+  const { credits } = useCredits();
   const posthog = usePostHog();
   const { preset, resetBudget } = useMotionTier();
   const routeLocation = useLocation();
+  const previousUserRef = React.useRef<string | null | undefined>(undefined);
+  const toastTimerRef = React.useRef<number | null>(null);
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [pricingModalOpen, setPricingModalOpen] = useState(false);
   const [initialReferralCode, setInitialReferralCode] = useState('');
+  const [showLoginToast, setShowLoginToast] = useState(false);
+
+  const userLabel = user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
+
+  useEffect(() => {
+    if (authLoading) return;
+    const previousUser = previousUserRef.current;
+    if (previousUser === undefined) {
+      previousUserRef.current = user?.uid || null;
+      return;
+    }
+    if (!previousUser && user?.uid) {
+      setShowLoginToast(true);
+      posthog.capture('login_success_toast_shown');
+      if (toastTimerRef.current) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+      toastTimerRef.current = window.setTimeout(() => setShowLoginToast(false), 5200);
+    }
+    previousUserRef.current = user?.uid || null;
+  }, [authLoading, user?.uid, posthog]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -322,6 +355,60 @@ function InnerApp() {
         setPricingModalOpen={setPricingModalOpen}
         isDarkMode={isDarkMode}
       />
+      <AnimatePresence>
+        {showLoginToast && user && (
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.96, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: 18, scale: 0.98, filter: 'blur(6px)' }}
+            transition={{ duration: preset.durations.med, ease: easings.easeOutExpo }}
+            className={`fixed right-4 top-28 z-[120] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-[1.75rem] border shadow-2xl backdrop-blur-2xl ${isDarkMode ? 'border-white/10 bg-zinc-950/85 shadow-indigo-950/30' : 'border-white/70 bg-white/90 shadow-indigo-200/40'}`}
+          >
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-indigo-500 to-fuchsia-500" />
+            <div className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-500 text-white shadow-lg shadow-indigo-500/25">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    <path
+                      d="M5 12.5l4.2 4L19 7"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2.2"
+                    />
+                  </svg>
+                  <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-emerald-400 ring-4 ring-zinc-950/80" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${isDarkMode ? 'text-cyan-300' : 'text-indigo-500'}`}>
+                    Signed in
+                  </p>
+                  <h3 className={`mt-1 truncate text-lg font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                    Welcome back, {userLabel}
+                  </h3>
+                  <p className={`mt-1 text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                    Your account is active. You have <span className={isDarkMode ? 'font-bold text-amber-300' : 'font-bold text-amber-600'}>{credits}</span> credits ready.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowLoginToast(false)}
+                  aria-label="Dismiss welcome message"
+                  className={`rounded-full p-2 transition-colors ${isDarkMode ? 'text-white/40 hover:bg-white/10 hover:text-white' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900'}`}
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <path
+                      d="M6 6l12 12M18 6L6 18"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -44,10 +44,7 @@ const MotionContext = createContext<MotionContextValue | null>(null);
 
 export function MotionProvider({ children }: { children: React.ReactNode }) {
   const [tier, setTier] = useState<MotionTier>(() => detectDeviceTier());
-  // Force `rm=false` so all gating logic across the app runs the full animation
-  // path. (Was: `prefersReducedMotion()`.) Pair with `reducedMotion="never"`
-  // on MotionConfig below.
-  const [rm, setRm] = useState<boolean>(false);
+  const [rm, setRm] = useState<boolean>(() => prefersReducedMotion());
   const location = useLocation();
   const prevPath = useRef(location.pathname);
 
@@ -56,8 +53,14 @@ export function MotionProvider({ children }: { children: React.ReactNode }) {
     setBudgetTier(tier);
   }, [tier]);
 
-  // Reduced-motion listener disabled while we're force-overriding it.
-  // (Re-enable along with `reducedMotion="user"` on MotionConfig if needed.)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setRm(media.matches);
+    update();
+    media.addEventListener?.('change', update);
+    return () => media.removeEventListener?.('change', update);
+  }, []);
 
   // Reflect tier on <html> for CSS scoping.
   useEffect(() => {
@@ -121,14 +124,9 @@ export function MotionProvider({ children }: { children: React.ReactNode }) {
     [tier, preset, rm, motionDisabled, requestSlot, startAnimation, endAnimation, resetBudget]
   );
 
-  // `reducedMotion="never"` tells motion to ALWAYS run animations regardless
-  // of the OS-level `prefers-reduced-motion: reduce` flag. This is a deliberate
-  // tradeoff: users with reduce-motion enabled (often vestibular sensitivity)
-  // will still see the entrance animations. If you want strict accessibility,
-  // change this to `"user"`.
   return (
     <MotionContext.Provider value={value}>
-      <MotionConfig reducedMotion="never">{children}</MotionConfig>
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </MotionContext.Provider>
   );
 }
