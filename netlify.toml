@@ -4,7 +4,7 @@
   functions = "netlify/functions"
 
 [functions]
-  external_node_modules = ["lightningcss", "esbuild"]
+  external_node_modules = ["lightningcss", "esbuild", "sharp", "firebase-admin"]
   node_bundler = "esbuild"
 
 [functions."api"]
