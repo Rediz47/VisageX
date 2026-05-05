@@ -1,4 +1,4 @@
-export const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
+export const yieldToMain = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 export async function checkImageLightingAndBlur(
   img: HTMLImageElement,
@@ -17,11 +17,7 @@ export async function checkImageLightingAndBlur(
   checkCanvas.height = Math.floor(cropH * scale);
 
   // Draw only the cropped face area
-  checkCtx.drawImage(
-    img,
-    cropX, cropY, cropW, cropH,
-    0, 0, checkCanvas.width, checkCanvas.height
-  );
+  checkCtx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, checkCanvas.width, checkCanvas.height);
 
   const imageData = checkCtx.getImageData(0, 0, checkCanvas.width, checkCanvas.height);
   const data = imageData.data;
@@ -35,10 +31,10 @@ export async function checkImageLightingAndBlur(
   const avgBrightness = totalLuminance / (data.length / 4);
 
   if (avgBrightness < 30) {
-    throw new Error("Photo is too dark. Please take a photo in better lighting.");
+    throw new Error('Photo is too dark. Please take a photo in better lighting.');
   }
   if (avgBrightness > 220) {
-    throw new Error("Photo is too bright or overexposed. Please adjust lighting.");
+    throw new Error('Photo is too bright or overexposed. Please adjust lighting.');
   }
 
   // 2. Blur Check (Laplacian Variance)
@@ -59,11 +55,7 @@ export async function checkImageLightingAndBlur(
     for (let x = 1; x < width - 1; x++) {
       const idx = y * width + x;
       const val =
-        gray[idx - width] +
-        gray[idx - 1] +
-        gray[idx + 1] +
-        gray[idx + width] -
-        4 * gray[idx];
+        gray[idx - width] + gray[idx - 1] + gray[idx + 1] + gray[idx + width] - 4 * gray[idx];
 
       sum += val;
       sumSq += val * val;
@@ -72,9 +64,9 @@ export async function checkImageLightingAndBlur(
   }
 
   const mean = sum / count;
-  const variance = (sumSq / count) - (mean * mean);
+  const variance = sumSq / count - mean * mean;
 
   if (variance < 50) {
-    throw new Error("Photo is too blurry. Please hold the camera still and try again.");
+    throw new Error('Photo is too blurry. Please hold the camera still and try again.');
   }
 }

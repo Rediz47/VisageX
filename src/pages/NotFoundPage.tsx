@@ -23,14 +23,20 @@ export default function NotFoundPage() {
           className="text-center max-w-lg"
         >
           <div className="mb-8">
-            <span className={`text-[140px] md:text-[200px] font-display italic leading-none tracking-tighter ${isDarkMode ? 'text-zinc-800' : 'text-zinc-200'}`}>
+            <span
+              className={`text-[140px] md:text-[200px] font-display italic leading-none tracking-tighter ${isDarkMode ? 'text-zinc-800' : 'text-zinc-200'}`}
+            >
               404
             </span>
           </div>
-          <h1 className={`text-3xl md:text-4xl font-display italic mb-4 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+          <h1
+            className={`text-3xl md:text-4xl font-display italic mb-4 ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
+          >
             Page not found
           </h1>
-          <p className={`text-base mb-10 font-light ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>
+          <p
+            className={`text-base mb-10 font-light ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}
+          >
             The page you're looking for doesn't exist or has been moved.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

@@ -22,13 +22,19 @@ export function CreditsProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const unsubscribe = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setCredits(data.credits || 0);
-        setUserData(data);
+    const unsubscribe = onSnapshot(
+      doc(db, 'users', user.uid),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setCredits(data.credits || 0);
+          setUserData(data);
+        }
+      },
+      (error) => {
+        console.error('[CreditsProvider] Firestore error:', error);
       }
-    });
+    );
 
     return () => unsubscribe();
   }, [user]);
@@ -36,11 +42,7 @@ export function CreditsProvider({ children }: { children: React.ReactNode }) {
   // Memoize value to prevent unnecessary re-renders
   const value = useMemo(() => ({ credits, userData }), [credits, userData]);
 
-  return (
-    <CreditsContext.Provider value={value}>
-      {children}
-    </CreditsContext.Provider>
-  );
+  return <CreditsContext.Provider value={value}>{children}</CreditsContext.Provider>;
 }
 
 export function useCredits() {

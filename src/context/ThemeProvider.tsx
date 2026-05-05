@@ -18,11 +18,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return true;
   });
 
-  const toggleTheme = () => setIsDarkMode(prev => {
-    const next = !prev;
-    localStorage.setItem(THEME_KEY, next ? 'dark' : 'light');
-    return next;
-  });
+  const toggleTheme = () =>
+    setIsDarkMode((prev) => {
+      const next = !prev;
+      localStorage.setItem(THEME_KEY, next ? 'dark' : 'light');
+      return next;
+    });
 
   useEffect(() => {
     if (isDarkMode) {
@@ -33,9 +34,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [isDarkMode]);
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>{children}</ThemeContext.Provider>
   );
 }
 

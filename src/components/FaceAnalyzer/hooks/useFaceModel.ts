@@ -10,22 +10,22 @@ export function useFaceModel() {
     async function loadModel() {
       try {
         const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
         );
         const landmarker = await FaceLandmarker.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-            delegate: "GPU"
+            delegate: 'GPU'
           },
           outputFaceBlendshapes: true,
-          runningMode: "IMAGE",
+          runningMode: 'IMAGE',
           numFaces: 1
         });
         setFaceLandmarker(landmarker);
         setIsModelLoading(false);
       } catch (err) {
-        console.error("Failed to load FaceLandmarker:", err);
-        setError("Failed to load AI model. Please refresh and try again.");
+        console.error('Failed to load FaceLandmarker:', err);
+        setError('Failed to load AI model. Please refresh and try again.');
         setIsModelLoading(false);
       }
     }

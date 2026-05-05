@@ -7,16 +7,17 @@ interface StructuredDataProps {
 
 const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
   const defaultSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "VisageX",
-    "operatingSystem": "Web browser",
-    "applicationCategory": "HealthApplication",
-    "description": "AI face analysis and facial symmetry test. Discover a personalized glow up guide.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'VisageX',
+    operatingSystem: 'Web browser',
+    applicationCategory: 'HealthApplication',
+    description:
+      'AI face analysis and facial symmetry test. Discover a personalized glow up guide.',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD'
     }
   };
 
@@ -24,9 +25,7 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
 
   return (
     <Helmet>
-      <script type="application/ld+json">
-        {JSON.stringify(schemaToRender)}
-      </script>
+      <script type="application/ld+json">{JSON.stringify(schemaToRender)}</script>
     </Helmet>
   );
 };

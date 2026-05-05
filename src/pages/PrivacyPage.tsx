@@ -16,10 +16,7 @@ export default function PrivacyPage() {
       transition={{ duration: 0.3 }}
       className="pt-20"
     >
-      <PrivacyPolicy
-        onBack={() => navigate('/')}
-        isDarkMode={isDarkMode}
-      />
+      <PrivacyPolicy onBack={() => navigate('/')} isDarkMode={isDarkMode} />
     </motion.div>
   );
 }

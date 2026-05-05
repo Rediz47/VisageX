@@ -16,10 +16,7 @@ export default function TermsPage() {
       transition={{ duration: 0.3 }}
       className="pt-20"
     >
-      <TermsOfService
-        onBack={() => navigate('/')}
-        isDarkMode={isDarkMode}
-      />
+      <TermsOfService onBack={() => navigate('/')} isDarkMode={isDarkMode} />
     </motion.div>
   );
 }

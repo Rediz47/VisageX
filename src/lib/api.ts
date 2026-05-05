@@ -1,24 +1,35 @@
 import axios from 'axios';
 import { auth } from '../firebase';
+import { getCaptchaToken } from './captcha';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: '/api'
 });
 
-api.interceptors.request.use(async (config) => {
-  if (auth.currentUser) {
-    try {
-      const token = await auth.currentUser.getIdToken();
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  async (config) => {
+    if (auth.currentUser) {
+      try {
+        const token = await auth.currentUser.getIdToken();
+        if (token && config.headers) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error('Error fetching Firebase token:', error);
       }
-    } catch (error) {
-      console.error('Error fetching Firebase token:', error);
     }
+
+    // Attach Turnstile CAPTCHA token if available
+    const captchaToken = getCaptchaToken();
+    if (captchaToken && config.headers) {
+      config.headers['x-captcha-token'] = captchaToken;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+);
 
 export default api;

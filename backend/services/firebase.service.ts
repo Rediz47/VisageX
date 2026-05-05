@@ -14,7 +14,7 @@ export function getAdminApp() {
       try {
         const cleanJson = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
         const cert = JSON.parse(cleanJson);
-        
+
         // Handle common formatting issue: replace escaped newlines in private_key
         if (cert.private_key) {
           cert.private_key = cert.private_key.replace(/\\n/g, '\n');
@@ -24,32 +24,35 @@ export function getAdminApp() {
           credential: admin.credential.cert(cert),
           projectId: cert.project_id
         });
-        console.log("Firebase Admin Initialized via Environment Variable.");
+        console.log('Firebase Admin Initialized via Environment Variable.');
         return admin.app();
       } catch (e: any) {
-        console.error("CRITICAL: Failed to parse FIREBASE_SERVICE_ACCOUNT env var. Check for copy-paste errors.", e.message);
+        console.error(
+          'CRITICAL: Failed to parse FIREBASE_SERVICE_ACCOUNT env var. Check for copy-paste errors.',
+          e.message
+        );
       }
     }
 
     // 2. Fallback to local files (development)
     const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
     if (!existsSync(configPath)) {
-      console.warn("Firebase config not found! Initializing with defaults.");
+      console.warn('Firebase config not found! Initializing with defaults.');
       admin.initializeApp();
       return admin.app();
     }
-    
+
     const firebaseConfig = JSON.parse(readFileSync(configPath, 'utf8'));
     const certPath = path.resolve(process.cwd(), 'serviceAccountKey.json');
-    
+
     if (!existsSync(certPath)) {
-       admin.initializeApp({ projectId: firebaseConfig.projectId });
+      admin.initializeApp({ projectId: firebaseConfig.projectId });
     } else {
-       const cert = JSON.parse(readFileSync(certPath, 'utf8'));
-       admin.initializeApp({
-         credential: admin.credential.cert(cert),
-         projectId: firebaseConfig.projectId,
-       });
+      const cert = JSON.parse(readFileSync(certPath, 'utf8'));
+      admin.initializeApp({
+        credential: admin.credential.cert(cert),
+        projectId: firebaseConfig.projectId
+      });
     }
   }
   return admin.app();
@@ -81,9 +84,9 @@ export function getAdminDb() {
 }
 
 export function getAdminAuth() {
-    if (!adminAuth) {
-        const app = getAdminApp();
-        adminAuth = getAuth(app);
-    }
-    return adminAuth;
+  if (!adminAuth) {
+    const app = getAdminApp();
+    adminAuth = getAuth(app);
+  }
+  return adminAuth;
 }

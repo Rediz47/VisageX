@@ -1,28 +1,20 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-}, firebaseConfig.firestoreDatabaseId);
+// Use default WebChannel transport. `experimentalForceLongPolling` was removed —
+// it more than doubles Firestore reads/billing and is only needed for legacy
+// corporate proxies. Re-enable here if you measurably need it.
+export const db = initializeFirestore(app, {}, firebaseConfig.firestoreDatabaseId);
 
-// Test connection to Firestore
-async function testConnection() {
-  try {
-    // Attempt to fetch a non-existent doc just to trigger a server request
-    await getDocFromServer(doc(db, '_connection_test', 'init'));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Firebase Connection Error: The client is offline. Please check your Firebase configuration and project status.");
-    }
-    // Other errors (like permission denied on this test path) are expected and mean we ARE connected
-  }
-}
-testConnection();
+// NOTE: Removed the `testConnection()` probe that called getDocFromServer on every
+// module load — it consumed one Firestore read per page load / HMR reload, which was
+// the single biggest source of the "free tier daily read quota" exhaustion in dev.
+// If you need connectivity diagnostics, use the Firebase Emulator or a one-off script.
 
 export default app;

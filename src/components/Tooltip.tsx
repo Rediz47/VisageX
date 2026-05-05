@@ -11,7 +11,11 @@ export function Tooltip({ content, isDarkMode }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <div className="relative inline-block ml-1.5" onMouseEnter={() => setIsVisible(true)} onMouseLeave={() => setIsVisible(false)}>
+    <div
+      className="relative inline-block ml-1.5"
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
       <Info className="w-3 h-3 opacity-50 cursor-help" />
       <AnimatePresence>
         {isVisible && (

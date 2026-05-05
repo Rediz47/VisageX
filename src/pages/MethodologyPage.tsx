@@ -18,19 +18,19 @@ export default function MethodologyPage() {
         canonical="https://visagex.online/methodology"
       />
       <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="pt-20"
-    >
-      <Methodology
-        onBack={() => navigate('/')}
-        isDarkMode={isDarkMode}
-        result={null}
-        imageUrl={undefined}
-      />
-    </motion.div>
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="pt-20"
+      >
+        <Methodology
+          onBack={() => navigate('/')}
+          isDarkMode={isDarkMode}
+          result={null}
+          imageUrl={undefined}
+        />
+      </motion.div>
     </>
   );
 }

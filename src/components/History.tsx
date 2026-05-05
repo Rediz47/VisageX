@@ -1,9 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Calendar, Loader2, Star, AlertCircle, TrendingUp, Columns, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  Loader2,
+  Star,
+  AlertCircle,
+  TrendingUp,
+  Columns,
+  X
+} from 'lucide-react';
 import { auth, db } from '../firebase';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 import { cn } from '../lib/utils';
 
 interface HistoryProps {
@@ -22,27 +39,31 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
   useEffect(() => {
     async function fetchHistory() {
       if (!auth.currentUser) {
-        setError("You must be logged in to view history.");
+        setError('You must be logged in to view history.');
         setLoading(false);
         return;
       }
 
       try {
+        // Cap at 30 most recent scans — full history fetch burns Firestore reads
+        // and users rarely scroll past the first page.
         const q = query(
           collection(db, 'scans'),
-          where('userId', '==', auth.currentUser.uid)
+          where('userId', '==', auth.currentUser.uid),
+          orderBy('createdAt', 'desc'),
+          limit(30)
         );
 
         const querySnapshot = await getDocs(q);
-        const fetchedScans = querySnapshot.docs.map(doc => ({
+        const fetchedScans = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data()
-        })).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        }));
 
         setScans(fetchedScans);
       } catch (err) {
-        console.error("Error fetching history:", err);
-        setError("Failed to load history. Please try again later.");
+        console.error('Error fetching history:', err);
+        setError('Failed to load history. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -52,11 +73,11 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
   }, []);
 
   const toggleComparison = (scan: any) => {
-    if (selectedForComparison.find(s => s.id === scan.id)) {
-      setSelectedForComparison(prev => prev.filter(s => s.id !== scan.id));
+    if (selectedForComparison.find((s) => s.id === scan.id)) {
+      setSelectedForComparison((prev) => prev.filter((s) => s.id !== scan.id));
     } else {
       if (selectedForComparison.length < 2) {
-        setSelectedForComparison(prev => [...prev, scan]);
+        setSelectedForComparison((prev) => [...prev, scan]);
       } else {
         setSelectedForComparison([selectedForComparison[1], scan]);
       }
@@ -64,7 +85,10 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date =
+      dateString && typeof (dateString as any).toDate === 'function'
+        ? (dateString as any).toDate()
+        : new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -74,8 +98,12 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
     }).format(date);
   };
 
-  const chartData = [...scans].reverse().map(scan => ({
-    date: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(scan.createdAt)),
+  const chartData = [...scans].reverse().map((scan) => ({
+    date: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(
+      scan.createdAt && typeof scan.createdAt.toDate === 'function'
+        ? scan.createdAt.toDate()
+        : new Date(scan.createdAt)
+    ),
     score: Number(scan.overallScore.toFixed(1)),
     fullDate: formatDate(scan.createdAt)
   }));
@@ -83,7 +111,9 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className={`p-4 rounded-xl border shadow-xl ${isDarkMode ? 'bg-zinc-900 border-white/10 text-white' : 'bg-white border-zinc-200 text-zinc-900'}`}>
+        <div
+          className={`p-4 rounded-xl border shadow-xl ${isDarkMode ? 'bg-zinc-900 border-white/10 text-white' : 'bg-white border-zinc-200 text-zinc-900'}`}
+        >
           <p className="text-sm font-medium mb-1 opacity-70">{payload[0].payload.fullDate}</p>
           <p className="text-2xl font-display font-bold text-cyan-400">
             {payload[0].value} <span className="text-sm font-normal opacity-50">/ 10</span>
@@ -100,7 +130,9 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
     const data2 = JSON.parse(scan2.analysisData);
 
     return (
-      <div className={`min-h-screen pt-12 pb-20 px-6 lg:px-8 max-w-[1600px] mx-auto ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+      <div
+        className={`min-h-screen pt-12 pb-20 px-6 lg:px-8 max-w-[1600px] mx-auto ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
+      >
         <button
           onClick={() => setIsComparing(false)}
           className={`flex items-center gap-2 mb-12 transition-colors ${isDarkMode ? 'text-white/50 hover:text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
@@ -111,10 +143,14 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
 
         <div className="mb-12">
           <h1 className="text-4xl md:text-6xl font-display italic tracking-tight mb-4">
-            Glow-Up <span className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Comparison</span>
+            Glow-Up{' '}
+            <span className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">
+              Comparison
+            </span>
           </h1>
           <p className={`text-lg font-light ${isDarkMode ? 'text-white/50' : 'text-zinc-500'}`}>
-            Comparing your progress between {formatDate(scan1.createdAt)} and {formatDate(scan2.createdAt)}.
+            Comparing your progress between {formatDate(scan1.createdAt)} and{' '}
+            {formatDate(scan2.createdAt)}.
           </p>
         </div>
 
@@ -122,17 +158,26 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
           {[scan1, scan2].map((scan, i) => {
             const data = JSON.parse(scan.analysisData);
             return (
-              <div key={i} className={`p-8 rounded-[2.5rem] border ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}>
+              <div
+                key={i}
+                className={`p-8 rounded-[2.5rem] border ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}
+              >
                 <div className="aspect-[4/5] rounded-3xl overflow-hidden mb-8 border border-white/5">
                   <img src={scan.imageUrl} alt="Scan" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-1">Overall Score</p>
-                    <p className="text-5xl font-display font-bold">{scan.overallScore.toFixed(1)}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-1">
+                      Facial Harmony Score
+                    </p>
+                    <p className="text-5xl font-display font-bold">
+                      {scan.overallScore.toFixed(1)}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-1">Date</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-1">
+                      Date
+                    </p>
                     <p className="text-sm font-medium">{formatDate(scan.createdAt)}</p>
                   </div>
                 </div>
@@ -144,7 +189,9 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                         <span className="opacity-60">{key}</span>
                         <span className="font-bold">{value.toFixed(1)}</span>
                       </div>
-                      <div className={`w-full h-1.5 rounded-full ${isDarkMode ? 'bg-white/5' : 'bg-zinc-100'}`}>
+                      <div
+                        className={`w-full h-1.5 rounded-full ${isDarkMode ? 'bg-white/5' : 'bg-zinc-100'}`}
+                      >
                         <div
                           className="h-full bg-cyan-400 rounded-full"
                           style={{ width: `${(value / 10) * 100}%` }}
@@ -158,7 +205,9 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
           })}
         </div>
 
-        <div className={`mt-12 p-8 rounded-[2.5rem] border text-center ${isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50 border-emerald-100'}`}>
+        <div
+          className={`mt-12 p-8 rounded-[2.5rem] border text-center ${isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50 border-emerald-100'}`}
+        >
           <h3 className="text-2xl font-display font-bold mb-2">Progress Analysis</h3>
           <p className={`text-lg ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
             {scan2.overallScore > scan1.overallScore
@@ -171,7 +220,9 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
   }
 
   return (
-    <div className={`min-h-screen pt-12 pb-20 px-6 lg:px-8 max-w-[1600px] mx-auto ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+    <div
+      className={`min-h-screen pt-12 pb-20 px-6 lg:px-8 max-w-[1600px] mx-auto ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
+    >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <button
           onClick={onBack}
@@ -185,7 +236,10 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
           <div className="flex items-center gap-4">
             <div className="flex -space-x-3">
               {selectedForComparison.map((scan, i) => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-zinc-800">
+                <div
+                  key={i}
+                  className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-zinc-800"
+                >
                   <img src={scan.imageUrl} alt="Selected" className="w-full h-full object-cover" />
                 </div>
               ))}
@@ -214,7 +268,10 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
 
       <div className="mb-12">
         <h1 className="text-4xl md:text-6xl font-display italic tracking-tight mb-4">
-          Glow-Up <span className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Tracker</span>
+          Glow-Up{' '}
+          <span className="not-italic text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">
+            Tracker
+          </span>
         </h1>
         <p className={`text-lg font-light ${isDarkMode ? 'text-white/50' : 'text-zinc-500'}`}>
           Review your past analyses and track your looksmaxxing journey over time.
@@ -224,24 +281,39 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
       {loading ? (
         <div className="space-y-12">
           {/* Skeleton Chart */}
-          <div className={`w-full h-64 rounded-3xl border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-zinc-100 border-zinc-200'}`} />
+          <div
+            className={`w-full h-64 rounded-3xl border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-zinc-100 border-zinc-200'}`}
+          />
 
           {/* Skeleton Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className={`aspect-[4/5] rounded-3xl border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-zinc-100 border-zinc-200'}`} />
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className={`aspect-[4/5] rounded-3xl border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-zinc-100 border-zinc-200'}`}
+              />
             ))}
           </div>
         </div>
       ) : error ? (
-        <div className={`p-6 rounded-2xl border flex items-start gap-4 ${isDarkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-100 text-red-600'}`}>
+        <div
+          className={`p-6 rounded-2xl border flex items-start gap-4 ${isDarkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-100 text-red-600'}`}
+        >
           <AlertCircle className="w-6 h-6 shrink-0" />
           <p>{error}</p>
         </div>
       ) : scans.length === 0 ? (
-        <div className={`text-center py-32 border rounded-3xl border-dashed ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-zinc-200 bg-zinc-50'}`}>
-          <p className={`text-xl font-display italic mb-2 ${isDarkMode ? 'text-white/70' : 'text-zinc-900'}`}>No scans found</p>
-          <p className={`font-light ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>Your analysis history will appear here once you complete a scan.</p>
+        <div
+          className={`text-center py-32 border rounded-3xl border-dashed ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-zinc-200 bg-zinc-50'}`}
+        >
+          <p
+            className={`text-xl font-display italic mb-2 ${isDarkMode ? 'text-white/70' : 'text-zinc-900'}`}
+          >
+            No scans found
+          </p>
+          <p className={`font-light ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>
+            Your analysis history will appear here once you complete a scan.
+          </p>
         </div>
       ) : (
         <div className="space-y-12">
@@ -258,7 +330,9 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                 </div>
                 <div>
                   <h2 className="text-xl font-display font-bold">Progress Overview</h2>
-                  <p className={`text-sm ${isDarkMode ? 'text-white/50' : 'text-zinc-500'}`}>Your overall score trajectory</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-white/50' : 'text-zinc-500'}`}>
+                    Your overall score trajectory
+                  </p>
                 </div>
               </div>
 
@@ -271,19 +345,29 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                         <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke={isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
+                    />
                     <XAxis
                       dataKey="date"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)', fontSize: 12 }}
+                      tick={{
+                        fill: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+                        fontSize: 12
+                      }}
                       dy={10}
                     />
                     <YAxis
                       domain={['dataMin - 0.5', 'dataMax + 0.5']}
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)', fontSize: 12 }}
+                      tick={{
+                        fill: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+                        fontSize: 12
+                      }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Area
@@ -293,7 +377,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                       strokeWidth={3}
                       fillOpacity={1}
                       fill="url(#colorScore)"
-                      activeDot={{ r: 6, fill: "#818cf8", stroke: "#fff", strokeWidth: 2 }}
+                      activeDot={{ r: 6, fill: '#818cf8', stroke: '#fff', strokeWidth: 2 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -310,11 +394,12 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                 try {
                   parsedData = JSON.parse(scan.analysisData);
                 } catch (e) {
-                  console.error("Failed to parse scan data", e);
+                  console.error('Failed to parse scan data', e);
                 }
 
-                const imageUrlToUse = parsedData.historyImage ||
-                  (scan.imageUrl === "base64-stored-in-analysisData" ? undefined : scan.imageUrl) ||
+                const imageUrlToUse =
+                  parsedData.historyImage ||
+                  (scan.imageUrl === 'base64-stored-in-analysisData' ? undefined : scan.imageUrl) ||
                   scan.imageBase64;
 
                 return (
@@ -342,10 +427,10 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                             toggleComparison(scan);
                           }}
                           className={cn(
-                            "p-2.5 rounded-xl border backdrop-blur-md transition-all",
-                            selectedForComparison.find(s => s.id === scan.id)
-                              ? "bg-cyan-500 border-cyan-400 text-white shadow-[0_0_15px_rgba(34,211,238,0.5)]"
-                              : "bg-white/10 border-white/20 text-white/70 hover:bg-white/20 hover:text-white"
+                            'p-2.5 rounded-xl border backdrop-blur-md transition-all',
+                            selectedForComparison.find((s) => s.id === scan.id)
+                              ? 'bg-cyan-500 border-cyan-400 text-white shadow-[0_0_15px_rgba(34,211,238,0.5)]'
+                              : 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20 hover:text-white'
                           )}
                         >
                           <Columns className="w-4 h-4" />
@@ -356,7 +441,9 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2 text-white/80">
                             <Calendar className="w-4 h-4" />
-                            <span className="text-xs font-medium uppercase tracking-wider">{formatDate(scan.createdAt)}</span>
+                            <span className="text-xs font-medium uppercase tracking-wider">
+                              {formatDate(scan.createdAt)}
+                            </span>
                           </div>
                         </div>
                         <div className="flex items-end gap-3">

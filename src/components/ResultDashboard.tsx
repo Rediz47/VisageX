@@ -784,6 +784,7 @@ export function ResultDashboard({
                 userData={userData}
                 onUnlock={onUnlock}
                 scrollToPricing={scrollToPricing}
+                onOpenPricing={onOpenPricing}
                 radarData={radarData}
               />
               <BreakdownCards breakdown={breakdown} isDarkMode={isDarkMode} isLocked={isLocked} />

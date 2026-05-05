@@ -26,7 +26,7 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
 
     const userMessage = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
     try {
@@ -61,14 +61,22 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
         })
       });
 
-      if (!response.ok) throw new Error("Coach failed to respond.");
+      if (!response.ok) throw new Error('Coach failed to respond.');
       const data = await response.json();
 
-      const aiText = data.response || "I'm sorry, I couldn't process that. Could you try rephrasing?";
-      setMessages(prev => [...prev, { role: 'assistant', content: aiText }]);
+      const aiText =
+        data.response || "I'm sorry, I couldn't process that. Could you try rephrasing?";
+      setMessages((prev) => [...prev, { role: 'assistant', content: aiText }]);
     } catch (error) {
-      console.error("Coach Error:", error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "I'm having a bit of trouble connecting to my neural network. Please try again in a moment." }]);
+      console.error('Coach Error:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content:
+            "I'm having a bit of trouble connecting to my neural network. Please try again in a moment."
+        }
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +92,8 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-8 right-8 z-[60] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-colors",
-          isDarkMode ? "bg-white text-black" : "bg-zinc-900 text-white"
+          'fixed bottom-8 right-8 z-[60] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-colors',
+          isDarkMode ? 'bg-white text-black' : 'bg-zinc-900 text-white'
         )}
       >
         <MessageSquare className="w-7 h-7" />
@@ -106,61 +114,89 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.9 }}
             className={cn(
-              "fixed bottom-28 right-8 z-[60] w-[90vw] md:w-[400px] h-[600px] max-h-[70vh] rounded-[2.5rem] shadow-2xl border flex flex-col overflow-hidden",
-              isDarkMode ? "bg-zinc-900 border-white/10" : "bg-white border-zinc-200"
+              'fixed bottom-28 right-8 z-[60] w-[90vw] md:w-[400px] h-[600px] max-h-[70vh] rounded-[2.5rem] shadow-2xl border flex flex-col overflow-hidden',
+              isDarkMode ? 'bg-zinc-900 border-white/10' : 'bg-white border-zinc-200'
             )}
           >
             {/* Header */}
-            <div className={cn(
-              "p-6 border-b flex items-center justify-between",
-              isDarkMode ? "bg-black/40 border-white/5" : "bg-zinc-50 border-zinc-100"
-            )}>
+            <div
+              className={cn(
+                'p-6 border-b flex items-center justify-between',
+                isDarkMode ? 'bg-black/40 border-white/5' : 'bg-zinc-50 border-zinc-100'
+              )}
+            >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-rose-500 flex items-center justify-center">
                   <Bot className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className={cn("font-display font-bold text-lg", isDarkMode ? "text-white" : "text-zinc-900")}>Glow-up Coach</h3>
+                  <h3
+                    className={cn(
+                      'font-display font-bold text-lg',
+                      isDarkMode ? 'text-white' : 'text-zinc-900'
+                    )}
+                  >
+                    Glow-up Coach
+                  </h3>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">AI Online</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">
+                      AI Online
+                    </span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className={cn("p-2 rounded-xl transition-colors", isDarkMode ? "hover:bg-white/5" : "hover:bg-black/5")}
+                className={cn(
+                  'p-2 rounded-xl transition-colors',
+                  isDarkMode ? 'hover:bg-white/5' : 'hover:bg-black/5'
+                )}
               >
                 <X className="w-5 h-5 opacity-50" />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-none">
               {messages.map((msg, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, x: msg.role === 'user' ? 10 : -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   className={cn(
-                    "flex gap-3",
-                    msg.role === 'user' ? "flex-row-reverse" : "flex-row"
+                    'flex gap-3',
+                    msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                   )}
                 >
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                    msg.role === 'user'
-                      ? (isDarkMode ? "bg-white/10" : "bg-zinc-100")
-                      : "bg-gradient-to-br from-indigo-500 to-rose-500"
-                  )}>
-                    {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 text-white" />}
+                  <div
+                    className={cn(
+                      'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
+                      msg.role === 'user'
+                        ? isDarkMode
+                          ? 'bg-white/10'
+                          : 'bg-zinc-100'
+                        : 'bg-gradient-to-br from-indigo-500 to-rose-500'
+                    )}
+                  >
+                    {msg.role === 'user' ? (
+                      <User className="w-4 h-4" />
+                    ) : (
+                      <Bot className="w-4 h-4 text-white" />
+                    )}
                   </div>
-                  <div className={cn(
-                    "max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed",
-                    msg.role === 'user'
-                      ? (isDarkMode ? "bg-white/5 text-zinc-100" : "bg-zinc-100 text-zinc-900")
-                      : (isDarkMode ? "bg-zinc-800 text-zinc-100" : "bg-zinc-50 text-zinc-900")
-                  )}>
+                  <div
+                    className={cn(
+                      'max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed',
+                      msg.role === 'user'
+                        ? isDarkMode
+                          ? 'bg-white/5 text-zinc-100'
+                          : 'bg-zinc-100 text-zinc-900'
+                        : isDarkMode
+                          ? 'bg-zinc-800 text-zinc-100'
+                          : 'bg-zinc-50 text-zinc-900'
+                    )}
+                  >
                     {msg.content}
                   </div>
                 </motion.div>
@@ -170,10 +206,12 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-rose-500 flex items-center justify-center">
                     <Bot className="w-4 h-4 text-white" />
                   </div>
-                  <div className={cn(
-                    "p-4 rounded-2xl flex items-center gap-2",
-                    isDarkMode ? "bg-zinc-800" : "bg-zinc-50"
-                  )}>
+                  <div
+                    className={cn(
+                      'p-4 rounded-2xl flex items-center gap-2',
+                      isDarkMode ? 'bg-zinc-800' : 'bg-zinc-50'
+                    )}
+                  >
                     <Loader2 className="w-4 h-4 animate-spin opacity-50" />
                     <span className="text-xs opacity-50 italic">Coach is thinking...</span>
                   </div>
@@ -183,10 +221,12 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
             </div>
 
             {/* Input */}
-            <div className={cn(
-              "p-6 border-t",
-              isDarkMode ? "bg-black/40 border-white/5" : "bg-white border-zinc-100"
-            )}>
+            <div
+              className={cn(
+                'p-6 border-t',
+                isDarkMode ? 'bg-black/40 border-white/5' : 'bg-white border-zinc-100'
+              )}
+            >
               <div className="relative">
                 <input
                   type="text"
@@ -195,33 +235,37 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask about your results..."
                   className={cn(
-                    "w-full pl-6 pr-14 py-4 rounded-2xl text-sm focus:outline-none focus:ring-2 transition-all",
+                    'w-full pl-6 pr-14 py-4 rounded-2xl text-sm focus:outline-none focus:ring-2 transition-all',
                     isDarkMode
-                      ? "bg-white/5 border-white/10 text-white focus:ring-white/20"
-                      : "bg-zinc-100 border-zinc-200 text-zinc-900 focus:ring-zinc-900/10"
+                      ? 'bg-white/5 border-white/10 text-white focus:ring-white/20'
+                      : 'bg-zinc-100 border-zinc-200 text-zinc-900 focus:ring-zinc-900/10'
                   )}
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   className={cn(
-                    "absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all",
+                    'absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all',
                     input.trim() && !isLoading
-                      ? (isDarkMode ? "bg-white text-black" : "bg-zinc-900 text-white")
-                      : "opacity-30 cursor-not-allowed"
+                      ? isDarkMode
+                        ? 'bg-white text-black'
+                        : 'bg-zinc-900 text-white'
+                      : 'opacity-30 cursor-not-allowed'
                   )}
                 >
                   <Send className="w-4 h-4" />
                 </button>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                {["How to fix asymmetry?", "Best haircut?", "Skin routine?"].map((q) => (
+                {['How to fix asymmetry?', 'Best haircut?', 'Skin routine?'].map((q) => (
                   <button
                     key={q}
                     onClick={() => setInput(q)}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors",
-                      isDarkMode ? "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white" : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900"
+                      'px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors',
+                      isDarkMode
+                        ? 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                        : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900'
                     )}
                   >
                     {q}

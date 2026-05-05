@@ -27,7 +27,7 @@ export function ViralShareOverlay({
   onGenerateCard,
   isGeneratingCard,
   user,
-  onOpenAuth,
+  onOpenAuth
 }: ViralShareOverlayProps) {
   const [copied, setCopied] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
@@ -40,17 +40,21 @@ export function ViralShareOverlay({
     }
   }, [isVisible, hasTriggered]);
 
-  const shareText = `I scored ${overallScore.toFixed(1)}/10 on the VisageX AI Face Analysis (Top ${topPercentile}% globally). Can you beat me?`;
+  const shareText = `I scored ${overallScore.toFixed(1)}/10 on the VisageX AI Face Analysis. Can you beat me?`;
   const shareUrl = `${window.location.origin}${referralCode ? `?ref=${referralCode}` : ''}`;
 
   const handleShare = async () => {
     if ((window as any).posthog) {
-      (window as any).posthog.capture('viral_share_overlay_clicked', { score: overallScore.toFixed(1) });
+      (window as any).posthog.capture('viral_share_overlay_clicked', {
+        score: overallScore.toFixed(1)
+      });
     }
     if (navigator.share) {
       try {
         await navigator.share({ title: 'My VisageX AI Score', text: shareText, url: shareUrl });
-      } catch {}
+      } catch {
+        /* noop */
+      }
     } else {
       await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
       setCopied(true);
@@ -59,10 +63,29 @@ export function ViralShareOverlay({
   };
 
   const getEmotionalMessage = () => {
-    if (overallScore >= 8.5) return { emoji: '🔥', headline: 'You\'re absolutely stunning.', sub: 'Your facial harmony is in the elite tier. Share it — make them wonder.' };
-    if (overallScore >= 7) return { emoji: '✨', headline: 'Impressive results.', sub: 'You scored higher than most people. Show the world what you\'re working with.' };
-    if (overallScore >= 5.5) return { emoji: '💪', headline: 'Solid foundation detected.', sub: 'You have real potential. Share your score and challenge your friends.' };
-    return { emoji: '🚀', headline: 'Your journey starts here.', sub: 'Everyone starts somewhere. Challenge your friends to beat your score.' };
+    if (overallScore >= 8.5)
+      return {
+        emoji: '🔥',
+        headline: "You're absolutely stunning.",
+        sub: 'Your facial harmony is in the elite tier. Share it — make them wonder.'
+      };
+    if (overallScore >= 7)
+      return {
+        emoji: '✨',
+        headline: 'Impressive results.',
+        sub: "You scored higher than most people. Show the world what you're working with."
+      };
+    if (overallScore >= 5.5)
+      return {
+        emoji: '💪',
+        headline: 'Solid foundation detected.',
+        sub: 'You have real potential. Share your score and challenge your friends.'
+      };
+    return {
+      emoji: '🚀',
+      headline: 'Your journey starts here.',
+      sub: 'Everyone starts somewhere. Challenge your friends to beat your score.'
+    };
   };
 
   const msg = getEmotionalMessage();
@@ -76,7 +99,9 @@ export function ViralShareOverlay({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
           className="fixed inset-0 z-[90] flex items-center justify-center p-4 sm:p-6 backdrop-blur-2xl bg-black/80"
-          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -89,8 +114,18 @@ export function ViralShareOverlay({
             )}
           >
             {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)' }} />
-            <div className="absolute bottom-0 left-0 w-48 h-48 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.08) 0%, transparent 70%)' }} />
+            <div
+              className="absolute top-0 right-0 w-64 h-64 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)'
+              }}
+            />
+            <div
+              className="absolute bottom-0 left-0 w-48 h-48 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle, rgba(244,63,94,0.08) 0%, transparent 70%)'
+              }}
+            />
 
             {/* Close button */}
             <button
@@ -98,7 +133,9 @@ export function ViralShareOverlay({
               aria-label="Close sharing overlay"
               className={cn(
                 'absolute top-6 right-6 p-2 rounded-full border transition-all z-20',
-                isDarkMode ? 'border-white/10 text-white/40 hover:bg-white/5' : 'border-zinc-200 text-zinc-400 hover:bg-zinc-100'
+                isDarkMode
+                  ? 'border-white/10 text-white/40 hover:bg-white/5'
+                  : 'border-zinc-200 text-zinc-400 hover:bg-zinc-100'
               )}
             >
               <X className="w-4 h-4" />
@@ -114,7 +151,9 @@ export function ViralShareOverlay({
               >
                 <div className="relative">
                   <div className="w-28 h-28 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-rose-500 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                    <span className="text-4xl font-display italic text-white font-bold">{overallScore.toFixed(1)}</span>
+                    <span className="text-4xl font-display italic text-white font-bold">
+                      {overallScore.toFixed(1)}
+                    </span>
                   </div>
                   <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center shadow-lg">
                     <Trophy className="w-5 h-5 text-amber-900" />
@@ -129,18 +168,32 @@ export function ViralShareOverlay({
                 transition={{ delay: 0.4 }}
               >
                 <p className="text-4xl mb-2">{msg.emoji}</p>
-                <h2 className={cn('text-2xl md:text-3xl font-display italic mb-3 tracking-tight', isDarkMode ? 'text-white' : 'text-zinc-900')}>
+                <h2
+                  className={cn(
+                    'text-2xl md:text-3xl font-display italic mb-3 tracking-tight',
+                    isDarkMode ? 'text-white' : 'text-zinc-900'
+                  )}
+                >
                   {msg.headline}
                 </h2>
-                <p className={cn('text-sm font-light mb-2 max-w-sm', isDarkMode ? 'text-white/50' : 'text-zinc-500')}>
+                <p
+                  className={cn(
+                    'text-sm font-light mb-2 max-w-sm',
+                    isDarkMode ? 'text-white/50' : 'text-zinc-500'
+                  )}
+                >
                   {msg.sub}
                 </p>
-                <p className={cn(
-                  'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8',
-                  isDarkMode ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
-                )}>
+                <p
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8',
+                    isDarkMode
+                      ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20'
+                      : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                  )}
+                >
                   <Sparkles className="w-3 h-3" />
-                  Top {topPercentile}% Globally
+                  Facial Harmony Score
                 </p>
               </motion.div>
 
@@ -158,7 +211,9 @@ export function ViralShareOverlay({
                 >
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                   <Share2 className="w-5 h-5 relative z-10" />
-                  <span className="relative z-10">{copied ? 'Copied to Clipboard!' : 'Challenge Your Friends'}</span>
+                  <span className="relative z-10">
+                    {copied ? 'Copied to Clipboard!' : 'Challenge Your Friends'}
+                  </span>
                 </button>
 
                 {/* Secondary: Download card */}
@@ -182,7 +237,9 @@ export function ViralShareOverlay({
                   onClick={onClose}
                   className={cn(
                     'w-full py-3 text-[10px] font-bold uppercase tracking-widest transition-all duration-300',
-                    isDarkMode ? 'text-white/20 hover:text-white/40' : 'text-zinc-300 hover:text-zinc-500'
+                    isDarkMode
+                      ? 'text-white/20 hover:text-white/40'
+                      : 'text-zinc-300 hover:text-zinc-500'
                   )}
                 >
                   Skip for now

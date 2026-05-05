@@ -21,11 +21,7 @@ export default function ProfilePage() {
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
       >
-        <Profile
-          onBack={() => navigate('/')}
-          isDarkMode={isDarkMode}
-          userCredits={credits}
-        />
+        <Profile onBack={() => navigate('/')} isDarkMode={isDarkMode} userCredits={credits} />
       </motion.div>
     </>
   );

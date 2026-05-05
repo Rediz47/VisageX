@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import React, { Component, type ReactNode, type ErrorInfo } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';

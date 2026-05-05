@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { auth, db } from '../../../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { auth } from '../../../firebase';
 import { AnalysisResult, Landmark, SaveStatus } from '../types';
+import { getCaptchaToken } from '../../../lib/captcha';
 
 export function useAnalysis(userCredits: number) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus | null>(null);
 
-  const analyzeImageServerSide = async (landmarks: Landmark[], croppedImageBase64: string): Promise<AnalysisResult> => {
+  const analyzeImageServerSide = async (
+    landmarks: Landmark[],
+    croppedImageBase64: string
+  ): Promise<AnalysisResult> => {
     const response = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -14,46 +17,87 @@ export function useAnalysis(userCredits: number) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to analyze face on the server.");
+      throw new Error('Failed to analyze face on the server.');
     }
     return await response.json();
   };
 
-  const getGeminiAnalysis = async (croppedImageBase64: string, currentAnalysis: AnalysisResult): Promise<AnalysisResult> => {
+  const getGeminiAnalysis = async (
+    croppedImageBase64: string,
+    currentAnalysis: AnalysisResult
+  ): Promise<AnalysisResult> => {
     if (!auth.currentUser || userCredits <= 0) {
-      console.log("Skipping premium AI analysis due to missing auth or credits.");
+      console.log('Skipping premium AI analysis due to missing auth or credits.');
       return currentAnalysis;
     }
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 1;
+    // Backend Gemini call can legitimately take 30–45s on vision analyses with the
+    // long structured-JSON prompt. Frontend must outlast the backend AbortController
+    // (60s) or we'll cancel a request that's about to succeed. 70s gives headroom.
+    const GEMINI_TIMEOUT_MS = 70000;
     let lastError: any = null;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const idToken = await auth.currentUser!.getIdToken(attempt > 1); // Force refresh on retry
+        const idToken = await auth.currentUser!.getIdToken(false);
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`
+        };
+        const captchaToken = getCaptchaToken();
+        if (captchaToken) headers['x-captcha-token'] = captchaToken;
+
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
         const aiResponse = await fetch('/api/gemini-analysis', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`
-          },
-          body: JSON.stringify({ image: croppedImageBase64 })
+          headers,
+          body: JSON.stringify({ image: croppedImageBase64 }),
+          signal: controller.signal
+        }).finally(() => {
+          window.clearTimeout(timeoutId);
         });
 
         if (aiResponse.status === 403) {
-          console.warn("Insufficient credits for AI analysis.");
+          console.warn('Insufficient credits for AI analysis.');
           return currentAnalysis;
         }
 
         if (!aiResponse.ok) {
-          throw new Error(`AI analysis failed (status ${aiResponse.status})`);
+          // Parse backend error payload so the real reason (missing key, Vertex 429, parse failure, etc.) is visible.
+          let backendDetail = '';
+          try {
+            const errBody = await aiResponse.json();
+            backendDetail = [
+              errBody?.error,
+              errBody?.detail,
+              errBody?.statusCode ? `vertex:${errBody.statusCode}` : null
+            ]
+              .filter(Boolean)
+              .join(' — ');
+          } catch {
+            try {
+              backendDetail = (await aiResponse.text()).slice(0, 300);
+            } catch {
+              /* noop */
+            }
+          }
+          console.error(`[Gemini] ${aiResponse.status} from /api/gemini-analysis:`, backendDetail);
+          throw new Error(
+            `AI analysis failed (status ${aiResponse.status})${backendDetail ? ': ' + backendDetail : ''}`
+          );
         }
 
         const geminiData = await aiResponse.json();
         if (geminiData && typeof geminiData.skin_quality === 'number') {
           const aiAesthetics = geminiData.overall_aesthetics_score || currentAnalysis.overallScore;
-          const aiWeight = 0.85;
-          const newOverallScore = (currentAnalysis.overallScore * (1 - aiWeight)) + (aiAesthetics * aiWeight);
+          const geometryScore = currentAnalysis.overallScore;
+          const aiWeight = 0.5;
+          const newOverallScore = geometryScore * (1 - aiWeight) + aiAesthetics * aiWeight;
+
+          currentAnalysis.structuralScore = Number(geometryScore.toFixed(1));
+          currentAnalysis.visualScore = Number(aiAesthetics.toFixed(1));
 
           if (!isNaN(newOverallScore)) {
             currentAnalysis.overallScore = Number(newOverallScore.toFixed(1));
@@ -62,13 +106,21 @@ export function useAnalysis(userCredits: number) {
           if (geminiData.potentialScore <= currentAnalysis.overallScore) {
             geminiData.potentialScore = Math.min(10, currentAnalysis.overallScore + 0.5);
           }
-          currentAnalysis.breakdown["Skin Quality"] = Number((geminiData.overall_skin_score || 0).toFixed(1));
-          currentAnalysis.breakdown["Grooming"] = Number((geminiData.grooming || 0).toFixed(1));
-          currentAnalysis.breakdown["Cheekbones"] = Number((geminiData.cheekbone_prominence || 0).toFixed(1));
+          currentAnalysis.breakdown['Skin Quality'] = Number(
+            (geminiData.overall_skin_score || 0).toFixed(1)
+          );
+          currentAnalysis.breakdown['Grooming'] = Number((geminiData.grooming || 0).toFixed(1));
+          currentAnalysis.breakdown['Cheekbones'] = Number(
+            (geminiData.cheekbone_prominence || 0).toFixed(1)
+          );
 
-          if (geminiData.visualStrengths) currentAnalysis.analysis.strengths.push(...geminiData.visualStrengths);
-          if (geminiData.visualWeaknesses) currentAnalysis.analysis.weaknesses.push(...geminiData.visualWeaknesses);
+          if (geminiData.visualStrengths)
+            currentAnalysis.analysis.strengths.push(...geminiData.visualStrengths);
+          if (geminiData.visualWeaknesses)
+            currentAnalysis.analysis.weaknesses.push(...geminiData.visualWeaknesses);
 
+          const landmarkFaceShape = currentAnalysis.visionAnalysis?.faceShape;
+          const landmarkFaceShapeConfidence = currentAnalysis.visionAnalysis?.faceShapeConfidence;
           currentAnalysis.visionAnalysis = {
             colorSeason: geminiData.color_season,
             skinAnalysis: geminiData.skinAnalysis,
@@ -76,8 +128,11 @@ export function useAnalysis(userCredits: number) {
             potentialScore: geminiData.potentialScore,
             improvements: geminiData.improvements,
             recommendedProducts: geminiData.recommendedProducts || [],
-            faceShape: geminiData.faceShape,
+            faceShape: landmarkFaceShape || geminiData.faceShape,
+            faceShapeConfidence: landmarkFaceShapeConfidence,
             hairRecommendations: geminiData.hairRecommendations,
+            insightDescriptions: geminiData.insightDescriptions || {},
+            improvementPlan: geminiData.improvementPlan || [],
             dermatology: {
               skin_quality: geminiData.skin_quality,
               acne_presence: geminiData.acne_presence,
@@ -95,59 +150,53 @@ export function useAnalysis(userCredits: number) {
         lastError = e;
         console.warn(`Gemini analysis attempt ${attempt}/${MAX_RETRIES} failed:`, e);
         if (attempt < MAX_RETRIES) {
-          // Wait before retrying (2s, then 4s)
-          await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+          await new Promise((resolve) => setTimeout(resolve, 300));
         }
       }
     }
 
-    console.error("Gemini Vision Error: All retries failed.", lastError);
+    console.error('Gemini Vision Error: All retries failed.', lastError);
     return currentAnalysis;
   };
 
   const saveToHistory = async (analysisResult: AnalysisResult, thumbBase64: string) => {
     if (!auth.currentUser) {
-      setSaveStatus({ message: "Not logged in. Scan not saved to history.", type: 'error' });
+      setSaveStatus({ message: 'Not logged in. Scan not saved to history.', type: 'error' });
       setTimeout(() => setSaveStatus(null), 4000);
       return;
     }
 
     try {
-      setSaveStatus({ message: "Saving to your history...", type: 'success' });
-      
+      setSaveStatus({ message: 'Saving to your history...', type: 'success' });
+
       const saveableResult = JSON.parse(JSON.stringify(analysisResult));
       saveableResult.historyImage = thumbBase64;
 
+      const idToken = await auth.currentUser.getIdToken(false);
       const scanData = {
-        userId: auth.currentUser.uid,
-        userEmail: auth.currentUser.email || '',
-        createdAt: new Date().toISOString(),
         overallScore: analysisResult.overallScore,
-        imageUrl: "base64-stored-in-analysisData",
+        imageUrl: 'base64-stored-in-analysisData',
         analysisData: JSON.stringify(saveableResult)
       };
 
-      await addDoc(collection(db, 'scans'), scanData);
-      console.log("Scan saved to Firebase successfully.");
-
-      try {
-        const idToken = await auth.currentUser.getIdToken();
-        await fetch('/api/referral/scan/complete', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`
-          },
-          body: JSON.stringify({ userId: auth.currentUser.uid })
-        });
-      } catch (e) {
-        console.error("Failed to trigger scan completion reward:", e);
+      const response = await fetch('/api/scans/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`
+        },
+        body: JSON.stringify(scanData)
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || `Save failed with status ${response.status}`);
       }
+      console.log('Scan saved to Firebase successfully.');
 
-      setSaveStatus({ message: "Saved to your history!", type: 'success' });
+      setSaveStatus({ message: 'Saved to your history!', type: 'success' });
       setTimeout(() => setSaveStatus(null), 3000);
     } catch (firebaseError: any) {
-      console.error("Error saving scan to Firebase:", firebaseError);
+      console.error('Error saving scan to Firebase:', firebaseError);
       setSaveStatus({ message: `Failed to save: ${firebaseError.message}`, type: 'error' });
       setTimeout(() => setSaveStatus(null), 4000);
     }

@@ -20,11 +20,11 @@ interface BeforeAfterSliderProps {
 export function BeforeAfterSlider({
   beforeImage,
   afterImage,
-  beforeLabel = "Raw Scan",
-  afterLabel = "AI Analysis",
+  beforeLabel = 'Raw Scan',
+  afterLabel = 'AI Analysis',
   className,
-  beforeImagePosition = "center",
-  afterImagePosition = "center"
+  beforeImagePosition = 'center',
+  afterImagePosition = 'center'
 }: BeforeAfterSliderProps) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -64,10 +64,10 @@ export function BeforeAfterSlider({
   }, []);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={cn(
-        "relative aspect-[3/4] w-full overflow-hidden rounded-2xl cursor-ew-resize select-none group",
+        'relative aspect-[3/4] w-full overflow-hidden rounded-2xl cursor-ew-resize select-none group',
         className
       )}
       onMouseMove={onMouseMove}
@@ -76,16 +76,16 @@ export function BeforeAfterSlider({
     >
       {/* After Image (The base) */}
       <div className="absolute inset-0">
-        <img 
-          src={afterImage} 
-          alt="After" 
+        <img
+          src={afterImage}
+          alt="After"
           className="w-full h-full object-cover"
           style={{ objectPosition: afterImagePosition }}
           referrerPolicy="no-referrer"
         />
         {/* Analysis Overlay (Mesh/Landmarks) */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTAgMGw0MCA0ME00MCAwbC00MCA0MCIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==')] opacity-40 mix-blend-overlay" />
-        
+
         {/* Landmark Points Simulation */}
         <div className="absolute inset-0 pointer-events-none">
           {[...Array(12)].map((_, i) => (
@@ -97,7 +97,7 @@ export function BeforeAfterSlider({
               className="absolute w-1 h-1 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"
               style={{
                 top: `${20 + Math.random() * 60}%`,
-                left: `${20 + Math.random() * 60}%`,
+                left: `${20 + Math.random() * 60}%`
               }}
             />
           ))}
@@ -105,16 +105,13 @@ export function BeforeAfterSlider({
       </div>
 
       {/* Before Image (The overlay) */}
-      <div 
-        className="absolute inset-0 overflow-hidden"
-        style={{ width: `${sliderPosition}%` }}
-      >
-        <img 
-          src={beforeImage} 
-          alt="Before" 
+      <div className="absolute inset-0 overflow-hidden" style={{ width: `${sliderPosition}%` }}>
+        <img
+          src={beforeImage}
+          alt="Before"
           className="absolute inset-0 w-full h-full object-cover grayscale"
-          style={{ 
-            width: `${100 / (sliderPosition / 100)}%`, 
+          style={{
+            width: `${100 / (sliderPosition / 100)}%`,
             maxWidth: 'none',
             objectPosition: beforeImagePosition
           }}
@@ -123,7 +120,7 @@ export function BeforeAfterSlider({
       </div>
 
       {/* Slider Handle */}
-      <div 
+      <div
         className="absolute inset-y-0 z-30 w-1 bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
         style={{ left: `${sliderPosition}%` }}
       >

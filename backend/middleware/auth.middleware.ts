@@ -2,6 +2,7 @@ import { getAdminAuth } from '../services/firebase.service.js';
 import { Request, Response, NextFunction } from 'express';
 
 // Extend the Express Request interface to include the user property
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace Express {
     interface Request {
@@ -12,6 +13,7 @@ declare global {
     }
   }
 }
+/* eslint-enable @typescript-eslint/no-namespace */
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
@@ -23,12 +25,12 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   try {
     const auth = getAdminAuth();
     const decodedToken = await auth.verifyIdToken(idToken);
-    
+
     req.user = {
       uid: decodedToken.uid,
-      email: decodedToken.email,
+      email: decodedToken.email
     };
-    
+
     next();
   } catch (error) {
     console.error('Firebase Auth Verification Error:', error);
