@@ -27,7 +27,25 @@ const SEO: React.FC<SEOProps> = ({
   jsonLd
 }) => {
   const fullTitle = title.includes('VisageX') ? title : `${title} | VisageX`;
-  const schema = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+  
+  const defaultSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "VisageX",
+    "url": "https://visagex.online",
+    "image": image,
+    "description": description,
+    "publisher": {
+      "@type": "Organization",
+      "name": "VisageX",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://visagex.online/icon.png"
+      }
+    }
+  };
+
+  const schema = jsonLd ? (Array.isArray(jsonLd) ? [defaultSchema, ...jsonLd] : [defaultSchema, jsonLd]) : [defaultSchema];
 
   return (
     <Helmet>
