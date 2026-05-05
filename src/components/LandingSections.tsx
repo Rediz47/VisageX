@@ -358,7 +358,7 @@ export function Hero({
                     duration: dSlow * 1.2,
                     ease: easings.easeOutExpo
                   }}
-                  className={`absolute -top-6 -right-6 md:-top-12 md:-right-12 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border backdrop-blur-xl scale-75 md:scale-100 origin-top-right ${isDarkMode ? 'bg-black/80 border-white/10' : 'bg-white/95 border-indigo-200 shadow-2xl'}`}
+                  className={`absolute -top-4 -right-4 md:-top-10 md:-right-10 p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border backdrop-blur-xl scale-75 md:scale-100 origin-top-right ${isDarkMode ? 'bg-black/80 border-white/10' : 'bg-white/95 border-indigo-200 shadow-xl shadow-indigo-500/10'}`}
                   style={{ zIndex: 10 }}
                 >
                   <div
@@ -368,12 +368,12 @@ export function Hero({
                     }}
                   >
                     <p
-                      className={`text-[10px] font-black uppercase tracking-[0.3em] mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                      className={`text-[9px] font-black uppercase tracking-[0.25em] mb-1.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                     >
                       Precision
                     </p>
                     <p
-                      className="text-4xl md:text-5xl font-display font-black"
+                      className="text-3xl md:text-4xl font-display font-black"
                       style={{
                         background: 'linear-gradient(135deg, #ffffff, #818cf8)',
                         WebkitBackgroundClip: 'text',
@@ -386,7 +386,49 @@ export function Hero({
                   </div>
                 </motion.div>
 
-                {/* Removed Health Index stat as requested */}
+                {/* Floating stat: Symmetry — restored for balance */}
+                <motion.div
+                  key={`hero-stat2-${k}`}
+                  initial={{
+                    opacity: 0,
+                    y: rm ? 0 : 60,
+                    x: rm ? 0 : -50,
+                    scale: rm ? 1 : 0.6,
+                    rotate: rm ? 0 : -12
+                  }}
+                  animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotate: 0 }}
+                  transition={{
+                    delay: dMed * 2.5,
+                    duration: dSlow * 1.2,
+                    ease: easings.easeOutExpo
+                  }}
+                  className={`absolute -bottom-4 -left-4 md:-bottom-10 md:-left-10 p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border backdrop-blur-xl scale-75 md:scale-100 origin-bottom-left ${isDarkMode ? 'bg-black/80 border-white/10' : 'bg-white/95 border-indigo-200 shadow-xl shadow-indigo-500/10'}`}
+                  style={{ zIndex: 10 }}
+                >
+                  <div
+                    style={{
+                      animation: rm ? undefined : 'floatDown 5s ease-in-out 1s infinite',
+                      willChange: 'transform'
+                    }}
+                  >
+                    <p
+                      className={`text-[9px] font-black uppercase tracking-[0.25em] mb-1.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                    >
+                      Symmetry
+                    </p>
+                    <p
+                      className="text-3xl md:text-4xl font-display font-black"
+                      style={{
+                        background: 'linear-gradient(135deg, #38bdf8, #818cf8)',
+                        WebkitBackgroundClip: 'text',
+                        backgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                      }}
+                    >
+                      9.8
+                    </p>
+                  </div>
+                </motion.div>
               </motion.div>
             </TiltCard>
           </Parallax>
