@@ -163,10 +163,10 @@ export function Hero({
                 className="flex items-center gap-4 mb-8"
               >
                 <div
-                  className={`badge-glow ${isDarkMode ? 'bg-indigo-500/10 text-indigo-300' : 'bg-indigo-50 text-indigo-600'}`}
+                  className={`badge-glow ${isDarkMode ? 'bg-white/5 text-zinc-100' : 'bg-zinc-100 text-zinc-900'}`}
                 >
-                  <Sparkles className="w-3 h-3" />
-                  Powered by Gemini AI · 468 Landmarks
+                  <Sparkles className="w-3 h-3 text-indigo-400" />
+                  VISAGE X — PROPRIETARY NEURAL HARMONY v4.0
                 </div>
               </motion.div>
 
@@ -217,7 +217,7 @@ export function Hero({
                   className={`text-lg max-w-xs font-light leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                 >
                   Free AI face analysis. Our neural networks decode 468 facial landmarks to reveal
-                  your unique structural profile and skin health insights.
+                  your unique aesthetic proportions and structural harmony markers.
                 </motion.p>
                 <div className="flex flex-col gap-4">
                   <motion.div
@@ -358,7 +358,7 @@ export function Hero({
                     duration: dSlow * 1.2,
                     ease: easings.easeOutExpo
                   }}
-                  className={`absolute -top-4 -right-4 md:-top-10 md:-right-10 p-4 md:p-5 rounded-2xl md:rounded-3xl border backdrop-blur-md scale-75 md:scale-100 origin-top-right ${isDarkMode ? 'bg-zinc-900/90 border-white/10' : 'bg-white/95 border-indigo-200/60 shadow-xl shadow-indigo-500/10'}`}
+                  className={`absolute -top-6 -right-6 md:-top-12 md:-right-12 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border backdrop-blur-xl scale-75 md:scale-100 origin-top-right ${isDarkMode ? 'bg-black/80 border-white/10' : 'bg-white/95 border-indigo-200 shadow-2xl'}`}
                   style={{ zIndex: 10 }}
                 >
                   <div
@@ -368,67 +368,25 @@ export function Hero({
                     }}
                   >
                     <p
-                      className={`text-[9px] font-bold uppercase tracking-widest mb-1 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-500'}`}
+                      className={`text-[10px] font-black uppercase tracking-[0.3em] mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                     >
-                      Symmetry
+                      Precision
                     </p>
                     <p
-                      className="text-2xl md:text-3xl font-display font-black"
+                      className="text-4xl md:text-5xl font-display font-black"
                       style={{
-                        background: 'linear-gradient(135deg, #6366f1, #22d3ee)',
+                        background: 'linear-gradient(135deg, #ffffff, #818cf8)',
                         WebkitBackgroundClip: 'text',
                         backgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
+                        WebkitTextFillColor: isDarkMode ? 'transparent' : '#1e1b4b'
                       }}
                     >
-                      98.2%
+                      99.4%
                     </p>
                   </div>
                 </motion.div>
 
-                {/* Floating stat: Health — drops in from bottom-left */}
-                <motion.div
-                  key={`hero-stat2-${k}`}
-                  initial={{
-                    opacity: 0,
-                    y: rm ? 0 : 60,
-                    x: rm ? 0 : -50,
-                    scale: rm ? 1 : 0.6,
-                    rotate: rm ? 0 : -12
-                  }}
-                  animate={{ opacity: 1, y: 0, x: 0, scale: 1, rotate: 0 }}
-                  transition={{
-                    delay: dMed * 2.5,
-                    duration: dSlow * 1.2,
-                    ease: easings.easeOutExpo
-                  }}
-                  className={`absolute -bottom-4 -left-4 md:-bottom-10 md:-left-10 p-4 md:p-5 rounded-2xl md:rounded-3xl border backdrop-blur-md scale-75 md:scale-100 origin-bottom-left ${isDarkMode ? 'bg-zinc-900/90 border-white/10' : 'bg-white/95 border-indigo-200/60 shadow-xl shadow-indigo-500/10'}`}
-                  style={{ zIndex: 10 }}
-                >
-                  <div
-                    style={{
-                      animation: rm ? undefined : 'floatDown 5s ease-in-out 1s infinite',
-                      willChange: 'transform'
-                    }}
-                  >
-                    <p
-                      className={`text-[9px] font-bold uppercase tracking-widest mb-1 ${isDarkMode ? 'text-cyan-400' : 'text-cyan-600'}`}
-                    >
-                      Health Index
-                    </p>
-                    <p
-                      className="text-2xl md:text-3xl font-display font-black"
-                      style={{
-                        background: 'linear-gradient(135deg, #22d3ee, #34d399)',
-                        WebkitBackgroundClip: 'text',
-                        backgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
-                      }}
-                    >
-                      Optimal
-                    </p>
-                  </div>
-                </motion.div>
+                {/* Removed Health Index stat as requested */}
               </motion.div>
             </TiltCard>
           </Parallax>

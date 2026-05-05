@@ -21,7 +21,7 @@ function getTier(score: number): Tier {
     };
   if (score >= 8)
     return {
-      label: 'Optimal',
+      label: 'Superior',
       color: '#818cf8',
       glow: 'rgba(129,140,248,0.2)',
       glowLight: 'rgba(129,140,248,0.08)'
@@ -62,7 +62,7 @@ const META: Record<string, { icon: React.ElementType; description: string; label
   },
   Symmetry: {
     icon: Gem,
-    description: 'Bilateral alignment across 468 landmarks.',
+    description: 'Bilateral harmonic alignment across 468 neural nodes.',
     label: 'Symmetry'
   },
   Jawline: {
@@ -260,10 +260,10 @@ export function BreakdownCards({ breakdown, isDarkMode, isLocked }: BreakdownCar
                   </div>
 
                   <div className={cn('flex items-baseline gap-1 flex-shrink-0 relative z-10', locked && 'blur-[10px] opacity-38 grayscale select-none')}>
-                    <span className="text-3xl md:text-4xl font-display font-black leading-none" style={scoreStyle}>
+                    <span className="text-4xl md:text-5xl font-display font-black leading-none tracking-tighter" style={scoreStyle}>
                       {card.score.toFixed(1)}
                     </span>
-                    <span className={cn('text-xs font-medium', isDarkMode ? 'text-white/15' : 'text-zinc-300')}>
+                    <span className={cn('text-[10px] font-bold uppercase tracking-widest opacity-40', isDarkMode ? 'text-white' : 'text-zinc-500')}>
                       / 10
                     </span>
                   </div>
