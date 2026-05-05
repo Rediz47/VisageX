@@ -41,6 +41,8 @@ const SEO: React.FC<SEOProps> = ({
       <meta name="theme-color" content="#050508" />
       <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'} />
       {canonical && <link rel="canonical" href={canonical} />}
+      <link rel="icon" type="image/png" href="/icon.png" />
+      <link rel="apple-touch-icon" href="/icon.png" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
 
