@@ -21,18 +21,6 @@ function getServe(): Promise<ReturnType<typeof serverless>> {
   return initPromise;
 }
 
-// Pre-warm: kick off the heavy backend import during Lambda init's idle time.
-// Lambda's init phase only blocks on synchronous top-level code, so this fires
-// the async work in the background. By the time the first invocation arrives
-// (microseconds to milliseconds later), the import is already in flight, and
-// is usually fully resolved before any cold-start request handler runs.
-// This keeps the init phase fast (no `exit 129`) while preventing slow
-// first-request handler timeouts on heavy endpoints (gemini-analysis,
-// scans/save) that previously caused 502s.
-getServe().catch(() => {
-  // Errors here are intentionally swallowed; the handler will surface them.
-});
-
 export const handler = async (event: any, context: any) => {
   const fn = await getServe();
   return fn(event, context);
