@@ -1,14 +1,27 @@
 import serverless from 'serverless-http';
-import { app, configureApp } from '../../backend/app.js';
 
-let initialized = false;
-let serve: ReturnType<typeof serverless>;
+// Heavy backend imports (firebase-admin, sharp, pino, helmet, route handlers)
+// are deferred to first invocation via dynamic import so the Lambda init phase
+// stays small. Without this, the init phase exceeds AWS Lambda's startup
+// budget on cold starts and the runtime is killed with `exit status 129`
+// (SIGHUP), surfacing to clients as a 502 Bad Gateway.
 
-export const handler = async (event: any, context: any) => {
-  if (!initialized) {
+let serve: ReturnType<typeof serverless> | null = null;
+let initPromise: Promise<ReturnType<typeof serverless>> | null = null;
+
+function getServe(): Promise<ReturnType<typeof serverless>> {
+  if (serve) return Promise.resolve(serve);
+  if (initPromise) return initPromise;
+  initPromise = (async () => {
+    const { app, configureApp } = await import('../../backend/app.js');
     await configureApp();
     serve = serverless(app);
-    initialized = true;
-  }
-  return await serve(event, context);
+    return serve;
+  })();
+  return initPromise;
+}
+
+export const handler = async (event: any, context: any) => {
+  const fn = await getServe();
+  return fn(event, context);
 };
