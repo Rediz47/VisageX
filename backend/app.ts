@@ -18,7 +18,6 @@ export function configureApp(): Promise<typeof app> {
   configurePromise = (async () => {
     const [
       { default: helmet },
-      { default: pinoHttp },
       { randomUUID },
       { createProxyMiddleware },
       { blockBots },
@@ -33,7 +32,6 @@ export function configureApp(): Promise<typeof app> {
       scanRoutes
     ] = await Promise.all([
       import('helmet'),
-      import('pino-http'),
       import('crypto'),
       import('http-proxy-middleware'),
       import('./middleware/bot.middleware.js'),
@@ -70,29 +68,24 @@ export function configureApp(): Promise<typeof app> {
   // Request logging with unique request IDs.
   // In dev, only log /api/* (skip Vite HMR, static assets, source files that would
   // otherwise flood stdout and make the terminal unreadable).
-    const isDevServer = process.env.NODE_ENV !== 'production' && !process.env.NETLIFY;
-    app.use(
-      pinoHttp({
-        logger,
-        genReqId: () => randomUUID(),
-        autoLogging: {
-          ignore: (req) => {
-            const url = req.url || '';
-            if (url === '/api/health') return true;
-            if (isDevServer) {
-              // Only log real API traffic in dev; skip everything else (Vite, static, HMR).
-              if (!url.startsWith('/api/')) return true;
-            }
-            return false;
-          }
-        },
-        // Compact one-line summary instead of the giant JSON object per request.
-        serializers: {
-          req: (req) => ({ method: req.method, url: req.url, id: req.id }),
-          res: (res) => ({ statusCode: res.statusCode })
-        }
-      })
-    );
+  const isDevServer = process.env.NODE_ENV !== 'production' && !process.env.NETLIFY;
+  app.use((req, res, next) => {
+    const reqId = randomUUID();
+    (req as any).id = reqId;
+
+    const url = req.url || '';
+    if (url !== '/api/health' && (!isDevServer || url.startsWith('/api/'))) {
+      console.log(`[${reqId}] ${req.method} ${url}`);
+    }
+
+    const originalJson = res.json.bind(res);
+    res.json = function (body) {
+      console.log(`[${reqId}] ${req.method} ${url} → ${res.statusCode}`);
+      return originalJson(body);
+    };
+
+    next();
+  });
 
     // Security headers
     app.use(
