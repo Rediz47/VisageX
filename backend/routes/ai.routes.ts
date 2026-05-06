@@ -157,10 +157,12 @@ async function withRetry<T>(
 }
 
 // Keep analysis responsive in both cloud and local dev.
-// Netlify function budget is 26s (cap at 18s to leave headroom for SSL + response).
-// Local dev has no platform cap; Gemini 2.5 Flash vision analysis legitimately
-// takes 20–45s on a long structured-JSON prompt, so give it 60s.
-const AI_TIMEOUT_MS = process.env.NETLIFY ? 18000 : 60000;
+// Netlify function budget is 26s. We use 24s here so the backend AbortController
+// fires before the platform hard-kills the function, leaving 2s for the response
+// to flush. Gemini 2.5 Flash vision analysis can take 20–40s on the long
+// structured-JSON prompt, so 24s gives it the maximum possible time.
+// Local dev has no platform cap — give Gemini a full 60s.
+const AI_TIMEOUT_MS = process.env.NETLIFY ? 24000 : 60000;
 
 // Helper: call the Gemini Developer API (or Vertex OAuth endpoint).
 //
