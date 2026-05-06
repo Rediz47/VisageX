@@ -473,7 +473,7 @@ export function ResultDashboard({
     [analysis.weaknesses, ratioInsights.weaknesses]
   );
 
-  const generateShareCard = async () => {
+  const generateShareCard = useCallback(async () => {
     if (isGeneratingCard) return;
     setIsGeneratingCard(true);
 
@@ -680,9 +680,9 @@ export function ResultDashboard({
     } finally {
       setIsGeneratingCard(false);
     }
-  };
+  }, [breakdown, imageUrl, isGeneratingCard, overallScore, result.visionAnalysis, setIsGeneratingCard]);
 
-  const scrollToPricing = (e?: React.MouseEvent) => {
+  const scrollToPricing = useCallback((e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -704,9 +704,10 @@ export function ResultDashboard({
         console.error('Scroll error:', err);
       }
     }
-  };
+  }, []);
 
-  const handleApplyReferral = async (code: string) => {
+  const handleApplyReferral = useCallback(async (code: string) => {
+    if (!user?.uid) throw new Error('Please sign in to apply a referral code');
     const fingerprint = `${window.screen.width}x${window.screen.height}-${navigator.userAgent}`;
     const response = await fetch('/api/referral/redeem', {
       method: 'POST',
@@ -721,19 +722,22 @@ export function ResultDashboard({
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Failed to apply code');
     return data;
-  };
+  }, [user?.uid]);
+
+  const dashboardContextValue = useMemo(
+    () => ({
+      isDarkMode,
+      isLocked,
+      scrollToPricing,
+      onOpenPricing,
+      pricingRef,
+      isGeneratingCard
+    }),
+    [isDarkMode, isLocked, scrollToPricing, onOpenPricing, isGeneratingCard]
+  );
 
   return (
-    <DashboardProvider
-      value={{
-        isDarkMode,
-        isLocked,
-        scrollToPricing,
-        onOpenPricing,
-        pricingRef,
-        isGeneratingCard
-      }}
-    >
+    <DashboardProvider value={dashboardContextValue}>
       <motion.div
         initial={{ opacity: 0, y: 40, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1129,8 +1133,8 @@ export function ResultDashboard({
                     isDarkMode={isDarkMode}
                     isLocked={isLocked}
                     show="strengths"
-                    strengths={[...analysis.strengths, ...ratioInsights.strengths]}
-                    weaknesses={[...analysis.weaknesses, ...ratioInsights.weaknesses]}
+                    strengths={strengthsWithRatioInsights}
+                    weaknesses={weaknessesWithRatioInsights}
                     breakdown={breakdown}
                     onUnlock={onUnlock}
                     insightDescriptions={result.visionAnalysis?.insightDescriptions}
@@ -1147,8 +1151,8 @@ export function ResultDashboard({
                     isDarkMode={isDarkMode}
                     isLocked={isLocked}
                     show="weaknesses"
-                    strengths={[...analysis.strengths, ...ratioInsights.strengths]}
-                    weaknesses={[...analysis.weaknesses, ...ratioInsights.weaknesses]}
+                    strengths={strengthsWithRatioInsights}
+                    weaknesses={weaknessesWithRatioInsights}
                     breakdown={breakdown}
                     onUnlock={onUnlock}
                     insightDescriptions={result.visionAnalysis?.insightDescriptions}
