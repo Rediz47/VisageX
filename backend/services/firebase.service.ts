@@ -9,6 +9,8 @@ let adminAuth: admin.auth.Auth | null = null;
 
 export function getAdminApp() {
   if (!admin.apps?.length) {
+    const isStrictEnv = process.env.NODE_ENV === 'production' || !!process.env.NETLIFY;
+
     // 1. Check for Service Account in environment variables (JSON string)
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
       try {
@@ -31,10 +33,22 @@ export function getAdminApp() {
           'CRITICAL: Failed to parse FIREBASE_SERVICE_ACCOUNT env var. Check for copy-paste errors.',
           e.message
         );
+        // In strict environments (production/Netlify), don't silently fall through to
+        // unauthenticated defaults — that causes Firestore/Auth calls to hang against
+        // the GCP metadata server until Lambda timeout, surfacing as 502 to clients.
+        if (isStrictEnv) {
+          throw new Error(
+            `Firebase Admin init failed: FIREBASE_SERVICE_ACCOUNT is invalid JSON (${e.message})`
+          );
+        }
       }
+    } else if (isStrictEnv) {
+      throw new Error(
+        'Firebase Admin init failed: FIREBASE_SERVICE_ACCOUNT environment variable is not set'
+      );
     }
 
-    // 2. Fallback to local files (development)
+    // 2. Fallback to local files (development only)
     const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
     if (!existsSync(configPath)) {
       console.warn('Firebase config not found! Initializing with defaults.');
