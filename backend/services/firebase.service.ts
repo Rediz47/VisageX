@@ -93,6 +93,19 @@ export function getAdminDb() {
 
     console.log(`Firestore connecting to database: "${databaseId}"`);
     adminDb = getFirestore(app, databaseId);
+
+    // CRITICAL for serverless: switch Firestore to HTTP/1.1 (REST) instead of
+    // the default gRPC transport. The gRPC handshake from a cold AWS Lambda
+    // container regularly takes 10-20s, which combined with the rest of the
+    // request work pushes us past Netlify's 26s function timeout and surfaces
+    // to clients as 502 Bad Gateway. HTTP/1.1 connects in well under 1s.
+    // settings() must be called BEFORE any read/write on this Firestore instance.
+    try {
+      adminDb.settings({ preferRest: true });
+    } catch (e: any) {
+      // Already had settings applied (e.g. hot-reload). Safe to ignore.
+      console.warn('Firestore settings({preferRest}) skipped:', e.message);
+    }
   }
   return adminDb;
 }
