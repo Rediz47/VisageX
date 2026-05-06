@@ -16,3 +16,6 @@ out.*
 ts-output.*
 check-scans.*
 test-import.*
+
+# Local Netlify folder
+.netlify
