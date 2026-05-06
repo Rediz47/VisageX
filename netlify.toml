@@ -4,7 +4,16 @@
   functions = "netlify/functions"
 
 [functions]
-  external_node_modules = ["lightningcss", "esbuild", "sharp", "firebase-admin"]
+  external_node_modules = [
+    "lightningcss",
+    "esbuild",
+    "sharp",
+    "firebase-admin",
+    "pino",
+    "pino-http",
+    "thread-stream",
+    "sonic-boom"
+  ]
   node_bundler = "esbuild"
 
 [functions."api"]
