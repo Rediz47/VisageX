@@ -42,9 +42,38 @@ export function getAdminApp() {
           );
         }
       }
-    } else if (isStrictEnv) {
+    }
+
+    // 1.5. Check for build-time generated service account file (Netlify fallback)
+    const serviceAccountPath = path.resolve(process.cwd(), 'firebase-service-account.json');
+    if (existsSync(serviceAccountPath)) {
+      try {
+        const cert = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
+        if (cert.private_key) {
+          cert.private_key = cert.private_key.replace(/\\n/g, '\n');
+        }
+        admin.initializeApp({
+          credential: admin.credential.cert(cert),
+          projectId: cert.project_id
+        });
+        console.log('Firebase Admin Initialized via build-time firebase-service-account.json.');
+        return admin.app();
+      } catch (e: any) {
+        console.error(
+          'CRITICAL: Failed to parse build-time firebase-service-account.json file.',
+          e.message
+        );
+        if (isStrictEnv) {
+          throw new Error(
+            `Firebase Admin init failed: firebase-service-account.json is invalid JSON (${e.message})`
+          );
+        }
+      }
+    }
+
+    if (isStrictEnv && !process.env.FIREBASE_SERVICE_ACCOUNT && !existsSync(serviceAccountPath)) {
       throw new Error(
-        'Firebase Admin init failed: FIREBASE_SERVICE_ACCOUNT environment variable is not set'
+        'Firebase Admin init failed: Neither FIREBASE_SERVICE_ACCOUNT environment variable nor firebase-service-account.json is set/available.'
       );
     }
 

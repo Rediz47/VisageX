@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "tsx watch backend/index.ts",
-    "build": "vite build",
+    "build": "node scripts/generate-service-account.js && vite build",
     "preview": "vite preview",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "lint": "eslint src backend",

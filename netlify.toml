@@ -4,6 +4,7 @@
   functions = "netlify/functions"
 
 [functions]
+  included_files = ["firebase-service-account.json"]
   external_node_modules = [
     "lightningcss",
     "esbuild",
