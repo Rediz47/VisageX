@@ -125,7 +125,7 @@ export function PrivacyPolicy({ onBack, isDarkMode }: { onBack: () => void; isDa
               isDarkMode ? 'text-white' : 'text-zinc-900'
             )}
           >
-            5. Contact
+            5. Contact Information & Operator
           </h2>
           <p
             className={cn(
@@ -133,7 +133,15 @@ export function PrivacyPolicy({ onBack, isDarkMode }: { onBack: () => void; isDa
               isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
             )}
           >
-            Questions about our privacy practices can be directed to privacy@visagex.online.
+            VisageX is owned and operated by sole proprietor <strong>Luka Chokheli</strong>. For any inquiries 
+            regarding our privacy practices, data deletion requests, or biometric concerns, you can contact us at{' '}
+            <a
+              href="mailto:privacy@visagex.online"
+              className="text-indigo-500 hover:text-indigo-400 transition-colors"
+            >
+              privacy@visagex.online
+            </a>
+            .
           </p>
         </section>
       </div>

@@ -116,15 +116,74 @@ export function TermsOfService({
             of facial analysis as described in our Privacy Policy.
           </p>
         </section>
-        <h2
-          className={`text-xl font-bold mt-8 mb-4 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}
-        >
-          5. Limitation of Liability
-        </h2>
-        <p>
-          VisageX shall not be liable for any indirect, incidental, special, consequential, or
-          punitive damages resulting from your use of the service.
-        </p>
+        <section>
+          <h2
+            className={cn(
+              'text-2xl font-display font-bold mb-6',
+              isDarkMode ? 'text-white' : 'text-zinc-900'
+            )}
+          >
+            5. Limitation of Liability
+          </h2>
+          <p
+            className={cn(
+              'text-sm md:text-base leading-relaxed mb-4',
+              isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
+            )}
+          >
+            VisageX shall not be liable for any indirect, incidental, special, consequential, or
+            punitive damages resulting from your use of the service.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            className={cn(
+              'text-2xl font-display font-bold mb-6',
+              isDarkMode ? 'text-white' : 'text-zinc-900'
+            )}
+          >
+            6. Merchant of Record & Payment Reseller
+          </h2>
+          <p
+            className={cn(
+              'text-sm md:text-base leading-relaxed mb-4',
+              isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
+            )}
+          >
+            Our order process is conducted and facilitated by our online reseller and merchant of record,{' '}
+            <strong>Paddle.com Market Limited</strong> (Paddle). Paddle is the Merchant of Record for
+            all of our customer transactions and handles all payment processing, tax compliance, and
+            billing inquiries.
+          </p>
+        </section>
+
+        <section>
+          <h2
+            className={cn(
+              'text-2xl font-display font-bold mb-6',
+              isDarkMode ? 'text-white' : 'text-zinc-900'
+            )}
+          >
+            7. Business & Sole Proprietorship Info
+          </h2>
+          <p
+            className={cn(
+              'text-sm md:text-base leading-relaxed mb-4',
+              isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
+            )}
+          >
+            VisageX is a proprietary brand owned and operated by <strong>Luka Chokheli</strong> (Sole Proprietor), 
+            with business inquiries directed to{' '}
+            <a
+              href="mailto:support@visagex.online"
+              className="text-indigo-500 hover:text-indigo-400 transition-colors"
+            >
+              support@visagex.online
+            </a>
+            .
+          </p>
+        </section>
       </div>
     </div>
   );
