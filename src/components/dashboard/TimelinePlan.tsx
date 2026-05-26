@@ -157,7 +157,12 @@ function TimelineItem({
           {isBlurred ? (
             <Lock className="w-4 h-4 text-zinc-400" />
           ) : (
-            <span className={cn('text-[11px] font-black', isDarkMode ? 'text-white/45' : 'text-zinc-400')}>
+            <span
+              className={cn(
+                'text-[11px] font-black',
+                isDarkMode ? 'text-white/45' : 'text-zinc-400'
+              )}
+            >
               {index + 1}
             </span>
           )}
@@ -183,7 +188,8 @@ function TimelineItem({
           'rounded-2xl border overflow-hidden cursor-pointer transition-all duration-300 h-full relative',
           isDarkMode ? 'bg-white/[0.025] hover:bg-white/[0.04]' : 'bg-white hover:bg-zinc-50/60',
           isExpanded &&
-            !isBlurred && (isDarkMode ? 'border-white/14 bg-white/[0.04]' : 'border-zinc-300 shadow-sm')
+            !isBlurred &&
+            (isDarkMode ? 'border-white/14 bg-white/[0.04]' : 'border-zinc-300 shadow-sm')
         )}
         style={{
           borderColor: isDarkMode ? 'rgba(255,255,255,0.075)' : 'rgba(24,24,27,0.09)'
@@ -502,7 +508,12 @@ export function TimelinePlan({ items, isDarkMode, isLocked, onUnlock }: Timeline
         <div className="relative p-6 md:p-8">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className={cn('w-4 h-4', isDarkMode ? 'text-white/35' : 'text-zinc-400')} />
-            <span className={cn('text-[9px] font-black uppercase tracking-[0.2em]', isDarkMode ? 'text-white/35' : 'text-zinc-400')}>
+            <span
+              className={cn(
+                'text-[9px] font-black uppercase tracking-[0.2em]',
+                isDarkMode ? 'text-white/35' : 'text-zinc-400'
+              )}
+            >
               Action Plan
             </span>
           </div>
@@ -514,7 +525,12 @@ export function TimelinePlan({ items, isDarkMode, isLocked, onUnlock }: Timeline
           >
             Personalized improvement plan
           </h2>
-          <p className={cn('text-sm max-w-2xl leading-relaxed', isDarkMode ? 'text-white/45' : 'text-zinc-500')}>
+          <p
+            className={cn(
+              'text-sm max-w-2xl leading-relaxed',
+              isDarkMode ? 'text-white/45' : 'text-zinc-500'
+            )}
+          >
             A realistic action plan focused on grooming, skin maintenance, presentation, and small
             evidence-based upgrades from your scan.
           </p>
@@ -612,13 +628,25 @@ export function TimelinePlan({ items, isDarkMode, isLocked, onUnlock }: Timeline
                         >
                           <Icon className="h-4 w-4" />
                         </div>
-                        <Lock className={cn('h-4 w-4', isDarkMode ? 'text-white/20' : 'text-zinc-300')} />
+                        <Lock
+                          className={cn('h-4 w-4', isDarkMode ? 'text-white/20' : 'text-zinc-300')}
+                        />
                       </div>
                       <div className="blur-[5px] select-none">
-                        <h4 className={cn('text-base font-bold mb-2', isDarkMode ? 'text-white/90' : 'text-zinc-900')}>
+                        <h4
+                          className={cn(
+                            'text-base font-bold mb-2',
+                            isDarkMode ? 'text-white/90' : 'text-zinc-900'
+                          )}
+                        >
                           {item.title}
                         </h4>
-                        <p className={cn('text-xs leading-relaxed', isDarkMode ? 'text-white/45' : 'text-zinc-500')}>
+                        <p
+                          className={cn(
+                            'text-xs leading-relaxed',
+                            isDarkMode ? 'text-white/45' : 'text-zinc-500'
+                          )}
+                        >
                           {item.description}
                         </p>
                         <div className="flex flex-wrap gap-1.5 mt-4">
@@ -627,7 +655,9 @@ export function TimelinePlan({ items, isDarkMode, isLocked, onUnlock }: Timeline
                               key={area}
                               className={cn(
                                 'px-2 py-1 rounded-lg text-[9px] font-bold',
-                                isDarkMode ? 'bg-white/5 text-white/35' : 'bg-zinc-100 text-zinc-500'
+                                isDarkMode
+                                  ? 'bg-white/5 text-white/35'
+                                  : 'bg-zinc-100 text-zinc-500'
                               )}
                             >
                               {area}
@@ -651,11 +681,22 @@ export function TimelinePlan({ items, isDarkMode, isLocked, onUnlock }: Timeline
               <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400/20 to-purple-500/20 border border-white/10">
                 <Lock className="h-6 w-6 text-emerald-400" />
               </div>
-              <h3 className={cn('text-2xl font-display italic mb-2', isDarkMode ? 'text-white' : 'text-zinc-950')}>
+              <h3
+                className={cn(
+                  'text-2xl font-display italic mb-2',
+                  isDarkMode ? 'text-white' : 'text-zinc-950'
+                )}
+              >
                 Your plan is ready
               </h3>
-              <p className={cn('text-sm leading-relaxed mb-6 max-w-xs', isDarkMode ? 'text-white/45' : 'text-zinc-500')}>
-                Unlock the full roadmap with prioritized steps, cost ranges, timelines, and exact areas to improve.
+              <p
+                className={cn(
+                  'text-sm leading-relaxed mb-6 max-w-xs',
+                  isDarkMode ? 'text-white/45' : 'text-zinc-500'
+                )}
+              >
+                Unlock the full roadmap with prioritized steps, cost ranges, timelines, and exact
+                areas to improve.
               </p>
               <button
                 onClick={onUnlock}
@@ -669,7 +710,12 @@ export function TimelinePlan({ items, isDarkMode, isLocked, onUnlock }: Timeline
                   </span>
                 </div>
               </button>
-              <div className={cn('mt-4 text-[10px] font-bold uppercase tracking-[0.16em]', isDarkMode ? 'text-white/25' : 'text-zinc-400')}>
+              <div
+                className={cn(
+                  'mt-4 text-[10px] font-bold uppercase tracking-[0.16em]',
+                  isDarkMode ? 'text-white/25' : 'text-zinc-400'
+                )}
+              >
                 Includes {previewItems.length}+ personalized actions
               </div>
             </div>
@@ -691,7 +737,6 @@ export function TimelinePlan({ items, isDarkMode, isLocked, onUnlock }: Timeline
           ))}
         </div>
       )}
-
     </div>
   );
 }

@@ -204,7 +204,12 @@ export function BreakdownCards({ breakdown, isDarkMode, isLocked }: BreakdownCar
                     <Icon className="w-5 h-5" style={{ color: tier.color }} />
                   </div>
 
-                  <div className={cn('flex-1 min-w-0 relative z-10', locked && 'blur-[8px] opacity-45 grayscale select-none')}>
+                  <div
+                    className={cn(
+                      'flex-1 min-w-0 relative z-10',
+                      locked && 'blur-[8px] opacity-45 grayscale select-none'
+                    )}
+                  >
                     <div className="flex items-center gap-2.5 mb-1">
                       <p
                         className={cn(
@@ -259,11 +264,24 @@ export function BreakdownCards({ breakdown, isDarkMode, isLocked }: BreakdownCar
                     </div>
                   </div>
 
-                  <div className={cn('flex items-baseline gap-1 flex-shrink-0 relative z-10', locked && 'blur-[10px] opacity-38 grayscale select-none')}>
-                    <span className="text-4xl md:text-5xl font-display font-black leading-none tracking-tighter" style={scoreStyle}>
+                  <div
+                    className={cn(
+                      'flex items-baseline gap-1 flex-shrink-0 relative z-10',
+                      locked && 'blur-[10px] opacity-38 grayscale select-none'
+                    )}
+                  >
+                    <span
+                      className="text-4xl md:text-5xl font-display font-black leading-none tracking-tighter"
+                      style={scoreStyle}
+                    >
                       {card.score.toFixed(1)}
                     </span>
-                    <span className={cn('text-[10px] font-bold uppercase tracking-widest opacity-40', isDarkMode ? 'text-white' : 'text-zinc-500')}>
+                    <span
+                      className={cn(
+                        'text-[10px] font-bold uppercase tracking-widest opacity-40',
+                        isDarkMode ? 'text-white' : 'text-zinc-500'
+                      )}
+                    >
                       / 10
                     </span>
                   </div>
@@ -304,11 +322,24 @@ export function BreakdownCards({ breakdown, isDarkMode, isLocked }: BreakdownCar
                     {card.meta.label}
                   </p>
 
-                  <div className={cn('flex items-baseline gap-1 mb-3 relative z-10', locked && 'blur-[10px] opacity-38 grayscale select-none')}>
-                    <span className="text-4xl md:text-[44px] font-display font-black leading-none" style={scoreStyle}>
+                  <div
+                    className={cn(
+                      'flex items-baseline gap-1 mb-3 relative z-10',
+                      locked && 'blur-[10px] opacity-38 grayscale select-none'
+                    )}
+                  >
+                    <span
+                      className="text-4xl md:text-[44px] font-display font-black leading-none"
+                      style={scoreStyle}
+                    >
                       {card.score.toFixed(1)}
                     </span>
-                    <span className={cn('text-sm font-medium', isDarkMode ? 'text-white/15' : 'text-zinc-300')}>
+                    <span
+                      className={cn(
+                        'text-sm font-medium',
+                        isDarkMode ? 'text-white/15' : 'text-zinc-300'
+                      )}
+                    >
                       / 10
                     </span>
                   </div>
@@ -325,7 +356,12 @@ export function BreakdownCards({ breakdown, isDarkMode, isLocked }: BreakdownCar
                     {card.meta.description}
                   </p>
 
-                  <div className={cn('mt-4 relative z-10', locked && 'blur-[8px] opacity-38 grayscale select-none')}>
+                  <div
+                    className={cn(
+                      'mt-4 relative z-10',
+                      locked && 'blur-[8px] opacity-38 grayscale select-none'
+                    )}
+                  >
                     <div
                       className={cn(
                         'h-1 w-full rounded-full overflow-hidden',

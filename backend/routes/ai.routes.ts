@@ -156,6 +156,31 @@ async function withRetry<T>(
   throw lastError;
 }
 
+function parseJsonObject(raw: string): any {
+  const attempts: string[] = [];
+  const trimmed = raw.trim();
+  attempts.push(trimmed);
+
+  const fence = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  if (fence) attempts.push(fence[1].trim());
+
+  const first = trimmed.indexOf('{');
+  const last = trimmed.lastIndexOf('}');
+  if (first !== -1 && last > first) {
+    attempts.push(trimmed.slice(first, last + 1));
+  }
+
+  for (const candidate of attempts) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      /* try next candidate */
+    }
+  }
+
+  throw new Error('JSON parse failed');
+}
+
 // Keep analysis responsive in both cloud and local dev.
 // Netlify function budget is 26s. We use 24s here so the backend AbortController
 // fires before the platform hard-kills the function, leaving 2s for the response
@@ -427,8 +452,8 @@ Respond ONLY with valid JSON matching the exact keys listed above. No markdown, 
                 maxOutputTokens: 8192
               }
             }),
-          1,
-          300
+          3,
+          1500
         );
       } catch (aiError: any) {
         console.error('Vertex AI call error:', aiError);
@@ -441,70 +466,51 @@ Respond ONLY with valid JSON matching the exact keys listed above. No markdown, 
         });
       }
 
-      // Robust parse: strip markdown fences and leading/trailing noise, then try to extract the outermost JSON object.
-      const cleanJson = (raw: string): string => {
-        let t = raw.trim();
-        // Strip ```json ... ``` or ``` ... ``` fences
-        const fence = t.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
-        if (fence) t = fence[1].trim();
-        // If the model still added prose before/after, grab the outermost { ... } block.
-        const first = t.indexOf('{');
-        const last = t.lastIndexOf('}');
-        if (first !== -1 && last > first) t = t.slice(first, last + 1);
-        return t;
-      };
-
       let aiResult: any;
       try {
-        aiResult = JSON.parse(resultText);
-      } catch {
-        try {
-          aiResult = JSON.parse(cleanJson(resultText));
-        } catch (parseError: any) {
-          console.error('Failed to parse Vertex AI response:', resultText?.slice(0, 1000));
-          // No credit was deducted — nothing to refund. Return a useful error.
-          return res.status(502).json({
-            error: 'Failed to parse AI response',
-            detail: parseError?.message || 'JSON parse failed',
-            preview: (resultText || '').slice(0, 240)
-          });
-        }
+        aiResult = parseJsonObject(resultText);
+      } catch (parseError: any) {
+        console.error('Failed to parse Vertex AI response:', resultText?.slice(0, 1000));
+        return res.status(502).json({
+          error: 'Failed to parse AI response',
+          detail: parseError?.message || 'JSON parse failed',
+          preview: (resultText || '').slice(0, 240)
+        });
       }
 
       console.log('Vertex AI analysis completed successfully for user', userId);
 
-      // ── Post-success side effects (all best-effort, never block the response) ─
-      // Store result for history + future cache hits.
-      storeScanResult(userId, imageFingerprint, 'analysis', aiResult).catch(() => {});
-
-      // Deduct the credit now that the user is guaranteed to get a result.
-      // If Firestore is momentarily unavailable, the deduct is queued in
-      // pending_deducts for later reconciliation — the user still gets their AI.
-      // Dev accounts bypass credit deduction when Firestore quota is exhausted.
-      deductCreditBestEffort(
+      const deductOutcome = await deductCreditBestEffort(
         userId,
         'analyze',
         { endpoint: 'gemini-analysis' },
         clientIp,
         req.user?.email
-      )
-        .then((outcome) => {
-          if (outcome.success) return;
-          if (outcome.statusCode === 403) {
-            console.warn(
-              `[gemini-analysis] Post-success deduct refused (INSUFFICIENT_CREDITS) for ${userId}. Rate limiter will contain abuse.`
-            );
-          } else if (outcome.deferred) {
-            console.warn(
-              `[gemini-analysis] Deduct queued in pending_deducts for ${userId}: ${outcome.error}`
-            );
-          } else {
-            console.error(`[gemini-analysis] Deduct lost for ${userId}:`, outcome.error);
-          }
-        })
-        .catch((err) => console.error('[gemini-analysis] Deduct unexpected error:', err));
+      );
 
-      return res.json(aiResult);
+      if (!deductOutcome.success) {
+        if (deductOutcome.statusCode === 403) {
+          return res
+            .status(403)
+            .json({ error: 'Insufficient credits', code: 'INSUFFICIENT_CREDITS' });
+        }
+
+        if (deductOutcome.deferred) {
+          console.warn(
+            `[gemini-analysis] Deduct queued in pending_deducts for ${userId}: ${deductOutcome.error}`
+          );
+        } else {
+          console.error(`[gemini-analysis] Deduct lost for ${userId}:`, deductOutcome.error);
+        }
+      }
+
+      storeScanResult(userId, imageFingerprint, 'analysis', aiResult).catch(() => {});
+
+      return res.json({
+        ...aiResult,
+        creditsDeducted: deductOutcome.success,
+        newBalance: deductOutcome.newBalance
+      });
     } catch (error: any) {
       console.error('Vertex AI analysis error:', error);
       return res.status(500).json({

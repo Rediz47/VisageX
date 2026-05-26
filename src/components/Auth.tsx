@@ -112,7 +112,6 @@ export function Auth({
         console.error('Failed to send welcome email', e);
       }
     }
-
   };
 
   // Handle Google redirect result on component mount (if user came back from redirect flow)

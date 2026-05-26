@@ -33,13 +33,7 @@ interface CelebMatch {
 const avatarUrl = (name: string) =>
   `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=512&bold=true`;
 
-function CelebrityPhoto({
-  name,
-  className
-}: {
-  name: string;
-  className?: string;
-}) {
+function CelebrityPhoto({ name, className }: { name: string; className?: string }) {
   const [src, setSrc] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -358,7 +352,12 @@ export default function CelebrityPage() {
                         isDarkMode ? 'border-white/15' : 'border-white'
                       )}
                     />
-                    <p className={cn('mt-4 text-xs font-medium', isDarkMode ? 'text-white/35' : 'text-zinc-500')}>
+                    <p
+                      className={cn(
+                        'mt-4 text-xs font-medium',
+                        isDarkMode ? 'text-white/35' : 'text-zinc-500'
+                      )}
+                    >
                       Face shape · eyes · jawline
                     </p>
                   </div>

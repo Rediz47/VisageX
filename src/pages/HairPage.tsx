@@ -356,7 +356,12 @@ export default function HairPage() {
                         isDarkMode ? 'border-white/15' : 'border-white'
                       )}
                     />
-                    <p className={cn('mt-4 text-xs font-medium', isDarkMode ? 'text-white/35' : 'text-zinc-500')}>
+                    <p
+                      className={cn(
+                        'mt-4 text-xs font-medium',
+                        isDarkMode ? 'text-white/35' : 'text-zinc-500'
+                      )}
+                    >
                       Hair type · density · hairline
                     </p>
                   </div>
@@ -496,13 +501,25 @@ export default function HairPage() {
                         key={item.label}
                         className={cn(
                           'rounded-2xl border p-3',
-                          isDarkMode ? 'bg-white/[.025] border-white/[.06]' : 'bg-zinc-50 border-zinc-100'
+                          isDarkMode
+                            ? 'bg-white/[.025] border-white/[.06]'
+                            : 'bg-zinc-50 border-zinc-100'
                         )}
                       >
-                        <p className={cn('text-[9px] font-black uppercase tracking-widest mb-1', isDarkMode ? 'text-white/30' : 'text-zinc-400')}>
+                        <p
+                          className={cn(
+                            'text-[9px] font-black uppercase tracking-widest mb-1',
+                            isDarkMode ? 'text-white/30' : 'text-zinc-400'
+                          )}
+                        >
                           {item.label}
                         </p>
-                        <p className={cn('text-xs font-bold truncate', isDarkMode ? 'text-white/75' : 'text-zinc-800')}>
+                        <p
+                          className={cn(
+                            'text-xs font-bold truncate',
+                            isDarkMode ? 'text-white/75' : 'text-zinc-800'
+                          )}
+                        >
                           {item.value || '—'}
                         </p>
                       </div>

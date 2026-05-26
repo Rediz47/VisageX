@@ -133,7 +133,7 @@ function coverFitRect(px: number, py: number, pw: number, ph: number, imgW: numb
 
 // Nose-tip (id 1) intentionally excluded from visit order to avoid a redundant
 // middle-nose dot, but kept in LANDMARK_META / FB for safe pt() fallback.
-const VISIT_ORDER = [10, 9, 70, 300, 33, 263, 168, 2, 234, 454, 61, 291, 152];
+const VISIT_ORDER = [168, 33, 263, 234, 454, 9, 70, 300, 10, 2, 61, 291, 152];
 
 const LANDMARK_META: Record<number, { label: string; col: string }> = {
   10: { label: 'CRANIUM', col: '#a78bfa' },

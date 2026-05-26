@@ -29,7 +29,7 @@ export function useImageProcessing(
     posthog.capture('scan_started');
     setIsProcessing(true);
     updateProgress(5);
-    setScanStep('Initializing neural engines...');
+    setScanStep('Calibrating 468-point spatial mesh...');
     setError(null);
 
     try {
@@ -44,7 +44,7 @@ export function useImageProcessing(
       });
       updateProgress(15);
 
-      setScanStep('Analyzing facial structure...');
+      setScanStep('Mapping structural landmarks...');
       const canvas = canvasRef.current;
       if (!canvas) throw new Error('Canvas not available');
       const ctx = canvas.getContext('2d');
@@ -68,7 +68,7 @@ export function useImageProcessing(
       setFaceLandmarks(landmarks);
       const blendshapes = result.faceBlendshapes?.[0];
 
-      setScanStep('Analyzing facial expression...');
+      setScanStep('Checking expression neutral alignment...');
       if (blendshapes) {
         const smileLeft =
           blendshapes.categories.find((c) => c.categoryName === 'mouthSmileLeft')?.score || 0;
@@ -83,7 +83,7 @@ export function useImageProcessing(
       }
       updateProgress(35);
 
-      setScanStep('Verifying image quality...');
+      setScanStep('Measuring facial ratios & symmetry...');
       let minX = 1,
         maxX = 0,
         minY = 1,
@@ -113,11 +113,11 @@ export function useImageProcessing(
       const cropW = Math.floor((cropMaxX - cropMinX) * img.width);
       const cropH = Math.floor((cropMaxY - cropMinY) * img.height);
 
-      setScanStep('Analyzing lighting & focus...');
+      setScanStep('Calibrating lighting & focus...');
       await checkImageLightingAndBlur(img, cropX, cropY, cropW, cropH);
       updateProgress(45);
 
-      setScanStep('Isolating facial features...');
+      setScanStep('Isolating face geometry...');
       canvas.width = cropW;
       canvas.height = cropH;
       ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
@@ -139,14 +139,14 @@ export function useImageProcessing(
       }
       const croppedImageBase64 = geminiCanvas.toDataURL('image/jpeg', 0.7);
 
-      setScanStep('Calculating Golden Ratio & Symmetry...');
+      setScanStep('Calculating bilateral symmetry & landmark ratios...');
       updateProgress(55);
 
       let analysisResult = await analyzeImageServerSide(landmarks, croppedImageBase64);
 
       drawFaceMesh(ctx, landmarks, img.width, img.height, cropX, cropY, analysisResult);
 
-      setScanStep('AI Skin & Texture Analysis...');
+      setScanStep('AI skin & surface texture analysis...');
       updateProgress(65);
 
       // No geminiPump needed: the rAF loop's milestone-aware creep asymptotes
@@ -170,20 +170,24 @@ export function useImageProcessing(
       // the animation wait. Without this, a fast Gemini would dash 80 → 100
       // in 50ms (jarring), and a slow one would stick at 99 too long.
       setScanStep('Finalizing your aesthetic report...');
-      updateProgress(95);
+      updateProgress(99);
 
       const finalImageUrl = canvas.toDataURL('image/jpeg', 0.8);
       const isLocked = userCredits <= 0;
 
-      // Wait briefly for the robot celebration, but never block results for long.
+      // Always let the robot finish its celebration animation — applies equally
+      // for locked (0-credit) and unlocked users. 10s safety cap only fires if
+      // the canvas never calls onAnimationComplete (e.g., unmounted early).
       if (waitForAnimation) {
         await Promise.race([
           waitForAnimation(),
-          new Promise<void>((resolve) => setTimeout(resolve, 2500))
+          new Promise<void>((resolve) => setTimeout(resolve, 10000))
         ]);
       }
 
-      updateProgress(100);
+      // Extra 2s polish to let the robot's final wave + ring effects breathe
+      // before transitioning to the results dashboard.
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       // Dash finale safeguard (belt-and-suspenders):
       //   1. The progress rAF loop is HARD-CAPPED to ≤300ms via DASH_PER_SECOND.
       //   2. We AWAIT the display reaching 100 (or 350ms safety) before

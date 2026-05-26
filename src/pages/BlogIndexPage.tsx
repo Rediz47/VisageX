@@ -49,7 +49,8 @@ export default function BlogIndexPage() {
 
     {
       title: 'What is Canthal Tilt?',
-      description: 'A clear breakdown of eye angle, how it affects facial expression, and why lighting and pose matter too.',
+      description:
+        'A clear breakdown of eye angle, how it affects facial expression, and why lighting and pose matter too.',
       icon: Eye,
       color: 'sky',
       link: '/blog/what-is-canthal-tilt',
@@ -273,7 +274,9 @@ export default function BlogIndexPage() {
                       <featuredArticle.icon className="w-3.5 h-3.5" />
                       {featuredArticle.tag}
                     </span>
-                    <span className={isDarkMode ? 'text-xs text-white/35' : 'text-xs text-zinc-400'}>
+                    <span
+                      className={isDarkMode ? 'text-xs text-white/35' : 'text-xs text-zinc-400'}
+                    >
                       {featuredArticle.readTime}
                     </span>
                   </div>
@@ -288,7 +291,8 @@ export default function BlogIndexPage() {
                     {featuredArticle.description}
                   </p>
                   <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-amber-500 transition-colors">
-                    Read article <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    Read article{' '}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
               </div>
@@ -324,11 +328,23 @@ export default function BlogIndexPage() {
                       >
                         <article.icon className="w-5 h-5" />
                       </div>
-                      <span className={isDarkMode ? 'text-[10px] text-white/30 font-bold' : 'text-[10px] text-zinc-400 font-bold'}>
+                      <span
+                        className={
+                          isDarkMode
+                            ? 'text-[10px] text-white/30 font-bold'
+                            : 'text-[10px] text-zinc-400 font-bold'
+                        }
+                      >
                         {article.readTime}
                       </span>
                     </div>
-                    <span className={isDarkMode ? 'text-[10px] text-white/35 font-black uppercase tracking-widest mb-3' : 'text-[10px] text-zinc-400 font-black uppercase tracking-widest mb-3'}>
+                    <span
+                      className={
+                        isDarkMode
+                          ? 'text-[10px] text-white/35 font-black uppercase tracking-widest mb-3'
+                          : 'text-[10px] text-zinc-400 font-black uppercase tracking-widest mb-3'
+                      }
+                    >
                       {article.tag}
                     </span>
                     <h3
@@ -342,7 +358,8 @@ export default function BlogIndexPage() {
                       {article.description}
                     </p>
                     <div className="mt-auto pt-5 border-t border-zinc-500/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] group-hover:text-indigo-500 transition-colors">
-                      Read guide <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                      Read guide{' '}
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
                 </Link>

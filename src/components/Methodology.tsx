@@ -118,11 +118,15 @@ export function Methodology({ onBack, isDarkMode, result, imageUrl }: Methodolog
                   >
                     {item.step}
                   </div>
-                  <p className={`text-sm font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  <p
+                    className={`text-sm font-bold leading-tight ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}
+                  >
                     {item.label}
                   </p>
                 </div>
-                <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>
+                <p
+                  className={`text-xs leading-relaxed ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}
+                >
                   {item.sub}
                 </p>
               </motion.div>

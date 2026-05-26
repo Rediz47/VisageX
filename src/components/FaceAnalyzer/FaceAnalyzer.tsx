@@ -29,10 +29,12 @@ export function FaceAnalyzer({
   const [isMobile, setIsMobile] = useState(false);
   const [analyzedCount, setAnalyzedCount] = useState(() => {
     const now = new Date();
-    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+    const dayOfYear = Math.floor(
+      (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
+    );
     const hour = now.getHours();
     // Base 1420 + daily growth + hourly distribution + random offset
-    return 1420 + (dayOfYear * 7) + (hour * 3) + Math.floor(Math.random() * 15);
+    return 1420 + dayOfYear * 7 + hour * 3 + Math.floor(Math.random() * 15);
   });
 
   // Dynamic counter incrementer
@@ -40,7 +42,7 @@ export function FaceAnalyzer({
     const interval = setInterval(() => {
       // 30% chance to increment every 8 seconds
       if (Math.random() > 0.7) {
-        setAnalyzedCount(prev => prev + 1);
+        setAnalyzedCount((prev) => prev + 1);
       }
     }, 8000);
     return () => clearInterval(interval);
@@ -291,7 +293,9 @@ export function FaceAnalyzer({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/60' : 'text-zinc-600'}`}>
+            <span
+              className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/60' : 'text-zinc-600'}`}
+            >
               {analyzedCount.toLocaleString()} faces analyzed today
             </span>
           </motion.div>
@@ -382,7 +386,9 @@ export function FaceAnalyzer({
                     >
                       Pro Tip for Accuracy
                     </p>
-                    <p className={`text-[11px] leading-relaxed ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>
+                    <p
+                      className={`text-[11px] leading-relaxed ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}
+                    >
                       Use even lighting, keep your face straight, and avoid heavy angles for cleaner
                       landmark detection.
                     </p>
@@ -463,11 +469,16 @@ export function FaceAnalyzer({
                   transition={{ delay: 0.4, duration: 0.5 }}
                   className={`mt-6 text-center flex flex-col items-center justify-center gap-2`}
                 >
-                  <div className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  <div
+                    className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
+                  >
                     <Lock className="w-3.5 h-3.5" /> Privacy Guaranteed
                   </div>
-                  <p className={`text-[11px] leading-relaxed max-w-sm ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}>
-                    Photos are analyzed entirely in-memory and immediately deleted. We never store, share, or sell your facial data.
+                  <p
+                    className={`text-[11px] leading-relaxed max-w-sm ${isDarkMode ? 'text-white/40' : 'text-zinc-500'}`}
+                  >
+                    Photos are analyzed entirely in-memory and immediately deleted. We never store,
+                    share, or sell your facial data.
                   </p>
                 </motion.div>
               </div>

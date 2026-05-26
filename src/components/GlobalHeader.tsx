@@ -108,22 +108,13 @@ export function GlobalHeader({
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className={navClass(pathname === '/')}
-            >
+            <Link to="/" className={navClass(pathname === '/')}>
               Analyzer
             </Link>
-            <Link
-              to="/methodology"
-              className={navClass(pathname === '/methodology')}
-            >
+            <Link to="/methodology" className={navClass(pathname === '/methodology')}>
               Methodology
             </Link>
-            <Link
-              to="/blog"
-              className={navClass(pathname.startsWith('/blog'))}
-            >
+            <Link to="/blog" className={navClass(pathname.startsWith('/blog'))}>
               The Hub
             </Link>
 
@@ -164,15 +155,21 @@ export function GlobalHeader({
                       <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
                     </div>
                     <div className="hidden min-w-0 text-left lg:block">
-                      <div className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.22em] ${isDarkMode ? 'text-emerald-300' : 'text-emerald-600'}`}>
+                      <div
+                        className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.22em] ${isDarkMode ? 'text-emerald-300' : 'text-emerald-600'}`}
+                      >
                         <CheckCircle2 className="h-3 w-3" />
                         Signed in
                       </div>
-                      <p className={`max-w-[120px] truncate text-sm font-black ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                      <p
+                        className={`max-w-[120px] truncate text-sm font-black ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}
+                      >
                         {userName}
                       </p>
                     </div>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${accountOpen ? 'rotate-180' : ''} ${isDarkMode ? 'text-white/40' : 'text-zinc-400'}`} />
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${accountOpen ? 'rotate-180' : ''} ${isDarkMode ? 'text-white/40' : 'text-zinc-400'}`}
+                    />
                   </button>
 
                   <AnimatePresence>
@@ -184,14 +181,22 @@ export function GlobalHeader({
                         transition={{ duration: preset.durations.fast, ease: easings.easeOutExpo }}
                         className={`absolute right-0 top-[calc(100%+0.75rem)] w-72 overflow-hidden rounded-[1.5rem] border p-2 shadow-2xl backdrop-blur-2xl ${isDarkMode ? 'border-white/10 bg-zinc-950/95 shadow-black/40' : 'border-zinc-200 bg-white/95 shadow-zinc-300/40'}`}
                       >
-                        <div className={`rounded-[1.25rem] p-4 ${isDarkMode ? 'bg-white/[0.04]' : 'bg-zinc-50'}`}>
-                          <p className={`text-[10px] font-black uppercase tracking-[0.25em] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                        <div
+                          className={`rounded-[1.25rem] p-4 ${isDarkMode ? 'bg-white/[0.04]' : 'bg-zinc-50'}`}
+                        >
+                          <p
+                            className={`text-[10px] font-black uppercase tracking-[0.25em] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                          >
                             Account active
                           </p>
-                          <p className={`mt-1 truncate text-base font-black ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                          <p
+                            className={`mt-1 truncate text-base font-black ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}
+                          >
                             {user.displayName || userName}
                           </p>
-                          <p className={`truncate text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
+                          <p
+                            className={`truncate text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}
+                          >
                             {user.email}
                           </p>
                         </div>
@@ -245,7 +250,9 @@ export function GlobalHeader({
           <div className="flex items-center space-x-3 md:hidden">
             {user ? (
               <>
-                <div className={`flex items-center gap-2 rounded-2xl border px-2 py-1.5 ${isDarkMode ? 'border-white/10 bg-white/[0.06]' : 'border-zinc-200 bg-white/80'}`}>
+                <div
+                  className={`flex items-center gap-2 rounded-2xl border px-2 py-1.5 ${isDarkMode ? 'border-white/10 bg-white/[0.06]' : 'border-zinc-200 bg-white/80'}`}
+                >
                   <div className="relative">
                     {user.photoURL ? (
                       <img
@@ -261,10 +268,14 @@ export function GlobalHeader({
                     <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
                   </div>
                   <div className="max-w-[82px]">
-                    <p className={`truncate text-[10px] font-black leading-none ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                    <p
+                      className={`truncate text-[10px] font-black leading-none ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}
+                    >
                       {userName}
                     </p>
-                    <p className={`mt-1 flex items-center gap-1 text-[9px] font-bold leading-none ${isDarkMode ? 'text-amber-300' : 'text-amber-600'}`}>
+                    <p
+                      className={`mt-1 flex items-center gap-1 text-[9px] font-bold leading-none ${isDarkMode ? 'text-amber-300' : 'text-amber-600'}`}
+                    >
                       <Coins className="h-3 w-3" />
                       {credits}
                     </p>

@@ -40,7 +40,13 @@ export interface LerpLineCanvasProps {
   isLocked?: boolean;
 }
 
-export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false }: LerpLineCanvasProps) {
+export function LerpLineCanvas({
+  display,
+  points,
+  viewW,
+  viewH,
+  isLocked = false
+}: LerpLineCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<{
     lines: {
@@ -155,7 +161,10 @@ export function LerpLineCanvas({ display, points, viewW, viewH, isLocked = false
     [targetLines]
   );
   const lineColors = useMemo(
-    () => targetLines.map((target) => getLineRGB(target.color ?? 'rgba(150,150,150,0.5)', display.score)),
+    () =>
+      targetLines.map((target) =>
+        getLineRGB(target.color ?? 'rgba(150,150,150,0.5)', display.score)
+      ),
     [targetLines, display.score]
   );
   const labelTexts = useMemo(

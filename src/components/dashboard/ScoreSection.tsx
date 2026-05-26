@@ -28,11 +28,12 @@ function ArcGauge({
   isLocked: boolean;
   isDarkMode: boolean;
 }) {
-  const size = 160;
-  const stroke = 7;
-  const r = (size - stroke) / 2;
-  const cx = size / 2,
-    cy = size / 2;
+  const size = 136;
+  const stroke = 6;
+  const pad = stroke / 2 + 2;
+  const r = (size - pad * 2) / 2;
+  const cx = size / 2;
+  const cy = size / 2;
   const startAngle = 135;
   const endAngle = 405;
   const totalArc = endAngle - startAngle;
@@ -59,8 +60,11 @@ function ArcGauge({
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      className="absolute inset-0 m-auto"
-      style={{ opacity: isLocked ? 0.08 : 0.5, filter: isLocked ? 'blur(5px) grayscale(1)' : undefined }}
+      className="absolute inset-0"
+      style={{
+        opacity: isLocked ? 0.08 : 0.5,
+        filter: isLocked ? 'blur(5px) grayscale(1)' : undefined
+      }}
     >
       <defs>
         <linearGradient id="arc-grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -77,16 +81,16 @@ function ArcGauge({
         strokeLinecap="round"
       />
       {!isLocked && (
-      <motion.path
-        d={fillPath}
-        fill="none"
-        stroke="url(#arc-grad)"
-        strokeWidth={stroke}
-        strokeLinecap="round"
-        initial={{ strokeDasharray: circumference, strokeDashoffset: circumference }}
-        animate={{ strokeDashoffset: 0 }}
-        transition={{ duration: 1.6, ease: 'easeOut', delay: 0.3 }}
-      />
+        <motion.path
+          d={fillPath}
+          fill="none"
+          stroke="url(#arc-grad)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          initial={{ strokeDasharray: circumference, strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: 0 }}
+          transition={{ duration: 1.6, ease: 'easeOut', delay: 0.3 }}
+        />
       )}
     </svg>
   );
@@ -818,14 +822,16 @@ export function ScoreSection({
         animate={{ opacity: 1, x: 0, scale: 1 }}
         transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
         className={cn(
-          'flex-1 self-start rounded-2xl md:rounded-3xl shadow-xl relative overflow-hidden flex flex-col items-center py-3 px-4 md:px-5 text-center',
+          'flex-1 self-start rounded-[1.75rem] md:rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col items-center p-4 md:p-6 text-center',
           isDarkMode ? 'bg-[#05060a]' : 'bg-white'
         )}
         style={{
-          border: isDarkMode ? '1px solid rgba(99,102,241,0.22)' : '1px solid rgba(99,102,241,0.12)',
+          border: isDarkMode
+            ? '1px solid rgba(99,102,241,0.24)'
+            : '1px solid rgba(99,102,241,0.16)',
           boxShadow: isDarkMode
             ? '0 0 0 1px rgba(99,102,241,0.08), 0 28px 90px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.06)'
-            : '0 0 0 1px rgba(99,102,241,0.06), 0 24px 70px rgba(99,102,241,0.1)'
+            : '0 0 0 1px rgba(99,102,241,0.08), 0 24px 70px rgba(99,102,241,0.13)'
         }}
       >
         {/* Top radial glow */}
@@ -833,7 +839,7 @@ export function ScoreSection({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse at 50% 0%, rgba(34,211,238,0.16) 0%, rgba(99,102,241,0.1) 36%, transparent 68%)'
+              'radial-gradient(ellipse at 50% -8%, rgba(34,211,238,0.20) 0%, rgba(99,102,241,0.12) 34%, transparent 62%)'
           }}
         />
         <div
@@ -845,34 +851,36 @@ export function ScoreSection({
         />
         {/* Score-coloured ambient glow */}
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-36 pointer-events-none rounded-full blur-3xl"
-          style={{ background: isLocked ? 'transparent' : tier.glow, opacity: 0.5 }}
+          className="absolute top-8 left-1/2 -translate-x-1/2 w-44 h-44 pointer-events-none rounded-full blur-3xl"
+          style={{ background: isLocked ? 'transparent' : tier.glow, opacity: 0.42 }}
         />
 
-        <div className="relative z-10 flex flex-col items-center w-full gap-2.5">
+        <div className="relative z-10 flex flex-col items-center w-full gap-4">
           {/* Score display with arc gauge */}
-          <div className="text-center relative">
+          <div className="text-center relative w-full">
             <p
               className={cn(
-                'text-[9px] font-black uppercase tracking-[0.28em] mb-0.5',
+                'text-[10px] font-black uppercase tracking-[0.34em] mb-1',
                 isDarkMode ? 'text-white/30' : 'text-zinc-900/30'
               )}
             >
               Facial Harmony Score
             </p>
-            <p className={cn('text-[9px] mb-1', isDarkMode ? 'text-white/35' : 'text-zinc-500')}>
-              AI-calibrated attractiveness and proportion index
+            <p className={cn('text-[10px] mb-2', isDarkMode ? 'text-white/35' : 'text-zinc-500')}>
+              AI-calibrated facial balance, structure, and visual harmony
             </p>
-            <div
-              className="relative inline-flex items-center justify-center"
-              style={{ width: 118, height: 118 }}
-            >
+            <div className="relative mx-auto" style={{ width: 136, height: 136 }}>
               <ArcGauge score={overallScore} isLocked={isLocked} isDarkMode={isDarkMode} />
-              <div className={cn('flex flex-col items-center justify-center', isLocked && 'blur-[14px] opacity-55 select-none')}>
-                <div className="flex items-baseline gap-0.5">
+              <div
+                className={cn(
+                  'absolute inset-0 flex flex-col items-center justify-center pb-2 z-10',
+                  isLocked && 'blur-[14px] opacity-55 select-none'
+                )}
+              >
+                <div className="flex items-baseline gap-0.5 leading-none">
                   <motion.span
                     className={cn(
-                      'text-[42px] md:text-[48px] font-black tabular-nums leading-none tracking-tight select-none',
+                      'text-[50px] md:text-[58px] font-black tabular-nums leading-none tracking-[-0.06em] select-none',
                       isLocked && 'blur-[10px] opacity-60'
                     )}
                     style={{
@@ -890,7 +898,7 @@ export function ScoreSection({
                   </motion.span>
                   <span
                     className={cn(
-                      'text-base opacity-20 font-light',
+                      'text-lg opacity-25 font-light',
                       isDarkMode ? 'text-zinc-100' : 'text-zinc-900'
                     )}
                   >
@@ -900,7 +908,7 @@ export function ScoreSection({
                 {/* Tier label */}
                 <motion.span
                   className={cn(
-                    'text-[9px] font-bold uppercase tracking-[0.15em] mt-0.5',
+                    'text-[10px] font-bold uppercase tracking-[0.18em] mt-1',
                     isLocked && 'blur-[6px] opacity-40'
                   )}
                   style={{ color: isLocked ? (isDarkMode ? '#71717a' : '#a1a1aa') : tier.color }}
@@ -915,15 +923,15 @@ export function ScoreSection({
 
             {/* Dual score breakdown */}
             <motion.div
-              className="mt-2 w-full max-w-[270px]"
+              className="mt-3 w-full max-w-[360px]"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55, duration: 0.5 }}
             >
               <div
                 className={cn(
-                  'flex items-stretch gap-1.5 rounded-2xl p-1.5',
-                  isDarkMode ? 'bg-white/[0.045]' : 'bg-zinc-50/80'
+                  'grid grid-cols-2 gap-2 rounded-[1.35rem] p-2',
+                  isDarkMode ? 'bg-white/[0.045]' : 'bg-white/85'
                 )}
                 style={{
                   border: isDarkMode
@@ -931,8 +939,12 @@ export function ScoreSection({
                     : '1px solid rgba(0,0,0,0.05)'
                 }}
               >
-                {/* Geometry Score */}
-                <div className="flex-1 text-center">
+                <div
+                  className={cn(
+                    'rounded-2xl p-3 text-center',
+                    isDarkMode ? 'bg-black/20' : 'bg-zinc-50'
+                  )}
+                >
                   <p
                     className={cn(
                       'text-[7px] font-bold uppercase tracking-[0.15em] mb-0.5',
@@ -943,7 +955,7 @@ export function ScoreSection({
                   </p>
                   <p
                     className={cn(
-                      'text-lg font-black tabular-nums leading-none',
+                      'text-2xl font-black tabular-nums leading-none',
                       isLocked && 'blur-[6px] opacity-40'
                     )}
                     style={{ color: '#818cf8' }}
@@ -962,13 +974,10 @@ export function ScoreSection({
 
                 <div
                   className={cn(
-                    'w-px self-stretch',
-                    isDarkMode ? 'bg-white/[0.06]' : 'bg-zinc-200/50'
+                    'rounded-2xl p-3 text-center',
+                    isDarkMode ? 'bg-black/20' : 'bg-zinc-50'
                   )}
-                />
-
-                {/* AI Visual Assessment */}
-                <div className="flex-1 text-center">
+                >
                   <p
                     className={cn(
                       'text-[7px] font-bold uppercase tracking-[0.15em] mb-0.5',
@@ -981,7 +990,7 @@ export function ScoreSection({
                     <>
                       <p
                         className={cn(
-                          'text-lg font-black tabular-nums leading-none',
+                          'text-2xl font-black tabular-nums leading-none',
                           isLocked && 'blur-[6px] opacity-40'
                         )}
                         style={{ color: '#22d3ee' }}

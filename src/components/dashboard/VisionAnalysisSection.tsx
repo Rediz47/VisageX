@@ -9,7 +9,8 @@ interface VisionAnalysisSectionProps {
   visionAnalysis: any;
 }
 
-const LONG_HAIR_STYLE_PATTERN = /\b(ponytail|bob|waves|wave|curls|curl|braid|bun|lob|layers|layered|side part)\b/i;
+const LONG_HAIR_STYLE_PATTERN =
+  /\b(ponytail|bob|waves|wave|curls|curl|braid|bun|lob|layers|layered|side part)\b/i;
 
 const getSafeHairRecommendations = (visionAnalysis: any) => {
   const recommendations = Array.isArray(visionAnalysis?.hairRecommendations)
@@ -92,8 +93,11 @@ export function VisionAnalysisSection({
           >
             What the vision model noticed
           </h3>
-          <p className={cn('text-sm mt-1 max-w-2xl', isDarkMode ? 'text-white/45' : 'text-zinc-500')}>
-            Qualitative observations from the image model: skin texture, grooming, presentation, and overall visual impression.
+          <p
+            className={cn('text-sm mt-1 max-w-2xl', isDarkMode ? 'text-white/45' : 'text-zinc-500')}
+          >
+            Qualitative observations from the image model: skin texture, grooming, presentation, and
+            overall visual impression.
           </p>
         </div>
         <div
@@ -102,7 +106,12 @@ export function VisionAnalysisSection({
             isDarkMode ? 'bg-white/[0.04] border-white/8' : 'bg-white/80 border-zinc-200'
           )}
         >
-          <p className={cn('text-[8px] font-black uppercase tracking-widest', isDarkMode ? 'text-white/35' : 'text-zinc-400')}>
+          <p
+            className={cn(
+              'text-[8px] font-black uppercase tracking-widest',
+              isDarkMode ? 'text-white/35' : 'text-zinc-400'
+            )}
+          >
             Source
           </p>
           <p className={cn('text-xs font-bold', isDarkMode ? 'text-white/80' : 'text-zinc-800')}>
@@ -236,7 +245,9 @@ export function VisionAnalysisSection({
                   isDarkMode ? 'text-white/[0.025]' : 'text-indigo-950/[0.035]'
                 )}
               >
-                {String(visionAnalysis.faceShape || '').slice(0, 2).toUpperCase()}
+                {String(visionAnalysis.faceShape || '')
+                  .slice(0, 2)
+                  .toUpperCase()}
               </span>
             </div>
             <div className="relative z-10">
@@ -244,7 +255,10 @@ export function VisionAnalysisSection({
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     <div
-                      className={cn('h-[1px] w-8', isDarkMode ? 'bg-indigo-300/35' : 'bg-indigo-400/35')}
+                      className={cn(
+                        'h-[1px] w-8',
+                        isDarkMode ? 'bg-indigo-300/35' : 'bg-indigo-400/35'
+                      )}
                     />
                     <p
                       className={cn(
@@ -263,8 +277,14 @@ export function VisionAnalysisSection({
                   >
                     Hair & Face Shape
                   </h4>
-                  <p className={cn('text-xs md:text-sm mt-2 max-w-2xl', isDarkMode ? 'text-white/45' : 'text-zinc-500')}>
-                    Hair recommendations are matched to your landmark-calculated face shape and visual framing.
+                  <p
+                    className={cn(
+                      'text-xs md:text-sm mt-2 max-w-2xl',
+                      isDarkMode ? 'text-white/45' : 'text-zinc-500'
+                    )}
+                  >
+                    Hair recommendations are matched to your landmark-calculated face shape and
+                    visual framing.
                   </p>
                 </div>
 
@@ -289,7 +309,12 @@ export function VisionAnalysisSection({
                     {isLocked ? 'Locked' : visionAnalysis.faceShape} Face
                   </div>
                   {faceShapeConfidence != null && !isLocked && (
-                    <span className={cn('text-[10px] font-bold', isDarkMode ? 'text-white/35' : 'text-zinc-400')}>
+                    <span
+                      className={cn(
+                        'text-[10px] font-bold',
+                        isDarkMode ? 'text-white/35' : 'text-zinc-400'
+                      )}
+                    >
                       {faceShapeConfidence}% geometry confidence
                     </span>
                   )}

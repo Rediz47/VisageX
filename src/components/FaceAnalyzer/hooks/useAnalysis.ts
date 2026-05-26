@@ -31,11 +31,8 @@ export function useAnalysis(userCredits: number) {
       return currentAnalysis;
     }
 
-    const MAX_RETRIES = 1;
-    // Backend Gemini call can legitimately take 30–45s on vision analyses with the
-    // long structured-JSON prompt. Frontend must outlast the backend AbortController
-    // (60s) or we'll cancel a request that's about to succeed. 70s gives headroom.
-    const GEMINI_TIMEOUT_MS = 70000;
+    const MAX_RETRIES = 2;
+    const GEMINI_TIMEOUT_MS = 220000;
     let lastError: any = null;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -84,9 +81,11 @@ export function useAnalysis(userCredits: number) {
             }
           }
           console.error(`[Gemini] ${aiResponse.status} from /api/gemini-analysis:`, backendDetail);
-          throw new Error(
+          const error: any = new Error(
             `AI analysis failed (status ${aiResponse.status})${backendDetail ? ': ' + backendDetail : ''}`
           );
+          error.statusCode = aiResponse.status;
+          throw error;
         }
 
         const geminiData = await aiResponse.json();
@@ -146,11 +145,12 @@ export function useAnalysis(userCredits: number) {
         }
         // Success — return immediately
         return currentAnalysis;
-      } catch (e) {
+      } catch (e: any) {
         lastError = e;
         console.warn(`Gemini analysis attempt ${attempt}/${MAX_RETRIES} failed:`, e);
-        if (attempt < MAX_RETRIES) {
-          await new Promise((resolve) => setTimeout(resolve, 300));
+        const retryableStatus = !e?.statusCode || e.statusCode === 429 || e.statusCode >= 500;
+        if (attempt < MAX_RETRIES && retryableStatus) {
+          await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
         }
       }
     }

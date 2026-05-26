@@ -110,7 +110,7 @@ export function RefundPolicy({ onBack, isDarkMode }: { onBack: () => void; isDar
           >
             If you are unsatisfied with your credit purchase, you may request a refund within{' '}
             <strong>7 days</strong> of the purchase date, provided that fewer than 25% of the
-            purchased credits have been consumed. Refund requests are processed via PayPal to the
+            purchased credits have been consumed. Refund requests are processed via Paddle to the
             original payment method.
           </p>
         </section>
@@ -167,7 +167,7 @@ export function RefundPolicy({ onBack, isDarkMode }: { onBack: () => void; isDar
             >
               support@visagex.online
             </a>{' '}
-            with your account email and the PayPal transaction ID. We aim to process all refund
+            with your account email and the Paddle transaction ID. We aim to process all refund
             requests within 3-5 business days.
           </p>
         </section>

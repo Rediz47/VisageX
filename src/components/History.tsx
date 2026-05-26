@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowLeft,
@@ -27,6 +27,83 @@ interface HistoryProps {
   onBack: () => void;
   isDarkMode: boolean;
   onSelectScan: (result: any, imageUrl: string) => void;
+}
+
+/* ── Interactive Before/After Split Slider ── */
+function ImageSlider({
+  beforeUrl,
+  afterUrl,
+  label1,
+  label2,
+  isDarkMode
+}: {
+  beforeUrl: string;
+  afterUrl: string;
+  label1: string;
+  label2: string;
+  isDarkMode: boolean;
+}) {
+  const [sliderPos, setSliderPos] = useState(50);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMove = (clientX: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPos(percentage);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (e.touches[0]) handleMove(e.touches[0].clientX);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (e.buttons === 1) handleMove(e.clientX);
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onMouseMove={onMouseMove}
+      onTouchMove={onTouchMove}
+      className={cn(
+        'relative aspect-[4/5] w-full rounded-[2.5rem] overflow-hidden select-none cursor-ew-resize border shadow-2xl',
+        isDarkMode ? 'border-white/10 bg-zinc-950' : 'border-zinc-200 bg-zinc-50'
+      )}
+    >
+      {/* Before Image (Left Base) */}
+      <img
+        src={beforeUrl}
+        alt="Before"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+      />
+      <div className="absolute top-5 left-5 z-20 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-white">
+        {label1}
+      </div>
+
+      {/* After Image (Right Clipped Overlay) */}
+      <div
+        className="absolute inset-0 pointer-events-none z-10"
+        style={{ clipPath: `polygon(${sliderPos}% 0, 100% 0, 100% 100%, ${sliderPos}% 100%)` }}
+      >
+        <img src={afterUrl} alt="After" className="w-full h-full object-cover" />
+      </div>
+      <div className="absolute top-5 right-5 z-20 bg-indigo-500/90 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-white">
+        {label2}
+      </div>
+
+      {/* Slider Split Line */}
+      <div
+        className="absolute inset-y-0 w-1 bg-white/80 cursor-ew-resize flex items-center justify-center shadow-xl z-20"
+        style={{ left: `${sliderPos}%` }}
+      >
+        <div className="w-9 h-9 rounded-full bg-white shadow-2xl flex items-center justify-center border-2 border-indigo-500 text-indigo-500 hover:scale-110 active:scale-95 transition-transform">
+          <Columns className="w-4.5 h-4.5 rotate-90" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
@@ -128,6 +205,7 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
     const [scan1, scan2] = selectedForComparison;
     const data1 = JSON.parse(scan1.analysisData);
     const data2 = JSON.parse(scan2.analysisData);
+    const scoreDiff = scan2.overallScore - scan1.overallScore;
 
     return (
       <div
@@ -149,71 +227,132 @@ export function History({ onBack, isDarkMode, onSelectScan }: HistoryProps) {
             </span>
           </h1>
           <p className={`text-lg font-light ${isDarkMode ? 'text-white/50' : 'text-zinc-500'}`}>
-            Comparing your progress between {formatDate(scan1.createdAt)} and{' '}
+            Analyze your progress between {formatDate(scan1.createdAt)} and{' '}
             {formatDate(scan2.createdAt)}.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {[scan1, scan2].map((scan, i) => {
-            const data = JSON.parse(scan.analysisData);
-            return (
-              <div
-                key={i}
-                className={`p-8 rounded-[2.5rem] border ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}
-              >
-                <div className="aspect-[4/5] rounded-3xl overflow-hidden mb-8 border border-white/5">
-                  <img src={scan.imageUrl} alt="Scan" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-1">
-                      Facial Harmony Score
-                    </p>
-                    <p className="text-5xl font-display font-bold">
-                      {scan.overallScore.toFixed(1)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50 mb-1">
-                      Date
-                    </p>
-                    <p className="text-sm font-medium">{formatDate(scan.createdAt)}</p>
-                  </div>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          {/* Left Column: Interactive Image Slider (5 cols) */}
+          <div className="lg:col-span-5 space-y-4">
+            <div
+              className={`p-1.5 rounded-[2.85rem] border ${isDarkMode ? 'bg-black/20 border-white/5' : 'bg-zinc-50/50 border-zinc-100'}`}
+            >
+              <ImageSlider
+                beforeUrl={scan1.imageUrl}
+                afterUrl={scan2.imageUrl}
+                label1={`BEFORE: ${new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(scan1.createdAt))}`}
+                label2={`AFTER: ${new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(scan2.createdAt))}`}
+                isDarkMode={isDarkMode}
+              />
+            </div>
+            <p className="text-center text-xs opacity-40 font-medium tracking-wide">
+              Drag or hover slider to compare facial alignment and features
+            </p>
+          </div>
 
-                <div className="space-y-4">
-                  {Object.entries(data.breakdown).map(([key, value]: [string, any]) => (
-                    <div key={key}>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="opacity-60">{key}</span>
-                        <span className="font-bold">{value.toFixed(1)}</span>
+          {/* Right Column: Comparative Metrics Sheet (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Overall Score Progress Banner */}
+            <div
+              className={`p-8 rounded-[2.5rem] border relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6 ${
+                isDarkMode
+                  ? 'bg-gradient-to-r from-indigo-950/20 via-black/40 to-black border-white/10'
+                  : 'bg-gradient-to-r from-indigo-50/30 to-white border-zinc-200 shadow-sm'
+              }`}
+            >
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-1.5 opacity-40">
+                  Glow-Up Trajectory
+                </p>
+                <h3 className="text-2xl font-display font-bold mb-1">
+                  {scoreDiff > 0 ? 'Improvement Detected' : 'Consistency Lock'}
+                </h3>
+                <p className="text-sm opacity-50 font-light max-w-sm">
+                  {scoreDiff > 0
+                    ? `Excellent progress! You have increased your facial harmony score by ${scoreDiff.toFixed(1)} points.`
+                    : 'Your facial structural measurements remain consistently locked. Focus on your roadmap to increase features.'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-5">
+                <div className="text-center">
+                  <p className="text-[9px] font-bold uppercase tracking-widest opacity-30 mb-0.5">
+                    Initial
+                  </p>
+                  <span className="text-3xl font-black">{scan1.overallScore.toFixed(1)}</span>
+                </div>
+                <div className="text-indigo-400 font-bold text-lg">➔</div>
+                <div className="text-center">
+                  <p className="text-[9px] font-bold uppercase tracking-widest opacity-30 mb-0.5">
+                    Latest
+                  </p>
+                  <span className="text-3xl font-black text-cyan-400">
+                    {scan2.overallScore.toFixed(1)}
+                  </span>
+                </div>
+                {scoreDiff > 0 && (
+                  <div className="ml-2 px-3 py-1.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-black tracking-tight flex items-center gap-0.5">
+                    +{scoreDiff.toFixed(1)}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Side-by-Side Breakdown Cards */}
+            <div
+              className={`p-8 rounded-[2.5rem] border space-y-6 ${isDarkMode ? 'bg-black/40 border-white/10' : 'bg-white border-zinc-200 shadow-sm'}`}
+            >
+              <h4 className="text-[10px] font-black uppercase tracking-[0.25em] opacity-40 mb-2">
+                Biometric Ratios Breakdown
+              </h4>
+
+              <div className="space-y-6">
+                {Object.entries(data1.breakdown).map(([key, value1]: [string, any]) => {
+                  const value2 = data2.breakdown[key] || 0;
+                  const diff = value2 - value1;
+
+                  return (
+                    <div key={key} className="space-y-2">
+                      <div className="flex justify-between items-baseline text-sm">
+                        <span className="font-semibold">{key}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="opacity-40 font-mono text-xs">{value1.toFixed(1)}</span>
+                          <span className="opacity-20 text-xs">➔</span>
+                          <span className="font-black text-cyan-400 font-mono text-xs">
+                            {value2.toFixed(1)}
+                          </span>
+                          {diff !== 0 && (
+                            <span
+                              className={`text-[10px] font-black ml-1.5 ${diff > 0 ? 'text-emerald-400' : 'text-rose-400'}`}
+                            >
+                              {diff > 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Overlapping progress track */}
                       <div
-                        className={`w-full h-1.5 rounded-full ${isDarkMode ? 'bg-white/5' : 'bg-zinc-100'}`}
+                        className={`w-full h-2 rounded-full relative overflow-hidden ${isDarkMode ? 'bg-white/[0.04]' : 'bg-zinc-100'}`}
                       >
+                        {/* Before line */}
                         <div
-                          className="h-full bg-cyan-400 rounded-full"
-                          style={{ width: `${(value / 10) * 100}%` }}
+                          className="absolute inset-y-0 left-0 bg-zinc-500/40 rounded-full"
+                          style={{ width: `${(value1 / 10) * 100}%` }}
+                        />
+                        {/* After fill line */}
+                        <div
+                          className={`absolute inset-y-0 left-0 rounded-full ${diff >= 0 ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : 'bg-rose-500/50'}`}
+                          style={{ width: `${(value2 / 10) * 100}%`, opacity: 0.85 }}
                         />
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-
-        <div
-          className={`mt-12 p-8 rounded-[2.5rem] border text-center ${isDarkMode ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-emerald-50 border-emerald-100'}`}
-        >
-          <h3 className="text-2xl font-display font-bold mb-2">Progress Analysis</h3>
-          <p className={`text-lg ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
-            {scan2.overallScore > scan1.overallScore
-              ? `You've improved your score by ${(scan2.overallScore - scan1.overallScore).toFixed(1)} points! Keep up the glow-up journey.`
-              : `Your score is consistent. Focus on the recommended improvements in your roadmap to see further gains.`}
-          </p>
+            </div>
+          </div>
         </div>
       </div>
     );

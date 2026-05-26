@@ -273,9 +273,13 @@ export function Hero({
                     }}
                     className={`mt-2 flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white' : 'text-zinc-700'}`}
                   >
-                    <span className="flex items-center gap-1.5"><Lock className="w-3 h-3 text-emerald-400" /> Secured by PayPal</span>
+                    <span className="flex items-center gap-1.5">
+                      <Lock className="w-3 h-3 text-emerald-400" /> Secured by Paddle
+                    </span>
                     <span className="opacity-30">·</span>
-                    <span className="flex items-center gap-1.5"><CreditCard className="w-3 h-3" /> 256-bit Encryption</span>
+                    <span className="flex items-center gap-1.5">
+                      <CreditCard className="w-3 h-3" /> 256-bit Encryption
+                    </span>
                   </motion.div>
                 </div>
               </div>
@@ -1254,31 +1258,42 @@ export function FAQ({ isDarkMode }: { isDarkMode: boolean }) {
 
   const faqs = [
     {
-      question: "What happens to my photo after I upload it?",
-      answer: "Your privacy is our top priority. Photos are processed entirely in-memory and are immediately deleted after the analysis is complete. We never store, share, or sell your facial data to any third parties."
+      question: 'What happens to my photo after I upload it?',
+      answer:
+        'Your privacy is our top priority. Photos are processed entirely in-memory and are immediately deleted after the analysis is complete. We never store, share, or sell your facial data to any third parties.'
     },
     {
-      question: "What if the AI fails to scan my face?",
-      answer: "We offer a 100% automatic Money-Back Guarantee. If our neural networks cannot detect your facial landmarks or fail to generate a comprehensive report, your credits will not be consumed, or we will refund your payment instantly."
+      question: 'What if the AI fails to scan my face?',
+      answer:
+        'We offer a 100% automatic Money-Back Guarantee. If our neural networks cannot detect your facial landmarks or fail to generate a comprehensive report, your credits will not be consumed, or we will refund your payment instantly.'
     },
     {
-      question: "Is this a monthly subscription?",
-      answer: "No. All of our plans are strictly one-time payments. You simply purchase the number of scans you want to use. There are no hidden fees and no recurring charges."
+      question: 'Is this a monthly subscription?',
+      answer:
+        'No. All of our plans are strictly one-time payments. You simply purchase the number of scans you want to use. There are no hidden fees and no recurring charges.'
     },
     {
-      question: "How accurate is the symmetry score?",
-      answer: "Our algorithm maps 468 distinct facial landmarks with sub-millimeter precision, providing an extremely accurate mathematical representation of your facial symmetry and proportions compared to established aesthetic golden ratios."
+      question: 'How accurate is the symmetry score?',
+      answer:
+        'Our algorithm maps 468 distinct facial landmarks with sub-millimeter precision, providing an extremely accurate mathematical representation of your facial symmetry and proportions compared to established aesthetic golden ratios.'
     }
   ];
 
   return (
-    <section className="py-32 transition-colors duration-500" style={{ background: isDarkMode ? '#050508' : '#f8f8fc' }}>
+    <section
+      className="py-32 transition-colors duration-500"
+      style={{ background: isDarkMode ? '#050508' : '#f8f8fc' }}
+    >
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
-          <p className={`text-[10px] font-bold uppercase tracking-widest mb-4 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-500'}`}>
+          <p
+            className={`text-[10px] font-bold uppercase tracking-widest mb-4 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-500'}`}
+          >
             Got Questions?
           </p>
-          <h2 className={`text-4xl md:text-5xl font-display font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
+          <h2
+            className={`text-4xl md:text-5xl font-display font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}
+          >
             Frequently Asked Questions
           </h2>
         </div>
@@ -1286,23 +1301,29 @@ export function FAQ({ isDarkMode }: { isDarkMode: boolean }) {
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`rounded-2xl border transition-colors duration-300 ${isDarkMode ? 'bg-white/[0.03] border-white/10 hover:bg-white/[0.05]' : 'bg-white border-zinc-200 hover:border-zinc-300'}`}
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : index)}
                   className="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none"
                 >
-                  <span className={`text-lg font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+                  <span
+                    className={`text-lg font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
+                  >
                     {faq.question}
                   </span>
-                  <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''} ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`} />
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''} ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                  />
                 </button>
-                <div 
+                <div
                   className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
                 >
-                  <p className={`px-6 pb-6 text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                  <p
+                    className={`px-6 pb-6 text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
+                  >
                     {faq.answer}
                   </p>
                 </div>

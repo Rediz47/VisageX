@@ -8,7 +8,10 @@ import {
   Activity,
   ChevronRight,
   Users,
-  Scissors
+  Scissors,
+  Calendar,
+  CheckCircle2,
+  Award
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { AnimatedCounter } from './AnimatedCounter';
@@ -312,6 +315,93 @@ const RATIO_TOPIC_KEYWORDS_BY_NAME: Record<string, string[]> = {
   'Palpebral Fissure Ratio': ['palpebral', 'eye opening']
 };
 
+/* ── Gorgeous 30-Day Glow-Up Loop & Milestone Banner ── */
+function GlowUpLoopBanner({
+  isDarkMode,
+  isLocked,
+  overallScore,
+  onImproveClick
+}: {
+  isDarkMode: boolean;
+  isLocked: boolean;
+  overallScore: number;
+  onImproveClick: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      className={cn(
+        'rounded-[2rem] border overflow-hidden p-6 md:p-8 flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10',
+        isDarkMode
+          ? 'bg-gradient-to-r from-[#07070f] via-[#0b0c16] to-[#04050a] border-white/[0.08]'
+          : 'bg-gradient-to-r from-indigo-50/40 via-white to-zinc-50 border-zinc-200 shadow-md'
+      )}
+    >
+      {/* Glow */}
+      <div className="absolute top-0 right-0 w-80 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="flex flex-col md:flex-row items-center gap-5 text-center md:text-left">
+        <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0 border border-indigo-500/20 shadow-lg">
+          <Calendar className="w-7 h-7" />
+        </div>
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">
+              Continuous Improvement
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-bold uppercase tracking-wider flex items-center gap-0.5">
+              <CheckCircle2 className="w-2.5 h-2.5" /> Next Scan Ready In 30 Days
+            </span>
+          </div>
+          <h3
+            className={cn(
+              'text-xl font-display font-bold',
+              isDarkMode ? 'text-white' : 'text-zinc-900'
+            )}
+          >
+            Track Your 30-Day Glow-Up Progress
+          </h3>
+          <p
+            className={cn(
+              'text-sm font-light max-w-xl leading-relaxed',
+              isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
+            )}
+          >
+            True structural improvements require consistent routines. Take a baseline scan today,
+            implement your AI-customized improvement roadmap, and re-scan next month to lock in your
+            progress milestones.
+          </p>
+        </div>
+      </div>
+
+      <div className="w-full lg:w-auto flex flex-col sm:flex-row items-stretch lg:items-center gap-3 shrink-0">
+        {/* Milestone preview badges */}
+        <div className="flex items-center justify-center gap-3 px-4 py-2 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-xs font-mono">
+          <div className="flex items-center gap-1.5 opacity-60">
+            <Award className="w-4 h-4 text-amber-400" />
+            <span>
+              Best Harmony:{' '}
+              <strong className={isDarkMode ? 'text-white font-black' : 'text-zinc-900 font-black'}>
+                {overallScore.toFixed(1)}/10
+              </strong>
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={onImproveClick}
+          className="px-6 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 group"
+        >
+          <span>Improve Your Score</span>
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 export function ResultDashboard({
   result,
   imageUrl,
@@ -332,10 +422,13 @@ export function ResultDashboard({
 
   // Reset screen budget whenever the user switches tabs, so the newly-mounted
   // panel's critical + secondary animations are not starved by earlier ones.
-  const handleTabChange = useCallback((tab: 'overview' | 'analysis' | 'plan') => {
-    resetBudget('tab');
-    setActiveTab(tab);
-  }, [resetBudget]);
+  const handleTabChange = useCallback(
+    (tab: 'overview' | 'analysis' | 'plan') => {
+      resetBudget('tab');
+      setActiveTab(tab);
+    },
+    [resetBudget]
+  );
 
   // Wire up shared controller — single source of truth for memoized data & shared state
   const ctrl = useDashboardController(result);
@@ -478,6 +571,9 @@ export function ResultDashboard({
     setIsGeneratingCard(true);
 
     try {
+      const referralCode = userData?.referralCode || '';
+      const shareUrl = `${window.location.origin}${referralCode ? `?ref=${referralCode}` : ''}`;
+
       const canvas = document.createElement('canvas');
       canvas.width = 1080;
       canvas.height = 1920;
@@ -506,6 +602,18 @@ export function ResultDashboard({
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = reject;
+      });
+
+      // Load QR Code
+      const qrImg = new Image();
+      qrImg.crossOrigin = 'anonymous';
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}&color=ffffff&bgcolor=020204`;
+      await new Promise((resolve) => {
+        qrImg.onload = resolve;
+        qrImg.onerror = () => {
+          console.warn('QR Code generation failed, continuing without QR');
+          resolve(null);
+        };
       });
 
       // 2. Focused Image Container
@@ -544,21 +652,31 @@ export function ResultDashboard({
         const leftEye = ratioPoints[33];
         const rightEye = ratioPoints[263];
         const eyeY = (leftEye.y + rightEye.y) / 2;
-        
+
         const eyeStripH = 260; // Size of the sharp eye area
-        const eyeStripY = drawY + (eyeY * drawH) - (eyeStripH / 2);
+        const eyeStripY = drawY + eyeY * drawH - eyeStripH / 2;
 
         ctx.save();
         ctx.beginPath();
         // Create a horizontal strip for the eyes
-        ctx.rect(destX, Math.max(destY, eyeStripY), destW, Math.min(eyeStripH, destH - (eyeStripY - destY)));
+        ctx.rect(
+          destX,
+          Math.max(destY, eyeStripY),
+          destW,
+          Math.min(eyeStripH, destH - (eyeStripY - destY))
+        );
         ctx.clip();
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
-        
+
         // Add a subtle divider/glow for the sharp area
         ctx.strokeStyle = 'rgba(255,255,255,0.1)';
         ctx.lineWidth = 1;
-        ctx.strokeRect(destX, Math.max(destY, eyeStripY), destW, Math.min(eyeStripH, destH - (eyeStripY - destY)));
+        ctx.strokeRect(
+          destX,
+          Math.max(destY, eyeStripY),
+          destW,
+          Math.min(eyeStripH, destH - (eyeStripY - destY))
+        );
         ctx.restore();
       } else {
         // Fallback: Sharp center if no landmarks
@@ -582,7 +700,7 @@ export function ResultDashboard({
       // 3. Typography & Header
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      
+
       ctx.fillStyle = 'rgba(99, 102, 241, 0.8)';
       ctx.font = 'bold 24px "JetBrains Mono", monospace';
       ctx.letterSpacing = '8px';
@@ -595,7 +713,7 @@ export function ResultDashboard({
 
       // 4. Score Circle
       const badgeY = destY + destH;
-      
+
       // Outer Glow
       ctx.beginPath();
       ctx.arc(540, badgeY, 150, 0, Math.PI * 2);
@@ -648,30 +766,85 @@ export function ResultDashboard({
         ctx.restore();
       };
 
-      const gridY = badgeY + 200;
+      const gridY = badgeY + 160;
       drawPremiumStat('SYMMETRY', breakdown['Symmetry']?.toFixed(1) || '-', 100, gridY);
       drawPremiumStat('JAWLINE', breakdown['Jawline']?.toFixed(1) || '-', 560, gridY);
-      drawPremiumStat('SKIN', breakdown['Skin Quality']?.toFixed(1) || '-', 100, gridY + 175);
-      drawPremiumStat('EYES', breakdown['Eyes']?.toFixed(1) || '-', 560, gridY + 175);
+      drawPremiumStat(
+        'SKIN HEALTH',
+        breakdown['Skin Quality']?.toFixed(1) || '-',
+        100,
+        gridY + 130
+      );
+      drawPremiumStat('EYES BALANCE', breakdown['Eyes']?.toFixed(1) || '-', 560, gridY + 130);
 
-      // 6. Footer Shape Info
-      const footerY = gridY + 370;
-      ctx.fillStyle = 'rgba(255,255,255,0.03)';
-      if (ctx.roundRect) ctx.roundRect(100, footerY, 880, 100, 50);
-      ctx.fill();
+      // 6. Luxury Footer with QR & Watermark
+      const footerY = gridY + 280;
+
+      // Divider line
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(100, footerY);
+      ctx.lineTo(980, footerY);
+      ctx.stroke();
+
+      // Left Column: Branding text
+      ctx.textAlign = 'left';
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.font = 'bold 20px "JetBrains Mono", monospace';
+      ctx.letterSpacing = '4px';
+      ctx.fillText('SCAN TO CALCULATE YOUR HARMONY', 100, footerY + 50);
+
+      const brandFooterGrad = ctx.createLinearGradient(100, 0, 450, 0);
+      brandFooterGrad.addColorStop(0, '#6366f1');
+      brandFooterGrad.addColorStop(1, '#22d3ee');
+      ctx.fillStyle = brandFooterGrad;
+      ctx.font = '900 58px "Inter", sans-serif';
+      ctx.letterSpacing = '-1px';
+      ctx.fillText('visagex.online', 100, footerY + 115);
 
       ctx.fillStyle = '#818cf8';
-      ctx.font = 'bold 30px "Inter", sans-serif';
+      ctx.font = 'bold 20px "JetBrains Mono", monospace';
       ctx.letterSpacing = '1px';
       let bottomText = `FACE SHAPE: ${result.visionAnalysis?.faceShape?.toUpperCase() || 'UNKNOWN'}`;
       if (result.visionAnalysis?.celebritySimilarity?.[0]) {
         bottomText += `  •  MATCH: ${result.visionAnalysis.celebritySimilarity[0].name.toUpperCase()}`;
       }
-      ctx.fillText(bottomText, 540, footerY + 50);
+      ctx.fillText(bottomText, 100, footerY + 180);
 
-      // Download
+      // Right Column: QR Code sitting in glowing rounded frame
+      if (qrImg && qrImg.complete) {
+        const qrX = 800;
+        const qrY = footerY + 25;
+        const qrSize = 160;
+
+        // Soft glow behind QR
+        ctx.save();
+        ctx.shadowColor = 'rgba(99, 102, 241, 0.25)';
+        ctx.shadowBlur = 20;
+        ctx.fillStyle = '#07070b';
+        if (ctx.roundRect) ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 18);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+
+        // Draw QR Image
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+        // QR label
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = 'bold 12px "JetBrains Mono", monospace';
+        ctx.letterSpacing = '2px';
+        ctx.fillText('SCAN ME', qrX + qrSize / 2, qrY + qrSize + 28);
+      }
+
+      // Trigger Download
       const link = document.createElement('a');
-      link.download = `visagex-premium-${Date.now()}.jpg`;
+      link.download = `visagex-harmony-score-${overallScore.toFixed(1)}-${Date.now()}.jpg`;
       link.href = canvas.toDataURL('image/jpeg', 0.95);
       link.click();
     } catch (err) {
@@ -680,7 +853,15 @@ export function ResultDashboard({
     } finally {
       setIsGeneratingCard(false);
     }
-  }, [breakdown, imageUrl, isGeneratingCard, overallScore, result.visionAnalysis, setIsGeneratingCard]);
+  }, [
+    breakdown,
+    imageUrl,
+    isGeneratingCard,
+    overallScore,
+    result.visionAnalysis,
+    setIsGeneratingCard,
+    userData
+  ]);
 
   const scrollToPricing = useCallback((e?: React.MouseEvent) => {
     if (e) {
@@ -706,23 +887,26 @@ export function ResultDashboard({
     }
   }, []);
 
-  const handleApplyReferral = useCallback(async (code: string) => {
-    if (!user?.uid) throw new Error('Please sign in to apply a referral code');
-    const fingerprint = `${window.screen.width}x${window.screen.height}-${navigator.userAgent}`;
-    const response = await fetch('/api/referral/redeem', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: user.uid,
-        referralCode: code,
-        fingerprint
-      })
-    });
+  const handleApplyReferral = useCallback(
+    async (code: string) => {
+      if (!user?.uid) throw new Error('Please sign in to apply a referral code');
+      const fingerprint = `${window.screen.width}x${window.screen.height}-${navigator.userAgent}`;
+      const response = await fetch('/api/referral/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.uid,
+          referralCode: code,
+          fingerprint
+        })
+      });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Failed to apply code');
-    return data;
-  }, [user?.uid]);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to apply code');
+      return data;
+    },
+    [user?.uid]
+  );
 
   const dashboardContextValue = useMemo(
     () => ({
@@ -831,6 +1015,17 @@ export function ResultDashboard({
                     isDarkMode={isDarkMode}
                     isLocked={isLocked}
                     visionAnalysis={result.visionAnalysis}
+                  />
+                </div>
+              )}
+
+              {!isLocked && (
+                <div className="order-[15]">
+                  <GlowUpLoopBanner
+                    isDarkMode={isDarkMode}
+                    isLocked={isLocked}
+                    overallScore={overallScore}
+                    onImproveClick={() => setActiveTab('plan')}
                   />
                 </div>
               )}

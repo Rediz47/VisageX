@@ -155,7 +155,8 @@ export function calculateFaceShape(l: LandmarkArray): { shape: string; confidenc
   const jawWidth = dist(l[132], l[361]);
   const templeWidth = dist(l[127] ?? l[234], l[356] ?? l[454]);
   const browWidth = dist(l[70] ?? l[105] ?? l[234], l[300] ?? l[334] ?? l[454]);
-  const foreheadWidth = templeWidth && browWidth ? (templeWidth * 0.65 + browWidth * 0.35) : templeWidth || browWidth;
+  const foreheadWidth =
+    templeWidth && browWidth ? templeWidth * 0.65 + browWidth * 0.35 : templeWidth || browWidth;
 
   if (!faceHeight || !cheekWidth || !jawWidth || !foreheadWidth) {
     return { shape: 'oval', confidence: 0.4 };

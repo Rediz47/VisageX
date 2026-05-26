@@ -1,7 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, Send, X, Bot, User, Loader2, Sparkles, ChevronRight } from 'lucide-react';
+import {
+  MessageSquare,
+  Send,
+  X,
+  Bot,
+  User,
+  Loader2,
+  Sparkles,
+  ChevronRight,
+  Lock,
+  KeyRound
+} from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useDashboardContext } from '../context/DashboardContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -14,6 +26,7 @@ interface GlowUpCoachProps {
 }
 
 export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
+  const { isLocked, scrollToPricing, onOpenPricing } = useDashboardContext();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -24,6 +37,9 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const userMessages = messages.filter((m) => m.role === 'user');
+  const isGated = isLocked && userMessages.length >= 3;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -36,7 +52,7 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
   }, [messages, isOpen]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (isGated || !input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput('');
@@ -221,58 +237,103 @@ export function GlowUpCoach({ result, isDarkMode }: GlowUpCoachProps) {
             </div>
 
             {/* Input */}
-            <div
-              className={cn(
-                'p-6 border-t',
-                isDarkMode ? 'bg-black/40 border-white/5' : 'bg-white border-zinc-100'
-              )}
-            >
-              <div className="relative">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Ask about your results..."
-                  className={cn(
-                    'w-full pl-6 pr-14 py-4 rounded-2xl text-sm focus:outline-none focus:ring-2 transition-all',
-                    isDarkMode
-                      ? 'bg-white/5 border-white/10 text-white focus:ring-white/20'
-                      : 'bg-zinc-100 border-zinc-200 text-zinc-900 focus:ring-zinc-900/10'
-                  )}
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  className={cn(
-                    'absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all',
-                    input.trim() && !isLoading
-                      ? isDarkMode
-                        ? 'bg-white text-black'
-                        : 'bg-zinc-900 text-white'
-                      : 'opacity-30 cursor-not-allowed'
-                  )}
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {['How to fix asymmetry?', 'Best haircut?', 'Skin routine?'].map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => setInput(q)}
+            {isGated ? (
+              <div
+                className={cn(
+                  'p-6 border-t flex flex-col items-center text-center gap-4 bg-gradient-to-b',
+                  isDarkMode
+                    ? 'from-indigo-950/20 to-black/60 border-white/5'
+                    : 'from-indigo-50/40 to-white border-zinc-100'
+                )}
+              >
+                <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                  <Lock className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <h4
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors',
-                      isDarkMode
-                        ? 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
-                        : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900'
+                      'text-sm font-black uppercase tracking-wider',
+                      isDarkMode ? 'text-white' : 'text-zinc-900'
                     )}
                   >
-                    {q}
-                  </button>
-                ))}
+                    Coach Preview Complete
+                  </h4>
+                  <p
+                    className={cn(
+                      'text-xs mt-1.5 leading-relaxed max-w-[280px]',
+                      isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
+                    )}
+                  >
+                    Unlock your full premium report to get unlimited coaching, attractiveness
+                    trends, and personalized routines.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (onOpenPricing) onOpenPricing();
+                    else scrollToPricing();
+                  }}
+                  className="w-full py-3.5 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
+                >
+                  <KeyRound className="w-4 h-4" />
+                  Unlock Premium Report
+                </button>
               </div>
-            </div>
+            ) : (
+              <div
+                className={cn(
+                  'p-6 border-t',
+                  isDarkMode ? 'bg-black/40 border-white/5' : 'bg-white border-zinc-100'
+                )}
+              >
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                    placeholder="Ask about your results..."
+                    className={cn(
+                      'w-full pl-6 pr-14 py-4 rounded-2xl text-sm focus:outline-none focus:ring-2 transition-all',
+                      isDarkMode
+                        ? 'bg-white/5 border-white/10 text-white focus:ring-white/20'
+                        : 'bg-zinc-100 border-zinc-200 text-zinc-900 focus:ring-zinc-900/10'
+                    )}
+                  />
+                  <button
+                    onClick={handleSend}
+                    disabled={!input.trim() || isLoading}
+                    className={cn(
+                      'absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-xl transition-all',
+                      input.trim() && !isLoading
+                        ? isDarkMode
+                          ? 'bg-white text-black'
+                          : 'bg-zinc-900 text-white'
+                        : 'opacity-30 cursor-not-allowed'
+                    )}
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {['How to fix asymmetry?', 'Best haircut?', 'Skin routine?'].map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => setInput(q)}
+                      className={cn(
+                        'px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors',
+                        isDarkMode
+                          ? 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                          : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900'
+                      )}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

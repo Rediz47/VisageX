@@ -27,25 +27,29 @@ const SEO: React.FC<SEOProps> = ({
   jsonLd
 }) => {
   const fullTitle = title.includes('VisageX') ? title : `${title} | VisageX`;
-  
+
   const defaultSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "VisageX",
-    "url": "https://visagex.online",
-    "image": image,
-    "description": description,
-    "publisher": {
-      "@type": "Organization",
-      "name": "VisageX",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://visagex.online/icon.png"
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'VisageX',
+    url: 'https://visagex.online',
+    image: image,
+    description: description,
+    publisher: {
+      '@type': 'Organization',
+      name: 'VisageX',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://visagex.online/icon.png'
       }
     }
   };
 
-  const schema = jsonLd ? (Array.isArray(jsonLd) ? [defaultSchema, ...jsonLd] : [defaultSchema, jsonLd]) : [defaultSchema];
+  const schema = jsonLd
+    ? Array.isArray(jsonLd)
+      ? [defaultSchema, ...jsonLd]
+      : [defaultSchema, jsonLd]
+    : [defaultSchema];
 
   return (
     <Helmet>
@@ -57,7 +61,14 @@ const SEO: React.FC<SEOProps> = ({
       <meta name="author" content="VisageX" />
       <meta name="application-name" content="VisageX" />
       <meta name="theme-color" content="#050508" />
-      <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'} />
+      <meta
+        name="robots"
+        content={
+          noindex
+            ? 'noindex, nofollow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+        }
+      />
       {canonical && <link rel="canonical" href={canonical} />}
       <link rel="icon" type="image/png" href="/icon.png" />
       <link rel="apple-touch-icon" href="/icon.png" />

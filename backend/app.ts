@@ -25,6 +25,7 @@ export function configureApp(): Promise<typeof app> {
       aiRoutes,
       geometryRoutes,
       paypalRoutes,
+      paddleRoutes,
       referralRoutes,
       emailRoutes,
       authRoutes,
@@ -39,6 +40,7 @@ export function configureApp(): Promise<typeof app> {
       import('./routes/ai.routes.js'),
       import('./routes/geometry.routes.js'),
       import('./routes/paypal.routes.js'),
+      import('./routes/paddle.routes.js'),
       import('./routes/referral.routes.js'),
       import('./routes/email.routes.js'),
       import('./routes/auth.routes.js'),
@@ -48,44 +50,53 @@ export function configureApp(): Promise<typeof app> {
 
     // PostHog Reverse Proxy
     app.use(
-    '/ingest',
-    createProxyMiddleware({
-      target: process.env.VITE_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-      changeOrigin: true,
-      pathRewrite: {
-        '^/ingest': ''
-      }
-    })
-  );
+      '/ingest',
+      createProxyMiddleware({
+        target: process.env.VITE_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/ingest': ''
+        }
+      })
+    );
 
     app.use(
       ['/api/gemini-analysis', '/api/celebrity-lookalike', '/api/hair-analysis'],
       express.json({ limit: '50mb' })
     );
     app.use('/api/scans/save', express.json({ limit: '2mb' }));
+    app.use(
+      '/api/paddle/webhook',
+      express.json({
+        limit: '1mb',
+        verify: (req: any, _res, buf) => {
+          req.rawBody = buf.toString('utf8');
+        }
+      })
+    );
     app.use(express.json({ limit: '1mb' }));
 
-  // Request logging with unique request IDs.
-  // In dev, only log /api/* (skip Vite HMR, static assets, source files that would
-  // otherwise flood stdout and make the terminal unreadable).
-  const isDevServer = process.env.NODE_ENV !== 'production' && !process.env.NETLIFY;
-  app.use((req, res, next) => {
-    const reqId = randomUUID();
-    (req as any).id = reqId;
+    // Request logging with unique request IDs.
+    // In dev, only log /api/* (skip Vite HMR, static assets, source files that would
+    // otherwise flood stdout and make the terminal unreadable).
+    const isDevServer = process.env.NODE_ENV !== 'production' && !process.env.NETLIFY;
+    app.use((req, res, next) => {
+      const reqId = randomUUID();
+      (req as any).id = reqId;
 
-    const url = req.url || '';
-    if (url !== '/api/health' && (!isDevServer || url.startsWith('/api/'))) {
-      console.log(`[${reqId}] ${req.method} ${url}`);
-    }
+      const url = req.url || '';
+      if (url !== '/api/health' && (!isDevServer || url.startsWith('/api/'))) {
+        console.log(`[${reqId}] ${req.method} ${url}`);
+      }
 
-    const originalJson = res.json.bind(res);
-    res.json = function (body) {
-      console.log(`[${reqId}] ${req.method} ${url} → ${res.statusCode}`);
-      return originalJson(body);
-    };
+      const originalJson = res.json.bind(res);
+      res.json = function (body) {
+        console.log(`[${reqId}] ${req.method} ${url} → ${res.statusCode}`);
+        return originalJson(body);
+      };
 
-    next();
-  });
+      next();
+    });
 
     // Security headers
     app.use(
@@ -99,8 +110,8 @@ export function configureApp(): Promise<typeof app> {
               "'self'",
               "'unsafe-inline'",
               "'wasm-unsafe-eval'",
-              'https://www.paypal.com',
-              'https://www.paypalobjects.com',
+              'https://cdn.paddle.com',
+              'https://*.paddle.com',
               'https://us.i.posthog.com',
               'https://challenges.cloudflare.com',
               'https://cdn.jsdelivr.net'
@@ -113,8 +124,9 @@ export function configureApp(): Promise<typeof app> {
               'https://*.firebase.com',
               'https://generativelanguage.googleapis.com',
               'https://us.i.posthog.com',
-              'https://api.paypal.com',
-              'https://api.sandbox.paypal.com',
+              'https://*.paddle.com',
+              'wss://localhost:*',
+              'ws://localhost:*',
               'https://api.resend.com',
               'https://challenges.cloudflare.com',
               'https://cdn.jsdelivr.net',
@@ -123,11 +135,7 @@ export function configureApp(): Promise<typeof app> {
             imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
             styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
             fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-            frameSrc: [
-              'https://www.paypal.com',
-              'https://www.sandbox.paypal.com',
-              'https://challenges.cloudflare.com'
-            ],
+            frameSrc: ['https://*.paddle.com', 'https://challenges.cloudflare.com'],
             workerSrc: ["'self'", 'blob:']
           }
         },
@@ -172,6 +180,7 @@ export function configureApp(): Promise<typeof app> {
     app.use('/api', geometryRoutes.default);
     app.use('/api', aiRoutes.default);
     app.use('/api/paypal', paypalRoutes.default);
+    app.use('/api/paddle', paddleRoutes.default);
     app.use('/api/referral', referralRoutes.default);
     app.use('/api/email', emailRoutes.default);
     app.use('/api/auth', authRoutes.default);

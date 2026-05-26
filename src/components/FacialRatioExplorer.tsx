@@ -76,17 +76,20 @@ export function FacialRatioExplorer({
   //  - After that, scroll stays fully trapped inside the list:
   //    `overscroll-behavior: contain` + `data-lenis-prevent` + stopPropagation
   //    prevent any chaining to the page.
-  const handleRatioWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    const atTop = el.scrollTop <= 0;
-    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-    const shouldReleasePageScroll = (e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom);
-    if (shouldReleasePageScroll) return;
+  const handleRatioWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      const el = e.currentTarget;
+      const atTop = el.scrollTop <= 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+      const shouldReleasePageScroll = (e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom);
+      if (shouldReleasePageScroll) return;
 
-    e.stopPropagation();
-    snappedRef.current = true;
-    centerFaceCard();
-  }, [centerFaceCard]);
+      e.stopPropagation();
+      snappedRef.current = true;
+      centerFaceCard();
+    },
+    [centerFaceCard]
+  );
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const displayIndex = hoverIndex !== null ? hoverIndex : activeIndex;
 
@@ -245,7 +248,9 @@ export function FacialRatioExplorer({
   };
 
   const renderPartiallyBlurredText = (text: string, visibleChunkSize = 4, hiddenChunkSize = 3) => {
-    const words = String(text || '').split(/\s+/).filter(Boolean);
+    const words = String(text || '')
+      .split(/\s+/)
+      .filter(Boolean);
     return words.map((word, idx) => {
       const cycle = visibleChunkSize + hiddenChunkSize;
       const indexInCycle = idx % cycle;
@@ -365,7 +370,13 @@ export function FacialRatioExplorer({
 
               {/* ── Advanced Canvas Overlay — Lerp-smoothed lines at 60fps ── */}
               {points && (
-                <LerpLineCanvas display={display} points={points} viewW={viewW} viewH={viewH} isLocked={isLocked} />
+                <LerpLineCanvas
+                  display={display}
+                  points={points}
+                  viewW={viewW}
+                  viewH={viewH}
+                  isLocked={isLocked}
+                />
               )}
             </motion.div>
 
@@ -389,7 +400,9 @@ export function FacialRatioExplorer({
                       </h4>
                       <p className="text-[10px] text-white/40 mt-0.5">Score</p>
                     </div>
-                    <div className={cn('text-right', isLocked && 'blur-[6px] opacity-50 select-none')}>
+                    <div
+                      className={cn('text-right', isLocked && 'blur-[6px] opacity-50 select-none')}
+                    >
                       <div className="flex items-baseline gap-1">
                         <span
                           className={cn(
@@ -461,7 +474,12 @@ export function FacialRatioExplorer({
                         {group.items.length}
                       </span>
                     </div>
-                    <span className={cn('text-[8px] font-bold tabular-nums', isLocked ? 'blur-[4px] opacity-50 text-zinc-500 select-none' : gColor.text)}>
+                    <span
+                      className={cn(
+                        'text-[8px] font-bold tabular-nums',
+                        isLocked ? 'blur-[4px] opacity-50 text-zinc-500 select-none' : gColor.text
+                      )}
+                    >
                       avg {gAvg.toFixed(1)}
                     </span>
                   </div>
@@ -562,7 +580,9 @@ export function FacialRatioExplorer({
                                   )}
                                 >
                                   {Math.round(
-                                    ((rNum - r.idealRange[0]) / (r.idealRange[1] - r.idealRange[0])) * 100
+                                    ((rNum - r.idealRange[0]) /
+                                      (r.idealRange[1] - r.idealRange[0])) *
+                                      100
                                   )}
                                   %
                                 </span>
@@ -571,7 +591,12 @@ export function FacialRatioExplorer({
                           </div>
 
                           {/* Center: Premium gradient bar with marker */}
-                          <div className={cn('w-24 md:w-32 flex-shrink-0', isLocked && 'blur-[4px] grayscale opacity-40')}>
+                          <div
+                            className={cn(
+                              'w-24 md:w-32 flex-shrink-0',
+                              isLocked && 'blur-[4px] grayscale opacity-40'
+                            )}
+                          >
                             <div
                               className="relative h-[6px] rounded-full"
                               style={{
@@ -585,16 +610,18 @@ export function FacialRatioExplorer({
                                 <div
                                   className="absolute inset-0 rounded-full"
                                   style={{
-                                    background: isLocked ? 'rgba(113,113,122,0.35)' : getBarGradient(r.score),
+                                    background: isLocked
+                                      ? 'rgba(113,113,122,0.35)'
+                                      : getBarGradient(r.score),
                                     opacity: isLocked
                                       ? 0.25
                                       : isActive
-                                      ? isDarkMode
-                                        ? 0.85
-                                        : 0.9
-                                      : isDarkMode
-                                        ? 0.3
-                                        : 0.28,
+                                        ? isDarkMode
+                                          ? 0.85
+                                          : 0.9
+                                        : isDarkMode
+                                          ? 0.3
+                                          : 0.28,
                                     transition: 'opacity 0.2s'
                                   }}
                                 />
@@ -1517,7 +1544,9 @@ export function FacialRatioExplorer({
                             isDarkMode ? 'text-white/60' : 'text-zinc-600'
                           )}
                         >
-                          {isLocked ? renderPartiallyBlurredText(mo.description, 4, 3) : mo.description}
+                          {isLocked
+                            ? renderPartiallyBlurredText(mo.description, 4, 3)
+                            : mo.description}
                         </p>
                       </motion.div>
 

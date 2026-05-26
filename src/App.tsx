@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { usePostHog } from '@posthog/react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Lenis from 'lenis';
 
 // Global State Providers
@@ -30,6 +30,7 @@ const MethodologyPage = lazy(() => import('./pages/MethodologyPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const RefundPage = lazy(() => import('./pages/RefundPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
 const BlogSymmetryPage = lazy(() => import('./pages/BlogSymmetryPage'));
 const BlogAnalysisPage = lazy(() => import('./pages/BlogAnalysisPage'));
 const BlogBestToolPage = lazy(() => import('./pages/BlogBestToolPage'));
@@ -68,6 +69,7 @@ function InnerApp() {
   const posthog = usePostHog();
   const { preset, resetBudget } = useMotionTier();
   const routeLocation = useLocation();
+  const navigate = useNavigate();
   const previousUserRef = React.useRef<string | null | undefined>(undefined);
   const toastTimerRef = React.useRef<number | null>(null);
 
@@ -117,12 +119,12 @@ function InnerApp() {
 
   useEffect(() => {
     const openPricing = () => {
-      setPricingModalOpen(true);
-      posthog.capture('pricing_modal_opened');
+      posthog.capture('pricing_page_opened');
+      navigate('/pricing');
     };
     window.addEventListener('visagex:open-pricing', openPricing);
     return () => window.removeEventListener('visagex:open-pricing', openPricing);
-  }, [posthog]);
+  }, [navigate, posthog]);
 
   // Premium Lenis smooth scroll. Low tier → skip (native scroll).
   useEffect(() => {
@@ -210,8 +212,8 @@ function InnerApp() {
           posthog.capture('auth_modal_opened', { mode });
         }}
         onOpenPricing={() => {
-          setPricingModalOpen(true);
-          posthog.capture('pricing_modal_opened');
+          posthog.capture('pricing_page_opened');
+          navigate('/pricing');
         }}
       />
 
@@ -271,7 +273,7 @@ function InnerApp() {
                     path="/"
                     element={
                       <Landing
-                        onOpenPricing={() => setPricingModalOpen(true)}
+                        onOpenPricing={() => navigate('/pricing')}
                         onOpenAuth={() => setAuthModalOpen(true)}
                         setAuthMode={setAuthMode}
                       />
@@ -281,6 +283,7 @@ function InnerApp() {
                   <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/refund" element={<RefundPage />} />
+                  <Route path="/pricing" element={<PricingPage />} />
                   <Route path="/blog/how-to-improve-face-symmetry" element={<BlogSymmetryPage />} />
                   <Route path="/blog/ai-face-analysis-explained" element={<BlogAnalysisPage />} />
                   <Route path="/blog/best-ai-face-analysis-tool" element={<BlogBestToolPage />} />
@@ -380,14 +383,28 @@ function InnerApp() {
                   <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-emerald-400 ring-4 ring-zinc-950/80" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${isDarkMode ? 'text-cyan-300' : 'text-indigo-500'}`}>
+                  <p
+                    className={`text-[10px] font-black uppercase tracking-[0.28em] ${isDarkMode ? 'text-cyan-300' : 'text-indigo-500'}`}
+                  >
                     Signed in
                   </p>
-                  <h3 className={`mt-1 truncate text-lg font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}>
+                  <h3
+                    className={`mt-1 truncate text-lg font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-zinc-950'}`}
+                  >
                     Welcome back, {userLabel}
                   </h3>
-                  <p className={`mt-1 text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                    Your account is active. You have <span className={isDarkMode ? 'font-bold text-amber-300' : 'font-bold text-amber-600'}>{credits}</span> credits ready.
+                  <p
+                    className={`mt-1 text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
+                  >
+                    Your account is active. You have{' '}
+                    <span
+                      className={
+                        isDarkMode ? 'font-bold text-amber-300' : 'font-bold text-amber-600'
+                      }
+                    >
+                      {credits}
+                    </span>{' '}
+                    credits ready.
                   </p>
                 </div>
                 <button
