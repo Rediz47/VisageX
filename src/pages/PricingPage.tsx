@@ -504,7 +504,7 @@ export default function PricingPage() {
         <AnimatePresence>
           {selectedPlan && selectedPaddleId && clientToken && (
             <motion.div
-              className="fixed inset-0 z-[120] p-3 sm:p-6"
+              className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -520,7 +520,7 @@ export default function PricingPage() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 18, scale: 0.985 }}
                 transition={{ duration: 0.45, ease: easeOut }}
-                className={`relative mx-auto mt-4 max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border shadow-2xl sm:mt-8 ${
+                className={`relative z-10 mx-auto max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border shadow-2xl ${
                   isDarkMode ? 'border-white/10 bg-[#0b0b0d]' : 'border-zinc-200 bg-white'
                 }`}
               >
