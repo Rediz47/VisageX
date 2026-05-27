@@ -87,8 +87,8 @@ graph TD
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/visagex.git
-   cd visagex
+   git clone https://github.com/Rediz47/VisageX.git
+   cd VisageX
    ```
 
 2. **Install dependencies**:
