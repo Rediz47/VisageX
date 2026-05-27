@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowLeft,
   ArrowRight,
   Check,
+  LockKeyhole,
   ShieldCheck,
   Sparkles,
   Star,
-  TrendingUp,
   X
 } from 'lucide-react';
 import { usePostHog } from '@posthog/react';
@@ -26,86 +26,66 @@ import type { CheckoutCompleteData } from '../../lib/paddle-types';
 interface Plan {
   id: 'price_single' | 'price_basic' | 'price_pro' | 'price_elite';
   name: string;
-  eyebrow: string;
   fallbackPrice: string;
   credits: number;
   description: string;
-  note: string;
   cta: string;
-  valueLine: string;
+  badge?: string;
+  note?: string;
+  kicker?: string;
+  trustLine?: string;
+  accent: 'slate' | 'indigo' | 'cyan' | 'amber';
   recommended?: boolean;
-  features: string[];
 }
 
 const PLANS: Plan[] = [
   {
     id: 'price_single',
-    name: 'Quick Scan',
-    eyebrow: 'Try it once',
+    name: '1 Scan',
     fallbackPrice: '$1.49',
     credits: 1,
-    description: 'Get a clear snapshot of how your face looks today.',
-    note: 'One-time payment. Private results.',
-    cta: 'Analyze My Face',
-    valueLine: 'Quick benchmark',
-    features: [
-      'See your current attractiveness signals',
-      'Find your strongest facial features',
-      'Understand your facial balance',
-      'Save a private glow-up report'
-    ]
+    description: 'Try VisageX once and get your first full report.',
+    cta: 'Buy 1 Scan',
+    kicker: 'Good for first-time users',
+    trustLine: 'Lowest commitment',
+    accent: 'slate'
   },
   {
     id: 'price_basic',
-    name: 'Glow-Up',
-    eyebrow: 'Most popular',
+    name: '5 Scans',
     fallbackPrice: '$4.99',
     credits: 5,
-    description: 'Track visible improvement and know exactly what changed.',
-    note: 'Only about $1 per scan.',
-    cta: 'Start My Glow-Up',
-    valueLine: 'Best deal for most people',
-    recommended: true,
-    features: [
-      'Track your glow-up week by week',
-      'Compare hairstyle, skin, and grooming changes',
-      'See how attractive your facial balance looks',
-      'Get clear improvement priorities'
-    ]
+    description: 'Best for most people. Track changes over time.',
+    cta: 'Buy 5 Scans',
+    badge: 'Most popular',
+    kicker: 'Best value for most buyers',
+    trustLine: 'Most people start here',
+    accent: 'indigo',
+    recommended: true
   },
   {
     id: 'price_pro',
-    name: 'Serious Progress',
-    eyebrow: 'Lowest per scan',
+    name: '15 Scans',
     fallbackPrice: '$12.99',
     credits: 15,
-    description: 'Build a real month-by-month transformation record.',
-    note: 'Save big vs single scans.',
-    cta: 'Track My Progress',
-    valueLine: 'About $0.87 per scan',
-    features: [
-      'Monitor your face improvement over time',
-      'Compare routines and photo conditions',
-      'Spot trends in symmetry and structure',
-      'Create a long-term progress history'
-    ]
+    description: 'For serious progress tracking and before/after testing.',
+    cta: 'Buy 15 Scans',
+    note: '$0.87 per scan',
+    kicker: 'Built for longer tracking',
+    trustLine: 'Best for a full routine cycle',
+    accent: 'cyan'
   },
   {
     id: 'price_elite',
-    name: 'Creator Pro',
-    eyebrow: 'For content & coaching',
+    name: '50 Scans',
     fallbackPrice: '$29.99',
     credits: 50,
-    description: 'For creators, coaches, and people documenting serious glow-ups.',
-    note: 'Premium bulk pack.',
-    cta: 'Unlock Creator Pack',
-    valueLine: 'Only $0.60 per scan',
-    features: [
-      'Create before/after glow-up content',
-      'Track multiple transformations',
-      'Use AI coach recommendations',
-      'Export private progress reports'
-    ]
+    description: 'Best for creators, coaches, and heavy use.',
+    cta: 'Buy 50 Scans',
+    note: '$0.60 per scan',
+    kicker: 'Best for bulk use',
+    trustLine: 'Highest savings per scan',
+    accent: 'amber'
   }
 ];
 
@@ -152,20 +132,22 @@ export default function PricingPage() {
   const openCheckout = useCallback(
     (plan: Plan) => {
       const priceId = PADDLE_PRICE_IDS[plan.id];
+
       if (!user?.uid) {
-        setCheckoutError(
-          'Please sign in before checkout so your credits can be added to your account.'
-        );
+        setCheckoutError('Please sign in before checkout so your credits go to your account.');
         return;
       }
+
       if (!clientToken) {
-        setCheckoutError('Paddle checkout is not configured. Missing client token.');
+        setCheckoutError('Paddle checkout is not configured.');
         return;
       }
+
       if (!priceId) {
         setCheckoutError(`Missing Paddle price ID for ${plan.name}.`);
         return;
       }
+
       setCheckoutError(null);
       setCheckoutComplete(false);
       setCreditsBeforeCheckout(credits);
@@ -189,9 +171,7 @@ export default function PricingPage() {
       setCheckoutError(null);
 
       if (!data.transactionId) {
-        setCheckoutError(
-          'Payment completed, but Paddle did not return a transaction ID. Please contact support.'
-        );
+        setCheckoutError('Payment completed, but the transaction could not be verified.');
         return;
       }
 
@@ -206,10 +186,12 @@ export default function PricingPage() {
           const body = await response.json().catch(() => null);
           throw new Error(body?.error || 'Unable to verify Paddle transaction.');
         }
-      } catch (error: any) {
-        setCheckoutError(
-          error?.message || 'Payment completed, but credits could not be added automatically.'
-        );
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Payment completed, but credits could not be added automatically.';
+        setCheckoutError(message);
       }
     },
     [posthog]
@@ -219,292 +201,261 @@ export default function PricingPage() {
     creditsBeforeCheckout !== null && selectedPlan
       ? creditsBeforeCheckout + selectedPlan.credits
       : null;
+
   const creditsApplied =
     checkoutComplete &&
     expectedCreditsAfterCheckout !== null &&
     credits >= expectedCreditsAfterCheckout;
 
   useEffect(() => {
-    if (creditsApplied) {
-      fireConfetti();
-    }
+    if (creditsApplied) fireConfetti();
   }, [creditsApplied]);
 
-  const pageBg = isDarkMode ? 'bg-[#070708]' : 'bg-[#fbfbfc]';
-  const panel = isDarkMode ? 'bg-[#101012] border-white/10' : 'bg-white border-zinc-200';
-  const title = isDarkMode ? 'text-zinc-50' : 'text-zinc-950';
-  const muted = isDarkMode ? 'text-zinc-400' : 'text-zinc-500';
-  const faint = isDarkMode ? 'text-zinc-600' : 'text-zinc-400';
+  useEffect(() => {
+    if (!selectedPlan) return;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedPlan]);
+
+  const pageBg = isDarkMode
+    ? 'bg-[#0b0b0c] text-white'
+    : 'bg-[linear-gradient(180deg,#fafafe_0%,#f4f4f7_100%)] text-zinc-950';
+  const card = isDarkMode
+    ? 'border-white/10 bg-[#151517]'
+    : 'border-zinc-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)]';
+  const muted = isDarkMode ? 'text-zinc-400' : 'text-zinc-600';
+  const faint = isDarkMode ? 'text-zinc-500' : 'text-zinc-500';
+  const title = isDarkMode ? 'text-white' : 'text-zinc-950';
+  const featuredCard = isDarkMode
+    ? 'border-violet-400/30 bg-gradient-to-b from-violet-600 to-purple-800 text-white shadow-[0_24px_80px_rgba(124,58,237,0.35)]'
+    : 'border-violet-500 bg-gradient-to-b from-violet-600 to-purple-800 text-white shadow-[0_24px_80px_rgba(124,58,237,0.32)]';
+  const normalCard = isDarkMode
+    ? 'border-white/8 bg-[#171719] text-white shadow-[0_20px_50px_rgba(0,0,0,0.25)]'
+    : 'border-zinc-200 bg-[#171719] text-white shadow-[0_20px_50px_rgba(0,0,0,0.18)]';
 
   return (
     <>
       <Helmet>
-        <title>Pricing — VisageX</title>
+        <title>Pricing - VisageX</title>
         <meta
           name="description"
-          content="Simple one-time scan credits for VisageX face analysis."
+          content="Buy one-time VisageX scan credits and start your face analysis instantly."
         />
       </Helmet>
 
-      <div className={`min-h-screen ${pageBg} px-4 pb-20 pt-6 sm:px-6`}>
-        <div className="mx-auto max-w-6xl">
-          <button
-            onClick={() => navigate('/')}
-            className={`mb-14 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              isDarkMode
-                ? 'border-white/10 text-zinc-400 hover:border-white/20 hover:text-white'
-                : 'border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900'
-            }`}
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back
-          </button>
+      <div className={`min-h-screen ${pageBg}`}>
+        <div className="mx-auto max-w-6xl px-4 pb-24 pt-6 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <button
+              onClick={() => navigate('/')}
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] ${card}`}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back
+            </button>
 
-          <motion.header
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: easeOut }}
-            className="mx-auto mb-8 max-w-3xl text-center"
-          >
-            <p className={`text-xs font-semibold uppercase tracking-[0.22em] ${faint}`}>
-              Glow-up scan credits
-            </p>
-            <h1 className={`mt-4 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl ${title}`}>
-              Track your face improvement with AI.
-            </h1>
-            <p className={`mx-auto mt-4 max-w-lg text-sm leading-6 ${muted}`}>
-              See what changed, what improved, and what to work on next. One-time credits. No
-              subscription.
-            </p>
-          </motion.header>
-
-          <div className="mx-auto mb-8 grid max-w-3xl grid-cols-3 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] text-center shadow-2xl shadow-indigo-950/10">
-            {[
-              ['42,000+', 'scans completed'],
-              ['71', 'countries'],
-              ['4.8/5', 'avg rating']
-            ].map(([value, label]) => (
-              <div key={label} className="border-r border-white/10 px-3 py-4 last:border-r-0">
-                <div className={`text-xl font-semibold tracking-[-0.03em] ${title}`}>{value}</div>
-                <div className={`mt-1 text-[11px] uppercase tracking-[0.14em] ${faint}`}>
-                  {label}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <motion.section
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: easeOut }}
-            className={`relative mx-auto mb-12 overflow-hidden rounded-[2rem] border p-5 shadow-2xl md:p-6 ${isDarkMode ? 'border-indigo-400/15 bg-white/[0.035] shadow-indigo-950/20' : 'border-indigo-100 bg-white shadow-indigo-100/60'}`}
-          >
-            <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-violet-500/20 blur-3xl" />
-            <div className="grid items-center gap-6 md:grid-cols-[1fr_1.25fr]">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  Example progress report
-                </div>
-                <h2 className={`mt-4 text-2xl font-semibold tracking-[-0.04em] ${title}`}>
-                  Know if your glow-up is actually working.
-                </h2>
-                <p className={`mt-3 text-sm leading-6 ${muted}`}>
-                  Compare scans over time, spot visible changes, and turn vague self-improvement
-                  into a simple progress timeline.
-                </p>
-                <div className="mt-5 grid gap-2 text-sm">
-                  {[
-                    'Track facial balance changes',
-                    'Compare skincare, haircut, and grooming',
-                    'Build confidence with measurable progress'
-                  ].map((item) => (
-                    <div key={item} className={`flex items-center gap-2 ${muted}`}>
-                      <Check className="h-4 w-4 text-emerald-500" />
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="relative rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
-                <div className="grid grid-cols-3 gap-3">
-                  {['Start', 'Week 2', 'Week 4'].map((label, idx) => (
-                    <div
-                      key={label}
-                      className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-800 to-zinc-950 p-3"
-                    >
-                      <div className="mx-auto h-20 w-16 rounded-full bg-gradient-to-b from-zinc-500/60 to-zinc-800 blur-[1px]" />
-                      <div className="mt-3 text-center text-[11px] font-semibold text-zinc-400">
-                        {label}
-                      </div>
-                      <div className="mt-1 text-center text-xs font-bold text-emerald-400">
-                        +{idx * 9}% balance
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 rounded-2xl bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">
-                  +18% facial balance improvement detected
-                </div>
-              </div>
+            <div
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold ${card}`}
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+              <span className={muted}>Credits</span>
+              <span className={title}>{credits}</span>
             </div>
-          </motion.section>
-
-          <div className="mx-auto mb-8 grid max-w-4xl gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              'Track facial improvements',
-              'Compare hairstyle changes',
-              'Improve symmetry awareness',
-              'Monitor skincare progress',
-              'Build confidence',
-              'Create glow-up content'
-            ].map((reason) => (
-              <div
-                key={reason}
-                className={`flex items-center gap-2 rounded-2xl border px-4 py-3 ${isDarkMode ? 'border-white/10 bg-white/[0.025] text-zinc-300' : 'border-zinc-200 bg-white text-zinc-600'}`}
-              >
-                <Sparkles className="h-4 w-4 text-violet-500" />
-                {reason}
-              </div>
-            ))}
           </div>
+
+          <section className="mx-auto max-w-3xl pt-14 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, ease: easeOut }}
+            >
+              <div
+                className={`mx-auto inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] ${
+                  isDarkMode
+                    ? 'border-indigo-400/20 bg-indigo-400/8 text-indigo-100'
+                    : 'border-indigo-200 bg-indigo-50 text-indigo-700'
+                }`}
+              >
+                No subscription
+              </div>
+
+              <h1
+                className={`mt-6 font-display text-5xl font-black tracking-[-0.06em] sm:text-6xl ${title}`}
+              >
+                Buy scans.
+                <span className="block">Get results instantly.</span>
+              </h1>
+
+              <p className={`mx-auto mt-5 max-w-2xl text-base leading-7 ${muted}`}>
+                Simple one-time pricing for face analysis. The more scans you buy, the easier it is
+                to track real progress.
+              </p>
+
+              {!user && (
+                <p className="mt-4 text-sm font-semibold text-amber-500 dark:text-amber-400">
+                  Sign in first so your credits are added to your account.
+                </p>
+              )}
+            </motion.div>
+          </section>
 
           {checkoutError && !selectedPlan && (
-            <div className="mx-auto mb-6 max-w-xl rounded-2xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-600 dark:text-amber-300">
+            <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-400">
               {checkoutError}
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-4">
-            {PLANS.map((plan, index) => {
-              const paddleId = PADDLE_PRICE_IDS[plan.id];
-              const price = paddleId ? prices[paddleId]?.total : undefined;
-              const isFeatured = Boolean(plan.recommended);
+          <section className="mt-14">
+            <div className="grid gap-5 lg:grid-cols-4">
+              {PLANS.map((plan, index) => {
+                const paddleId = PADDLE_PRICE_IDS[plan.id];
+                const price = paddleId ? prices[paddleId]?.total : undefined;
+                const isFeatured = Boolean(plan.recommended);
+                const cardTheme = isFeatured ? featuredCard : normalCard;
 
-              return (
-                <motion.article
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: isFeatured ? -12 : 0 }}
-                  whileHover={{ y: isFeatured ? -18 : -6, rotateX: isFeatured ? 1.5 : 0 }}
-                  transition={{ duration: 0.55, delay: index * 0.06, ease: easeOut }}
-                  className={`relative rounded-[1.75rem] border p-6 shadow-sm transition-all md:p-7 ${
-                    isFeatured
-                      ? isDarkMode
-                        ? 'scale-[1.03] border-violet-400/50 bg-[#121018] shadow-2xl shadow-violet-950/50 ring-2 ring-violet-400/30'
-                        : 'scale-[1.03] border-violet-300 bg-white shadow-2xl shadow-violet-200/70 ring-2 ring-violet-200'
-                      : isDarkMode
-                        ? `${panel} shadow-black/20`
-                        : `${panel} shadow-zinc-200/60`
-                  }`}
-                >
-                  {isFeatured && (
-                    <div className="absolute -top-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-white shadow-lg shadow-violet-500/30">
-                      <Star className="h-3 w-3 fill-white" />
-                      Most popular
-                    </div>
-                  )}
-
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p
-                        className={`text-xs font-semibold uppercase tracking-[0.12em] ${isFeatured ? 'text-violet-400' : faint}`}
-                      >
-                        {plan.eyebrow}
-                      </p>
-                      <h2 className={`mt-2 text-2xl font-semibold tracking-[-0.03em] ${title}`}>
-                        {plan.name}
-                      </h2>
-                    </div>
-                    <div
-                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${isFeatured ? 'bg-violet-500/15 text-violet-300' : isDarkMode ? 'bg-white/5 text-zinc-300' : 'bg-zinc-100 text-zinc-600'}`}
-                    >
-                      {plan.credits} scan{plan.credits > 1 ? 's' : ''}
-                    </div>
-                  </div>
-
-                  <div className="mt-7 flex items-end gap-2">
-                    {pricesLoading && !price ? (
-                      <div
-                        className={`h-10 w-24 animate-pulse rounded-xl ${isDarkMode ? 'bg-white/10' : 'bg-zinc-100'}`}
-                      />
-                    ) : (
-                      <span className={`text-5xl font-semibold tracking-[-0.05em] ${title}`}>
-                        {price || plan.fallbackPrice}
-                      </span>
+                return (
+                  <motion.article
+                    key={plan.id}
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.05, ease: easeOut }}
+                    whileHover={{ y: -6 }}
+                    className={`relative flex h-full min-h-[430px] flex-col rounded-xl border p-5 transition-transform ${cardTheme}`}
+                  >
+                    {isFeatured && (
+                      <div className="pointer-events-none absolute right-5 top-4 h-10 w-16 rounded-full border-t border-white/60 opacity-80 rotate-12" />
                     )}
-                    <span className={`pb-2 text-xs ${faint}`}>one-time</span>
+                    <div className="flex min-h-[1.75rem] items-start justify-between gap-3">
+                      <p className="text-xs font-medium text-zinc-300">{plan.name}</p>
+                      {plan.badge && (
+                        <div className="rounded-full bg-white px-3 py-1 text-[10px] font-bold text-violet-700 shadow-sm">
+                          Popular
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4 flex items-end gap-1">
+                      {pricesLoading && !price ? (
+                        <div className="h-10 w-24 animate-pulse rounded-xl bg-white/10" />
+                      ) : (
+                        <span className="text-4xl font-semibold tracking-[-0.05em] text-white">
+                          {price || plan.fallbackPrice}
+                        </span>
+                      )}
+                      <span className="pb-1 text-xs font-medium text-zinc-300">/ scan</span>
+                    </div>
+
+                    <p className="mt-1 text-xs text-zinc-300">{plan.description}</p>
+
+                    <div className="my-5 h-px bg-white/10" />
+
+                    {plan.kicker && (
+                      <p className="mb-4 text-xs font-semibold text-zinc-200">{plan.kicker}</p>
+                    )}
+
+                    <ul className="space-y-2.5">
+                      {[
+                        `${plan.credits} face scan${plan.credits > 1 ? 's' : ''}`,
+                        plan.note || plan.trustLine || 'Instant full report',
+                        'AI face attractiveness report',
+                        'Symmetry and feature insights',
+                        'Private results',
+                        'Discord community support'
+                      ].map((feature) => (
+                        <li
+                          key={feature}
+                          className={`flex items-center gap-2 text-xs text-zinc-100 ${isFeatured ? 'font-semibold' : ''}`}
+                        >
+                          <Check className="h-3.5 w-3.5 shrink-0 rounded-sm bg-white text-zinc-950 p-0.5" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={() => openCheckout(plan)}
+                      className={`mt-auto flex w-full items-center justify-center gap-2 rounded-full border px-5 py-3 text-xs font-medium transition-all hover:-translate-y-0.5 ${
+                        isFeatured
+                          ? 'border-white bg-white text-zinc-950 hover:bg-zinc-100'
+                          : 'border-white/30 bg-transparent text-white hover:border-white hover:bg-white/10'
+                      }`}
+                    >
+                      <span>Get Started</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className={`mt-14 rounded-[2rem] border p-6 sm:p-8 ${card}`}>
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div>
+                <h3 className={`text-2xl font-black tracking-[-0.04em] ${title}`}>
+                  Why people buy more than one scan
+                </h3>
+                <div className="mt-5 space-y-4">
+                  {[
+                    'Track whether your haircut, skincare, or weight-loss changes are working',
+                    'Compare results over time instead of guessing from photos',
+                    'Get the same premium analysis every time you scan'
+                  ].map((item) => (
+                    <div key={item} className={`flex items-start gap-3 text-sm leading-6 ${muted}`}>
+                      <Check className="mt-1 h-4 w-4 shrink-0 text-indigo-500 dark:text-emerald-400" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  {
+                    title: 'Secure checkout',
+                    text: 'Paddle handles payment and tax inside checkout.',
+                    icon: ShieldCheck
+                  },
+                  {
+                    title: 'No subscription',
+                    text: 'One payment. No renewal. No surprise charges.',
+                    icon: LockKeyhole
+                  },
+                  {
+                    title: 'Instant delivery',
+                    text: 'Credits go straight to your account after purchase.',
+                    icon: Sparkles
+                  },
+                  {
+                    title: 'Easy to use',
+                    text: 'Buy credits, scan, and get your report in minutes.',
+                    icon: Star
+                  }
+                ].map((item) => (
+                  <div key={item.title} className={`rounded-2xl border p-5 ${card}`}>
+                    <item.icon className="h-5 w-5 text-indigo-500 dark:text-amber-400" />
+                    <p className={`mt-3 text-sm font-bold ${title}`}>{item.title}</p>
+                    <p className={`mt-2 text-sm leading-6 ${muted}`}>{item.text}</p>
                   </div>
-                  <div
-                    className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${isFeatured ? 'bg-emerald-500/10 text-emerald-400' : isDarkMode ? 'bg-white/5 text-zinc-400' : 'bg-zinc-100 text-zinc-500'}`}
-                  >
-                    {plan.valueLine}
-                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
 
-                  <p className={`mt-5 min-h-[60px] text-sm leading-6 ${muted}`}>
-                    {plan.description}
-                  </p>
-
-                  <div className={`my-6 h-px ${isDarkMode ? 'bg-white/10' : 'bg-zinc-200'}`} />
-
-                  <ul className="space-y-3">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className={`flex gap-2.5 text-sm ${muted}`}>
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => openCheckout(plan)}
-                    className={`mt-8 flex w-full items-center justify-center gap-2 rounded-full px-4 py-3.5 text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] ${
-                      isFeatured
-                        ? 'bg-gradient-to-r from-violet-500 via-fuchsia-500 to-indigo-500 text-white shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40'
-                        : isDarkMode
-                          ? 'bg-white/7 text-white ring-1 ring-white/10 hover:bg-white/12'
-                          : 'bg-zinc-950 text-white hover:bg-zinc-800'
-                    }`}
-                  >
-                    {plan.cta}
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-
-                  <p className={`mt-4 text-center text-xs ${faint}`}>{plan.note}</p>
-                  <div className={`mt-3 flex flex-wrap justify-center gap-2 text-[10px] ${faint}`}>
-                    <span>Instant results</span>
-                    <span>•</span>
-                    <span>No subscription</span>
-                    <span>•</span>
-                    <span>Private analysis</span>
-                  </div>
-                </motion.article>
-              );
-            })}
-          </div>
-
-          <div
-            className={`mx-auto mt-12 flex max-w-xl items-center justify-center gap-2 rounded-full border px-4 py-2 text-xs ${
-              isDarkMode ? 'border-white/10 text-zinc-500' : 'border-zinc-200 text-zinc-500'
-            }`}
-          >
-            <ShieldCheck className="h-4 w-4 text-emerald-500" />
-            Secure checkout by Paddle. Taxes are calculated inside checkout.
-          </div>
-
-          <div className={`mx-auto mt-4 text-center text-[10px] uppercase font-bold tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          <div className={`mx-auto mt-10 text-center text-xs font-semibold ${faint}`}>
             Need custom or enterprise pricing?{' '}
-            <a href="mailto:support@visagex.online" className="text-indigo-500 hover:text-indigo-400 transition-colors underline">
+            <a
+              href="mailto:support@visagex.online"
+              className="text-indigo-500 underline transition-colors hover:text-indigo-400"
+            >
               Contact support
-            </a>{' '}
-            to request our downloadable custom enterprise sheet.
+            </a>
           </div>
         </div>
 
         <AnimatePresence>
           {selectedPlan && selectedPaddleId && clientToken && (
             <motion.div
-              className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-6"
+              className="checkout-scrollbar fixed inset-0 z-[120] flex items-start justify-center overflow-y-auto px-3 pb-6 pt-3 sm:px-5 sm:pt-5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -512,32 +463,30 @@ export default function PricingPage() {
               <button
                 aria-label="Close checkout"
                 onClick={closeCheckout}
-                className="absolute inset-0 h-full w-full bg-zinc-950/65 backdrop-blur-md"
+                className="absolute inset-0 h-full w-full bg-black/70 backdrop-blur-sm"
               />
 
               <motion.section
-                initial={{ opacity: 0, y: 28, scale: 0.985 }}
+                initial={{ opacity: 0, y: 22, scale: 0.99 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 18, scale: 0.985 }}
-                transition={{ duration: 0.45, ease: easeOut }}
-                className={`relative z-10 mx-auto max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border shadow-2xl ${
-                  isDarkMode ? 'border-white/10 bg-[#0b0b0d]' : 'border-zinc-200 bg-white'
-                }`}
+                exit={{ opacity: 0, y: 12, scale: 0.99 }}
+                transition={{ duration: 0.4, ease: easeOut }}
+                className={`checkout-scrollbar relative z-10 mx-auto max-h-[calc(100vh-1.5rem)] w-full max-w-[1180px] overflow-y-auto rounded-[1.75rem] border ${card}`}
               >
                 <div
-                  className={`sticky top-0 z-10 flex items-center justify-between border-b px-5 py-4 backdrop-blur-xl sm:px-7 ${
-                    isDarkMode ? 'border-white/10 bg-[#0b0b0d]/85' : 'border-zinc-200 bg-white/85'
-                  }`}
+                  className={`sticky top-0 z-10 flex items-center justify-between border-b px-5 py-4 backdrop-blur-xl ${isDarkMode ? 'border-white/10 bg-[#0a0a0c]/90' : 'border-zinc-200 bg-white/90'}`}
                 >
                   <div>
-                    <p className={`text-xs font-medium ${faint}`}>Checkout</p>
-                    <h2 className={`text-lg font-semibold tracking-[-0.02em] ${title}`}>
-                      {selectedPlan.name} · {selectedPlan.credits} scans
+                    <p className={`text-[11px] font-bold uppercase tracking-[0.16em] ${faint}`}>
+                      Checkout
+                    </p>
+                    <h2 className={`mt-1 text-lg font-black ${title}`}>
+                      {selectedPlan.name} - {selectedPlan.credits} credits
                     </h2>
                   </div>
                   <button
                     onClick={closeCheckout}
-                    className={`rounded-full p-2 transition-colors ${isDarkMode ? 'text-zinc-400 hover:bg-white/10 hover:text-white' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}`}
+                    className={`rounded-full p-2 ${isDarkMode ? 'text-zinc-400 hover:bg-white/10 hover:text-white' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}`}
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -547,59 +496,31 @@ export default function PricingPage() {
                   {checkoutComplete ? (
                     <motion.div
                       key="success"
-                      initial={{ opacity: 0, y: 12 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                       className="px-6 py-16 text-center"
                     >
-                      <div
-                        className={`mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full text-white ${creditsApplied ? 'bg-emerald-500' : 'bg-indigo-500'}`}
-                      >
+                      <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white">
                         {creditsApplied ? (
-                          <Check className="h-6 w-6" />
+                          <Check className="h-7 w-7" />
                         ) : (
                           <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                         )}
                       </div>
-                      <h3 className={`text-2xl font-semibold tracking-[-0.03em] ${title}`}>
+                      <h3 className={`text-3xl font-black tracking-[-0.04em] ${title}`}>
                         {creditsApplied ? 'Credits added' : 'Payment received'}
                       </h3>
-                      <p className={`mx-auto mt-2 max-w-sm text-sm ${muted}`}>
+                      <p className={`mx-auto mt-3 max-w-md text-sm leading-6 ${muted}`}>
                         {creditsApplied
-                          ? `Your balance is now ${credits} credits. You can start a new analysis now.`
+                          ? `Your balance is now ${credits} credits.`
                           : checkoutError ||
-                            'Paddle confirmed your payment. Waiting for the secure webhook to add credits to your account...'}
+                            'We are waiting for payment confirmation to finish adding your credits.'}
                       </p>
-                      <div
-                        className={`mx-auto mt-5 max-w-xs rounded-2xl border px-4 py-3 text-sm ${isDarkMode ? 'border-white/10 bg-white/[0.03]' : 'border-zinc-200 bg-zinc-50'}`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className={muted}>Current balance</span>
-                          <span className={`font-semibold ${title}`}>{credits}</span>
-                        </div>
-                        {expectedCreditsAfterCheckout !== null && (
-                          <div className="mt-2 flex items-center justify-between">
-                            <span className={muted}>Expected balance</span>
-                            <span className={`font-semibold ${title}`}>
-                              {expectedCreditsAfterCheckout}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      {creditsApplied ? (
-                        <button
-                          onClick={() => navigate('/')}
-                          className="mt-7 inline-flex items-center gap-2 rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
-                        >
-                          Start analysis
-                          <ArrowRight className="h-4 w-4" />
-                        </button>
-                      ) : (
-                        <p className={`mx-auto mt-5 max-w-sm text-xs leading-5 ${faint}`}>
-                          If this stays here, add PADDLE_API_KEY to the backend or fix your Paddle
-                          webhook URL/secret.
-                        </p>
-                      )}
+                      <button onClick={() => navigate('/')} className="btn-primary mt-8">
+                        Start analysis
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
                     </motion.div>
                   ) : (
                     <motion.div
@@ -607,119 +528,85 @@ export default function PricingPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="grid gap-0 lg:grid-cols-[360px_1fr]"
+                      className="grid gap-0 lg:grid-cols-[360px_minmax(0,1fr)]"
                     >
                       <aside
-                        className={`relative overflow-hidden border-b p-6 lg:border-b-0 lg:border-r lg:p-7 ${isDarkMode ? 'border-white/10 bg-white/[0.015]' : 'border-zinc-200 bg-zinc-50/40'}`}
+                        className={`relative overflow-hidden border-b p-6 lg:border-b-0 lg:border-r lg:p-7 ${isDarkMode ? 'border-white/10 bg-gradient-to-b from-white/[0.045] to-white/[0.015]' : 'border-zinc-200 bg-zinc-50/70'}`}
                       >
-                        <div className="pointer-events-none absolute -right-20 -top-20 h-44 w-44 rounded-full bg-indigo-500/10 blur-3xl" />
+                        <div className="pointer-events-none absolute -left-20 -top-20 h-44 w-44 rounded-full bg-violet-500/15 blur-3xl" />
+                        <div className="pointer-events-none absolute -bottom-20 right-0 h-44 w-44 rounded-full bg-cyan-500/10 blur-3xl" />
                         <div className="relative">
-                          <div className="flex items-center justify-between gap-3">
-                            <p
-                              className={`text-xs font-semibold uppercase tracking-[0.18em] ${faint}`}
-                            >
-                              Selected plan
-                            </p>
-                            <span
-                              className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${selectedPlan.recommended ? 'bg-indigo-500/10 text-indigo-500' : isDarkMode ? 'bg-white/5 text-zinc-300' : 'bg-white text-zinc-600 ring-1 ring-zinc-200'}`}
-                            >
-                              {selectedPlan.recommended ? 'Recommended' : selectedPlan.eyebrow}
-                            </span>
-                          </div>
-
-                          <h3 className={`mt-4 text-4xl font-semibold tracking-[-0.05em] ${title}`}>
+                          <p
+                            className={`text-[11px] font-bold uppercase tracking-[0.16em] ${faint}`}
+                          >
+                            Order summary
+                          </p>
+                          <h3 className={`mt-3 text-3xl font-black ${title}`}>
                             {selectedPlan.name}
                           </h3>
                           <p className={`mt-3 text-sm leading-6 ${muted}`}>
                             {selectedPlan.description}
                           </p>
 
-                          <div
-                            className={`mt-6 rounded-[1.35rem] border p-4 shadow-sm ${isDarkMode ? 'border-white/10 bg-black/20' : 'border-zinc-200 bg-white'}`}
-                          >
-                            <div className="flex items-end justify-between">
-                              <div>
-                                <span className={`text-sm font-medium ${muted}`}>Today</span>
-                                <p className={`mt-1 text-xs ${faint}`}>One payment. No renewal.</p>
-                              </div>
-                              <span
-                                className={`text-4xl font-semibold tracking-[-0.05em] ${title}`}
-                              >
+                          <div className={`mt-6 rounded-2xl border p-4 ${card}`}>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={muted}>Price</span>
+                              <span className={`font-bold ${title}`}>
                                 {prices[selectedPaddleId]?.total || selectedPlan.fallbackPrice}
                               </span>
                             </div>
-                            <div
-                              className={`mt-4 grid grid-cols-2 gap-2 border-t pt-4 ${isDarkMode ? 'border-white/10' : 'border-zinc-100'}`}
-                            >
-                              <div>
-                                <p className={`text-[11px] uppercase tracking-[0.14em] ${faint}`}>
-                                  Credits
-                                </p>
-                                <p className={`mt-1 text-sm font-semibold ${title}`}>
-                                  {selectedPlan.credits} scans
-                                </p>
-                              </div>
-                              <div>
-                                <p className={`text-[11px] uppercase tracking-[0.14em] ${faint}`}>
-                                  Delivery
-                                </p>
-                                <p className={`mt-1 text-sm font-semibold ${title}`}>Instant</p>
-                              </div>
+                            <div className="mt-2 flex items-center justify-between text-sm">
+                              <span className={muted}>Credits</span>
+                              <span className={`font-bold ${title}`}>{selectedPlan.credits}</span>
                             </div>
                           </div>
 
-                          <div
-                            className={`mt-5 rounded-[1.35rem] border p-4 ${isDarkMode ? 'border-emerald-500/15 bg-emerald-500/[0.04]' : 'border-emerald-100 bg-emerald-50/70'}`}
-                          >
-                            <div className="flex gap-3">
-                              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
-                                <ShieldCheck className="h-4 w-4" />
+                          <div className={`mt-5 rounded-2xl border p-4 ${card}`}>
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-500/15 text-violet-300">
+                                <Sparkles className="h-5 w-5" />
                               </div>
                               <div>
-                                <p className={`text-sm font-semibold ${title}`}>
-                                  Why this is worth it
+                                <p className={`text-sm font-bold ${title}`}>
+                                  Instant glow-up credits
                                 </p>
                                 <p className={`mt-1 text-xs leading-5 ${muted}`}>
-                                  Compare scans, understand what actually changed, and leave with
-                                  clear priorities instead of guessing from photos.
+                                  Your scans unlock right after Paddle confirms the payment.
                                 </p>
                               </div>
                             </div>
                           </div>
 
-                          <p
-                            className={`mt-6 text-xs font-semibold uppercase tracking-[0.16em] ${faint}`}
-                          >
-                            Included
-                          </p>
-                        </div>
+                          <div className="mt-5 space-y-3">
+                            {[
+                              'One-time payment',
+                              'Private analysis',
+                              'Saved to your account',
+                              'Secure Paddle checkout'
+                            ].map((item) => (
+                              <div
+                                key={item}
+                                className={`flex items-center gap-2 text-sm ${muted}`}
+                              >
+                                <Check className="h-4 w-4 text-emerald-400" />
+                                {item}
+                              </div>
+                            ))}
+                          </div>
 
-                        <ul className="relative mt-4 space-y-3">
-                          {selectedPlan.features.map((feature) => (
-                            <li key={feature} className={`flex gap-2.5 text-sm ${muted}`}>
-                              <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <button
-                          onClick={closeCheckout}
-                          className={`relative mt-7 w-full rounded-full border px-4 py-3 text-sm font-semibold transition-colors ${isDarkMode ? 'border-white/10 text-zinc-300 hover:bg-white/5 hover:text-white' : 'border-zinc-200 text-zinc-700 hover:bg-white hover:text-zinc-950'}`}
-                        >
-                          Change plan
-                        </button>
+                          {checkoutError && (
+                            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                              {checkoutError}
+                            </div>
+                          )}
+                        </div>
                       </aside>
 
-                      <div className="p-3 sm:p-5">
-                        {checkoutError && (
-                          <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-500">
-                            {checkoutError}
-                          </div>
-                        )}
+                      <div className="min-w-0 p-3 sm:p-5 lg:p-7">
                         <InlineCheckout
                           clientToken={clientToken}
                           environment={environment}
-                          theme={isDarkMode ? 'dark' : 'light'}
+                          theme="light"
                           items={[{ priceId: selectedPaddleId, quantity: 1 }]}
                           summaryPosition="bottom"
                           successUrl={`${window.location.origin}/pricing?checkout=success`}
@@ -733,6 +620,7 @@ export default function PricingPage() {
                           policyLabel="Refund policy"
                           onComplete={handleComplete}
                           onError={(error) => setCheckoutError(error.message)}
+                          className="checkout-paddle-frame"
                         />
                       </div>
                     </motion.div>
