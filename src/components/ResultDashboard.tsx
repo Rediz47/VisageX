@@ -894,7 +894,7 @@ export function ResultDashboard({
           accentGrad.addColorStop(1, '#6366f1');
         }
         ctx.fillStyle = accentGrad;
-        if (ctx.roundRect) ctx.roundRect(sx, sy, 5, h, { topLeft: 24, bottomLeft: 24 });
+        if (ctx.roundRect) ctx.roundRect(sx, sy, 5, h, [24, 0, 0, 24]);
         ctx.fill();
         
         // Stat Label
