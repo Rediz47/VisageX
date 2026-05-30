@@ -78,7 +78,7 @@ export default function BlogAnalysisPage() {
             <p
               className={`text-lg md:text-xl font-light max-w-2xl mx-auto ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
             >
-              Ever wondered how bots actually map your face? We break down the clinical geometry and
+              Ever wondered how bots actually map your face? We break down the aesthetic geometry and
               the science of the 468-point neural mesh.
             </p>
           </header>
@@ -144,15 +144,15 @@ export default function BlogAnalysisPage() {
               </ul>
             </Card>
 
-            <Card icon={Camera} title="Step 3: Dermatological Pixels">
+            <Card icon={Camera} title="Step 3: Surface & Clarity Analysis">
               <p>
                 Beyond bone structure geometry, specialized vision models analyze the actual texture
-                of your skin's pixels. The AI scans for contrast irregularities that indicate{' '}
-                <strong>dark circles, hyper-pigmentation, and acne presence</strong>.
+                of your photo's pixels. The AI scans for contrast irregularities that indicate{' '}
+                <strong>dark circles, redness variation, and surface clarity</strong>.
               </p>
               <p>
-                It generates a density map measuring oiliness and redness to output a final,
-                objective "Skin Quality Score".
+                It generates a density map measuring lighting reflections and tone evenness to output a final,
+                objective "Surface Quality Score".
               </p>
             </Card>
 
@@ -190,8 +190,8 @@ export default function BlogAnalysisPage() {
               <p
                 className={`text-lg md:text-xl font-light ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}
               >
-                Experience the 468-point neural mesh yourself. Discover your symmetry score, skin
-                health metrics, and personalized glow-up routine.
+                Experience the 468-point neural mesh yourself. Discover your symmetry score, surface
+                quality metrics, and personalized glow-up routine.
               </p>
               <div className="pt-4 flex justify-center">
                 <Link

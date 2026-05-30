@@ -274,7 +274,7 @@ router.post('/webhook', async (req, res) => {
                       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                         <h2>Thank you for your purchase!</h2>
                         <p>We've successfully added <strong>${credits} credits</strong> to your account.</p>
-                        <p>You can now run more clinical facial analyses.</p>
+                        <p>You can now run more aesthetic facial analyses.</p>
                         <p>Log in to <a href="${process.env.APP_URL}">Visage AI</a> to continue.</p>
                       </div>
                     `

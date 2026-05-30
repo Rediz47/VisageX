@@ -191,13 +191,13 @@ export default function Landing({
           '@type': 'SoftwareApplication',
           name: 'VisageX',
           operatingSystem: 'Web',
-          applicationCategory: 'HealthApplication',
+          applicationCategory: 'MultimediaApplication',
           offers: {
             '@type': 'Offer',
             price: '0',
             priceCurrency: 'USD'
           },
-          description: 'Professional AI-powered facial analysis and symmetry scoring platform.'
+          description: 'AI-powered facial aesthetics analysis — symmetry scoring, proportions, and visual feature assessment.'
         }}
       />
       <AnimatePresence mode="wait">

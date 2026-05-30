@@ -29,14 +29,14 @@ export default function BlogLooksmaxRoutinePage() {
     {
       icon: Sun,
       color: 'amber',
-      label: 'Skin',
-      title: 'Skincare Routine',
-      desc: "Clear, even-toned skin is one of the strongest signals of health and youth. A basic consistent routine beats an expensive complicated one. Most people's skin problems are caused by skipping SPF and using harsh cleansers.",
+      label: 'Skin/Texture',
+      title: 'Surface Clarity Routine',
+      desc: "Clear, even-toned skin is one of the strongest signals of vitality and aesthetic appeal. A basic consistent routine beats an expensive complicated one. Most people's surface texture issues are solved by avoiding harsh chemical treatments.",
       actions: [
-        'AM — gentle cleanser, Vitamin C serum (L-ascorbic acid 10–20%), SPF 50+ (non-negotiable)',
-        'PM — gentle cleanser, retinol or retinoid (start 0.025%, build up), moisturiser',
-        'Weekly — exfoliant (AHA/BHA, not physical scrubs)',
-        'Get an AI skin analysis to see your specific acne/texture/oiliness baseline'
+        'AM — gentle cleanser, moisturizer, hydrating protection',
+        'PM — gentle cleanser, nightly moisturizer',
+        'Weekly — gentle exfoliation to support natural texture renewal',
+        'Get an AI surface analysis to see your specific clarity/texture/oiliness baseline'
       ]
     },
     {

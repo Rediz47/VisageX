@@ -85,7 +85,7 @@ export default function BlogFreeAIFacePage() {
     >
       <SEO
         title="Free AI Face Analysis — What Actually Works in 2026 | VisageX"
-        description="Looking for a free AI face analysis? We break down what these tools actually measure, which ones are worth using, and how to get a clinical-grade result for free."
+        description="Looking for a free AI face analysis? We break down what these tools actually measure, which ones are worth using, and how to get a precision aesthetic result for free."
         canonical="https://visagex.online/blog/free-ai-face-analysis"
       />
 
@@ -116,7 +116,7 @@ export default function BlogFreeAIFacePage() {
               className={`text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
             >
               Not all "AI face rating" tools are equal. Most are just random number generators.
-              Here's what clinical-grade analysis actually looks like — and how to get it free.
+              Here's what precision aesthetic analysis actually looks like — and how to get it free.
             </p>
             <div
               className={`inline-flex items-center gap-2 text-xs font-medium ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
@@ -136,7 +136,7 @@ export default function BlogFreeAIFacePage() {
             >
               <strong>TL;DR:</strong> Real AI face analysis uses{' '}
               <strong>468+ facial landmark points</strong>, measures geometric ratios (golden ratio,
-              facial thirds, canthal tilt), and adds a dermatology-grade skin assessment. Anything
+              facial thirds, canthal tilt), and adds a precision-grade surface assessment. Anything
               doing less is guessing.{' '}
               <Link to="/" className="text-indigo-500 font-bold hover:underline">
                 VisageX does this for free.
@@ -179,7 +179,7 @@ export default function BlogFreeAIFacePage() {
               </Card>
               <Card icon={Shield} title="Skin Quality Assessment" color="emerald">
                 <p>
-                  A real dermatology-grade AI analyzes acne presence, skin texture uniformity, pore
+                  A real precision-grade AI analyzes surface clarity, texture uniformity, and visual
                   visibility, dark circles severity, redness, oiliness, and wrinkle depth using
                   computer vision models.
                 </p>

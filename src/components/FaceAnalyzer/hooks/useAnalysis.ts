@@ -132,7 +132,7 @@ export function useAnalysis(userCredits: number) {
             hairRecommendations: geminiData.hairRecommendations,
             insightDescriptions: geminiData.insightDescriptions || {},
             improvementPlan: geminiData.improvementPlan || [],
-            dermatology: {
+            surfaceAnalysis: {
               skin_quality: geminiData.skin_quality,
               acne_presence: geminiData.acne_presence,
               wrinkle_visibility: geminiData.wrinkle_visibility,

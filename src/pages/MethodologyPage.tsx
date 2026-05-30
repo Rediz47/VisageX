@@ -14,7 +14,7 @@ export default function MethodologyPage() {
     <>
       <SEO
         title="Our Methodology | Science Behind the Analysis"
-        description="Learn how VisageX uses 468 facial landmarks and advanced neural networks to provide clinical-grade aesthetic analysis."
+        description="Learn how VisageX uses 468 facial landmarks and advanced neural networks to provide precision aesthetic analysis."
         canonical="https://visagex.online/methodology"
       />
       <motion.div

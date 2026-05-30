@@ -787,7 +787,7 @@ export function Features({ isDarkMode }: { isDarkMode: boolean }) {
               <p
                 className={`text-sm font-light leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
-                Instant AI insights into facial symmetry and skin health markers, powered by
+                Instant AI insights into facial symmetry and surface clarity markers, powered by
                 468-point landmark detection.
               </p>
             </div>

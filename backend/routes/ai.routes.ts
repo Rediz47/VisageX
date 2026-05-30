@@ -386,41 +386,41 @@ router.post(
         return res.json(cached);
       }
 
-      const prompt = `You are an expert dermatologist and facial aesthetics analyst. Analyze this face photo with extreme clinical precision.
+      const prompt = `You are an expert aesthetic photography analyst and visual consultant. Analyze this face photo from a purely visual and compositional perspective.
 
 Rate each metric on a scale of 1.0 to 10.0 (one decimal place). Be honest and accurate — do NOT inflate scores.
 
 Analyze:
-1. **Skin Quality** (overall_skin_score): Clarity, pore visibility, evenness
-2. **Acne Presence** (acne_presence): 10 = no acne, 1 = severe acne
-3. **Wrinkle Visibility** (wrinkle_visibility): 10 = no wrinkles, 1 = deep wrinkles
-4. **Skin Texture** (skin_texture): Smoothness and uniformity
-5. **Dark Circles** (dark_circles): 10 = none, 1 = severe
-6. **Redness** (redness): 10 = no redness, 1 = very red/irritated
-7. **Oiliness** (oiliness): 10 = balanced, 1 = extremely oily
-8. **Skin Quality Score** (skin_quality): Combined skin health rating
+1. **Surface Quality** (overall_skin_score): Visual clarity, pore visibility, evenness of tone
+2. **Surface Clarity** (acne_presence): 10 = very clear surface, 1 = noticeably textured surface
+3. **Texture Smoothness** (wrinkle_visibility): 10 = very smooth appearance, 1 = visibly textured
+4. **Texture Uniformity** (skin_texture): Smoothness and uniformity of visible surface
+5. **Under-Eye Clarity** (dark_circles): 10 = clear under-eye area, 1 = heavily shadowed
+6. **Tone Evenness** (redness): 10 = even tone, 1 = noticeably uneven or flushed
+7. **Luminance Balance** (oiliness): 10 = balanced matte finish, 1 = high shine
+8. **Surface Quality Score** (skin_quality): Combined visual surface quality rating
 9. **Grooming** (grooming): Eyebrow grooming, facial hair maintenance
 10. **Cheekbone Prominence** (cheekbone_prominence): How defined are the cheekbones
-11. **Overall Aesthetics Score** (overall_aesthetics_score): Overall facial attractiveness rating considering all features
+11. **Overall Aesthetics Score** (overall_aesthetics_score): Overall visual harmony rating considering all features
 
 Also provide:
 - **Face Shape** (faceShape): One of: oval, round, square, heart, oblong, diamond, triangle
-- **Color Season** (color_season): One of: Spring, Summer, Autumn, Winter (based on skin tone, hair, features)
-- **Skin Analysis** (skinAnalysis): 2-3 sentence clinical skin assessment
+- **Color Season** (color_season): One of: Spring, Summer, Autumn, Winter (based on visible coloring, hair, features)
+- **Surface Analysis** (skinAnalysis): 2-3 sentence visual surface assessment based on what is visible in the photo
 - **Aesthetics Analysis** (aestheticsAnalysis): 2-3 sentence facial aesthetics assessment
 - **Potential Score** (potentialScore): What score this person could reach with improvements (must be higher than overall_aesthetics_score)
-- **Visual Strengths** (visualStrengths): Array of 2-4 specific facial strengths observed
-- **Visual Weaknesses** (visualWeaknesses): Array of 1-3 areas for improvement
+- **Visual Strengths** (visualStrengths): Array of 2-4 specific visual strengths observed
+- **Visual Weaknesses** (visualWeaknesses): Array of 1-3 areas for visual improvement
 - **Improvements** (improvements): Array of 3-5 specific, actionable improvement suggestions
 - **Hair Recommendations** (hairRecommendations): Array of 2-3 hair style objects, each with a 'styleName' and 'reason'. These MUST be realistic for the person in the image. Infer visible hair length, current haircut, hairline, hair density, gender presentation, and face shape before recommending. Do NOT suggest ponytails, bobs, waves, or long-hair styles unless the person clearly has long enough hair and that presentation fits the image. For masculine/short-hair presentation, recommend barber-relevant cuts only (e.g. textured crop, low/mid taper, side part, fringe, crew cut, quiff) and explain using this person's actual forehead, jaw, cheekbones, and face shape. Avoid generic face-shape advice.
 - **Recommended Products** (recommendedProducts): Array of 3-5 product recommendations, each with "name", "category", and "reason"
-- **Insight Descriptions** (insightDescriptions): A JSON object where each key is EXACTLY one of the strings from visualStrengths or visualWeaknesses, and each value is a 2-sentence description. Sentence 1: explain the scientific/aesthetic reason WHY this feature matters. Sentence 2: for strengths, describe the visual advantage; for weaknesses, give one specific actionable fix.
-- **Improvement Plan** (improvementPlan): An array of 6-10 realistic, evidence-based improvement steps ordered easiest-to-hardest. Use simple everyday language a normal person understands. Be conservative and truthful. Only recommend an item if it is supported by visible evidence in THIS image or by measured geometry from the analysis context. Prefer grooming, haircut, sleep, posture, lighting/photo habits, basic skincare, and non-medical routines. Do NOT invent clinical problems like tear-trough hollowing, nasal tip issues, chin deficiency, wrinkles, acne, or surgery unless they are clearly visible and important. Each object must have:
-  - "title": Short simple name (e.g. "Use Sunscreen Daily", "Clean Up Eyebrows", "Get a Low Taper Haircut", "Simple Night Skincare"). Avoid hard clinical words and dramatic medical/procedure names unless truly justified.
+- **Insight Descriptions** (insightDescriptions): A JSON object where each key is EXACTLY one of the strings from visualStrengths or visualWeaknesses, and each value is a 2-sentence description. Sentence 1: explain the aesthetic reason WHY this feature matters. Sentence 2: for strengths, describe the visual advantage; for weaknesses, give one specific actionable fix.
+- **Improvement Plan** (improvementPlan): An array of 6-10 realistic, evidence-based improvement steps ordered easiest-to-hardest. Use simple everyday language a normal person understands. Be conservative and truthful. Only recommend an item if it is supported by visible evidence in THIS image or by measured geometry from the analysis context. Prefer grooming, haircut, sleep, posture, lighting/photo habits, basic skincare, and non-medical routines. Do NOT invent problems like tear-trough hollowing, nasal tip issues, chin deficiency, or surgery unless they are clearly visible and important. Each object must have:
+  - "title": Short simple name (e.g. "Use Sunscreen Daily", "Clean Up Eyebrows", "Get a Low Taper Haircut", "Simple Night Skincare"). Avoid dramatic procedure names unless truly justified.
   - "category": EXACTLY one of "Foundational", "Non-Invasive", "Minimally Invasive", "Surgical"
   - "difficulty": Integer 1-5 (1=daily habit/grooming, 2=lifestyle/skincare, 3=professional non-invasive treatment, 4=minor optional procedure, 5=major surgery)
   - "description": 1 short sentence in simple words
-  - "details": 2 short sentences explaining exactly what to do and why. Avoid clinical jargon.
+  - "details": 2 short sentences explaining exactly what to do and why. Avoid jargon.
   - "expectedImpact": Simple realistic impact (e.g. "Cleaner look", "Healthier-looking skin", "Sharper face framing")
   - "costRange": Simple realistic cost (e.g. "$10–30", "$25–60/month", "$30–80 haircut")
   - "timeframe": Simple timeframe (e.g. "1–2 weeks", "4–8 weeks", "Same day")

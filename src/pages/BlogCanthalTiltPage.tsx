@@ -78,7 +78,7 @@ export default function BlogCanthalTiltPage() {
             <p
               className={`text-lg md:text-xl font-light max-w-2xl mx-auto ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
             >
-              The mathematical secret to "Hunter Eyes". Discover the absolute clinical truth behind
+              The mathematical secret to "Hunter Eyes". Discover the absolute aesthetic science behind
               eye geometry and facial dimorphism.
             </p>
           </header>

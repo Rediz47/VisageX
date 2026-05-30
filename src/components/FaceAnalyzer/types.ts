@@ -53,7 +53,7 @@ export interface AnalysisResult {
       recovery: string | null;
       targetAreas: string[];
     }>;
-    dermatology?: Record<string, number>;
+    surfaceAnalysis?: Record<string, number>;
     celebritySimilarity?: any[];
   };
   historyImage?: string;

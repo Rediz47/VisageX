@@ -186,8 +186,8 @@ const getDescription = (str: string, isStrength: boolean): string => {
     lc.includes('texture')
   )
     return isStrength
-      ? 'Clear, smooth skin texture with consistent tone and low pore visibility — a primary subconscious health signal that strongly influences attractiveness ratings.'
-      : 'Skin texture irregularities, uneven tone, or visible pores were detected. A consistent routine with retinol, niacinamide, and SPF 50+ can produce measurable improvement within 8–12 weeks.';
+      ? 'Clear, smooth skin texture with consistent tone and low pore visibility — a primary subconscious vitality signal that strongly influences attractiveness ratings.'
+      : 'Skin texture irregularities, uneven tone, or visible pores were detected. A consistent routine with gentle washing and protective moisturizer can produce measurable improvement within 8–12 weeks.';
 
   // Nose
   if (lc.includes('nose') || lc.includes('nasal'))

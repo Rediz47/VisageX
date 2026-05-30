@@ -59,7 +59,8 @@ export interface VisionAnalysis {
     targetAreas: string[];
   }>;
   celebritySimilarity?: CelebritySimilarity[];
-  dermatology?: Record<string, unknown>;
+  surfaceAnalysis?: Record<string, unknown>;
+
 }
 
 // ── Breakdown Scores ────────────────────────────────────────────────────

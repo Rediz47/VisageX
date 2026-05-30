@@ -11,9 +11,9 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
     '@type': 'SoftwareApplication',
     name: 'VisageX',
     operatingSystem: 'Web browser',
-    applicationCategory: 'HealthApplication',
+    applicationCategory: 'MultimediaApplication',
     description:
-      'AI face analysis and facial symmetry test. Discover a personalized glow up guide.',
+      'AI-powered facial aesthetics analysis — symmetry scoring, proportions, and visual feature assessment.',
     offers: {
       '@type': 'Offer',
       price: '0',

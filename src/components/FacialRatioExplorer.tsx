@@ -233,7 +233,7 @@ export function FacialRatioExplorer({
     if (isWithinIdeal)
       return 'This ratio is already in the ideal range. No correction is needed; preserve it with consistent grooming, posture, sleep, and skin/hair maintenance.';
     if (isAbove)
-      return `Your measurement is ${absDelta.toFixed(2)}${active.unit || ''} above the ideal midpoint (${idealMid.toFixed(2)}${active.unit || ''}). Focus first on visual balancing: hairstyle, beard/contour choices, posture, and reducing puffiness before considering clinical options.`;
+      return `Your measurement is ${absDelta.toFixed(2)}${active.unit || ''} above the ideal midpoint (${idealMid.toFixed(2)}${active.unit || ''}). Focus first on visual balancing: hairstyle, beard/contour choices, posture, and reducing puffiness before considering advanced aesthetic styling.`;
     return `Your measurement is ${absDelta.toFixed(2)}${active.unit || ''} below the ideal midpoint (${idealMid.toFixed(2)}${active.unit || ''}). The most realistic improvements are visual framing, grooming, body-fat management, posture, and photo-angle consistency.`;
   };
 
@@ -1597,7 +1597,7 @@ export function FacialRatioExplorer({
                             {moWithin
                               ? 'This ratio is already in the ideal range. No correction is needed; preserve it with consistent grooming, posture, sleep, and skin/hair maintenance.'
                               : moAbove
-                                ? `Your measurement is ${Math.abs(moDelta).toFixed(2)}${mo.unit || ''} above the ideal midpoint (${moMid.toFixed(2)}${mo.unit || ''}). Start with realistic visual balancing: hairstyle, beard/contour choices, posture, and reducing puffiness before considering clinical options.`
+                                ? `Your measurement is ${Math.abs(moDelta).toFixed(2)}${mo.unit || ''} above the ideal midpoint (${moMid.toFixed(2)}${mo.unit || ''}). Start with realistic visual balancing: hairstyle, beard/contour choices, posture, and reducing puffiness before considering advanced aesthetic styling.`
                                 : `Your measurement is ${Math.abs(moDelta).toFixed(2)}${mo.unit || ''} below the ideal midpoint (${moMid.toFixed(2)}${mo.unit || ''}). The most realistic improvements are visual framing, grooming, body-fat management, posture, and photo-angle consistency.`}
                           </p>
                         </motion.div>

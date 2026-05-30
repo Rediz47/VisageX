@@ -103,7 +103,7 @@ export default function BlogSymmetryPage() {
               <Link to="/" className="text-emerald-500 font-bold hover:underline">
                 AI face analysis tool
               </Link>{' '}
-              to get a clinical-grade breakdown of your geometry before starting these changes.
+              to get a precision aesthetic breakdown of your geometry before starting these changes.
             </p>
           </div>
 

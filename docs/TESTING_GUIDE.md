@@ -122,7 +122,7 @@ npm run format
   2. Check facial ratio cards
   3. Confirm breakdown metrics
   4. View celebrity matches
-  5. Check dermatology section
+  5. Check surface analysis section
   6. Verify timeline plan
 
 - [ ] **Error Handling**

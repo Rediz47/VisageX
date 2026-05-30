@@ -529,11 +529,11 @@ export function generateImprovements(
     },
     skin: {
       category: 'Features',
-      affectedMetrics: [{ name: 'Skin Quality Index', score: breakdown['Skin Quality'] || 5 }],
+      affectedMetrics: [{ name: 'Surface Quality Index', score: breakdown['Skin Quality'] || 5 }],
       actions: [
-        { label: 'Daily SPF + retinol routine', type: 'foundational' },
+        { label: 'Daily moisturizing & surface protection', type: 'foundational' },
         { label: 'Hydration & diet optimization', type: 'foundational' },
-        { label: 'Professional chemical peel', type: 'advanced' }
+        { label: 'Advanced non-invasive exfoliating & skin-surface balancing', type: 'advanced' }
       ],
       guideLink: '/blog/does-gua-sha-work'
     },
@@ -592,7 +592,7 @@ export function generateImprovements(
       category: mapping.category || 'Harmony',
       severity,
       impact: parseFloat((-(10 - avgScore) * 0.3).toFixed(2)),
-      description: `Analysis indicates this area is scoring below optimal levels. ${lc.includes('jaw') ? 'The jaw structure appears softer or less defined than ideal proportions suggest.' : lc.includes('symmetry') ? 'Bilateral asymmetry detected across multiple landmark pairs.' : lc.includes('skin') ? 'Texture irregularities and tone imbalances detected in the dermatological scan.' : 'Improving this metric can significantly boost your overall harmony score.'}`,
+      description: `Analysis indicates this area is scoring below optimal levels. ${lc.includes('jaw') ? 'The jaw structure appears softer or less defined than ideal proportions suggest.' : lc.includes('symmetry') ? 'Bilateral asymmetry detected across multiple landmark pairs.' : lc.includes('skin') ? 'Texture irregularities and tone imbalances detected in the surface quality scan.' : 'Improving this metric can significantly boost your overall harmony score.'}`,
       affectedMetrics: mapping.affectedMetrics || [],
       actions: mapping.actions || [],
       guideLink: mapping.guideLink

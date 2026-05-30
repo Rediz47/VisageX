@@ -141,7 +141,7 @@ export function VisionAnalysisSection({
                 isDarkMode ? 'text-cyan-300/70' : 'text-cyan-600'
               )}
             >
-              Skin Health
+              Surface Analysis
             </p>
             <h4
               className={cn(

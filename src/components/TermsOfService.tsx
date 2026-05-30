@@ -91,9 +91,9 @@ export function TermsOfService({
               isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
             )}
           >
-            The analyses provided by VisageX are for informational purposes only. We do not provide
-            medical advice or clinical diagnoses. Always consult with a professional for
-            health-related concerns.
+            VisageX provides visual observations generated from photographs for informational and
+            educational purposes only. Results are aesthetic assessments based on visible image
+            data — not medical advice, clinical assessments, or diagnostic tools of any kind. Always consult a qualified professional for any personal concerns.
           </p>
         </section>
 

@@ -57,7 +57,7 @@ const META: Record<string, { icon: React.ElementType; description: string; label
   },
   'Skin Quality': {
     icon: ShieldCheck,
-    description: 'Texture, clarity, and vascular health.',
+    description: 'Texture, clarity, and tone evenness.',
     label: 'Skin Quality'
   },
   Symmetry: {
@@ -70,7 +70,7 @@ const META: Record<string, { icon: React.ElementType; description: string; label
     description: 'Angular definition and mandibular width.',
     label: 'Jawline'
   },
-  Hair: { icon: Sparkles, description: 'Hairline health, density, and styling.', label: 'Hair' },
+  Hair: { icon: Sparkles, description: 'Hairline density, styling, and visual framing.', label: 'Hair' },
   Dimorphism: {
     icon: UserRound,
     description: 'Secondary sex characteristics and structure.',
@@ -78,7 +78,7 @@ const META: Record<string, { icon: React.ElementType; description: string; label
   },
   Grooming: {
     icon: Sparkles,
-    description: 'Facial hair, skincare, and overall presentation.',
+    description: 'Facial hair, grooming routine, and overall presentation.',
     label: 'Grooming'
   },
   Cheekbones: {

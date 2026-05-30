@@ -12,7 +12,7 @@
  *     interpolation, no string concatenation with raw data.
  *   - Max 2 lines, max 38 characters per line.
  *
- * Tone target: clinical report notation.
+ * Tone target: aesthetic report notation.
  *
  * Input shape mirrors the live `result` object passed to ResultDashboard;
  * unknown / missing fields degrade silently — the helper always returns a
@@ -22,7 +22,7 @@
 export type FindingTone = 'neutral' | 'refinement';
 
 export interface InitialFinding {
-  /** Short clinical phrase. ≤ 38 chars. */
+  /** Short aesthetic phrase. ≤ 38 chars. */
   label: string;
   /** Cyan accent for "neutral" facts; amber for "refinement" notes. */
   tone: FindingTone;
@@ -36,7 +36,7 @@ interface FindingsInput {
 
 // ── Enumerated phrase tables ─────────────────────────────────────────────────
 //
-// Each entry has a regex matching the source string family and a short clinical
+// Each entry has a regex matching the source string family and a short aesthetic
 // phrase. Phrases are intentionally generic so the helper never leaks private
 // numerical data into UI text.
 

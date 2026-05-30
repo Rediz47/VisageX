@@ -289,7 +289,7 @@ export function Methodology({ onBack, isDarkMode, result, imageUrl }: Methodolog
                   <p
                     className={`text-xs leading-relaxed font-mono uppercase tracking-wide ${isDarkMode ? 'text-white/30' : 'text-[#86868b]'}`}
                   >
-                    {i % 2 === 0 ? 'Action: Skin & Texture' : 'Action: Structure & Grooming'}
+                    {i % 2 === 0 ? 'Action: Surface Quality' : 'Action: Structure & Grooming'}
                   </p>
                 </div>
               </div>
@@ -329,12 +329,12 @@ export function Methodology({ onBack, isDarkMode, result, imageUrl }: Methodolog
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {[
               {
-                metric: 'Skin Health',
+                metric: 'Surface Quality',
                 score: breakdown['Skin Quality'] || 5,
                 icon: <Sun className="w-6 h-6 text-amber-400" />,
                 tips: [
-                  'Hydration Focus: Increase water intake to 3L/day and use a hyaluronic acid serum to improve skin elasticity and glow.',
-                  'Texture Refinement: Incorporate a gentle chemical exfoliant (AHA/BHA) 2-3 times a week to clear pores and smooth surface texture.'
+                  'Hydration Focus: Maintain consistent daily hydration to support natural skin radiance and visual fullness.',
+                  'Surface Smoothness: Focus on gentle washing and protective moisture to keep the surface clear and photography-ready.'
                 ]
               },
               {
@@ -549,10 +549,10 @@ export function Methodology({ onBack, isDarkMode, result, imageUrl }: Methodolog
             <h3
               className={`text-2xl font-display italic mb-6 ${isDarkMode ? 'text-white' : 'text-[#1d1d1f]'}`}
             >
-              Recommended Products
+              Suggested Grooming Essentials
             </h3>
             <ul className="space-y-4">
-              {['Vitamin C Serum', 'Hydrating Cleanser', 'SPF 50 Sunscreen'].map((product, i) => (
+              {['Gentle Moisturizing Lotion', 'Mild Daily Face Cleanser', 'Hydrating Mist'].map((product, i) => (
                 <li
                   key={i}
                   className={`flex items-center gap-4 p-4 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-zinc-50'}`}

@@ -70,7 +70,7 @@ export function ResultHeader({
             isDarkMode ? 'text-white/30' : 'text-zinc-400'
           )}
         >
-          Neural scan processed with clinical precision
+          Neural scan processed with aesthetic precision
         </motion.p>
       </motion.div>
 

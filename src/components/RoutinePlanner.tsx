@@ -23,7 +23,7 @@ interface RoutinePlannerProps {
 
 export function RoutinePlanner({ result, isDarkMode }: RoutinePlannerProps) {
   const { visionAnalysis, breakdown } = result;
-  const dermatology = visionAnalysis?.dermatology || {};
+  const surfaceAnalysis = visionAnalysis?.surfaceAnalysis || {};
 
   const getMorningRoutine = (): RoutineItem[] => {
     if (visionAnalysis?.routine?.am && visionAnalysis.routine.am.length > 0) {
@@ -38,47 +38,47 @@ export function RoutinePlanner({ result, isDarkMode }: RoutinePlannerProps) {
 
     const routine: RoutineItem[] = [
       {
-        task: 'Gentle Cleansing',
-        benefit: 'Remove overnight impurities',
+        task: 'Gentle Face Wash',
+        benefit: 'Start the day with a clean canvas',
         details: 'Massage into damp skin for 60 seconds, then rinse with lukewarm water.',
-        products: 'Look for a low-pH, hydrating cleanser.',
+        products: 'Look for a gentle, fragrance-free cleanser.',
         icon: <Droplets className="w-4 h-4" />
       }
     ];
 
-    if (dermatology.oiliness < 7) {
+    if (surfaceAnalysis.oiliness < 7) {
       routine.push({
-        task: 'Oil-Control Serum',
-        benefit: 'Balance sebum production',
-        details: 'Apply 2-3 drops to dry skin, focusing on the T-zone.',
-        products: 'Niacinamide or Zinc PCA.',
+        task: 'Shine-Control Step',
+        benefit: 'Keep a matte, balanced look throughout the day',
+        details: 'Apply a lightweight mattifying product to the T-zone before moisturiser.',
+        products: 'Look for a lightweight, oil-free moisturiser.',
         icon: <Activity className="w-4 h-4" />
       });
     } else {
       routine.push({
-        task: 'Vitamin C Serum',
-        benefit: 'Brighten and protect',
-        details: 'Apply 3-4 drops to dry skin and let it absorb fully.',
-        products: 'L-ascorbic acid (10-15%).',
+        task: 'Brightening Serum',
+        benefit: 'Improve visual luminosity and even tone',
+        details: 'Apply a few drops to dry skin and let it absorb before moisturiser.',
+        products: 'Look for a brightening face serum.',
         icon: <Sparkles className="w-4 h-4" />
       });
     }
 
-    if (dermatology.skin_quality < 8) {
+    if (surfaceAnalysis.skin_quality < 8) {
       routine.push({
-        task: 'Hyaluronic Acid',
-        benefit: 'Deep hydration boost',
+        task: 'Hydration Layer',
+        benefit: 'Improve visible plumpness and surface smoothness',
         details: 'Apply to slightly damp skin to lock in moisture.',
-        products: 'Multi-molecular weight hyaluronic acid.',
+        products: 'Look for a hydrating moisturiser with humectants.',
         icon: <Droplets className="w-4 h-4" />
       });
     }
 
     routine.push({
-      task: 'SPF 50+',
-      benefit: 'Essential UV protection',
+      task: 'Daily SPF',
+      benefit: 'Preserve skin appearance and prevent photoaging',
       details: 'Apply two finger-lengths to face and neck as the final step.',
-      products: 'Broad-spectrum sunscreen, mineral or chemical.',
+      products: 'Broad-spectrum SPF 50+, mineral or chemical.',
       icon: <Sun className="w-4 h-4" />
     });
 
@@ -98,56 +98,57 @@ export function RoutinePlanner({ result, isDarkMode }: RoutinePlannerProps) {
 
     const routine: RoutineItem[] = [
       {
-        task: 'Double Cleanse',
-        benefit: 'Remove SPF and pollutants',
+        task: 'Evening Cleanse',
+        benefit: 'Remove buildup and refresh appearance',
         details:
-          'Start with an oil-based cleanser for 60s, rinse, then follow with a water-based cleanser.',
-        products: 'Cleansing balm/oil + gentle gel cleanser.',
+          'Use a gentle cleanser to remove the day. Take your time — 60–90 seconds works best.',
+        products: 'Gentle gel or cream cleanser.',
         icon: <Droplets className="w-4 h-4" />
       }
     ];
 
-    if (dermatology.acne_presence < 8) {
+    if (surfaceAnalysis.acne_presence < 8) {
       routine.push({
-        task: 'Salicylic Acid',
-        benefit: 'Clear pores and prevent acne',
-        details: 'Apply to affected areas or full face 2-3 times a week.',
-        products: '2% BHA liquid exfoliant.',
+        task: 'Surface Clarity Step',
+        benefit: 'Improve visible surface clarity and texture uniformity',
+        details: 'Apply a gentle exfoliating toner 2–3 times a week after cleansing.',
+        products: 'Look for a mild exfoliating toner.',
         icon: <Zap className="w-4 h-4" />
       });
     }
 
     if (breakdown.Jawline < 8 || breakdown.Symmetry < 8) {
       routine.push({
-        task: 'Gua Sha / Massage',
-        benefit: 'Lymphatic drainage & contouring',
+        task: 'Facial Massage',
+        benefit: 'Improve visual definition and contouring',
         details:
           'Use with a facial oil, gliding upwards and outwards along the jawline and cheekbones.',
-        products: 'Rose quartz or jade Gua Sha tool.',
+        products: 'Facial massage tool or clean hands with a few drops of facial oil.',
         icon: <Activity className="w-4 h-4" />
       });
     }
 
-    if (dermatology.wrinkle_visibility < 8) {
+    if (surfaceAnalysis.wrinkle_visibility < 8) {
       routine.push({
-        task: 'Retinol (0.5%)',
-        benefit: 'Cell turnover & collagen',
-        details: 'Apply a pea-sized amount to dry skin. Start 2x a week and build tolerance.',
-        products: 'Encapsulated retinol or retinaldehyde.',
+        task: 'Overnight Renewal Cream',
+        benefit: 'Support visible texture smoothness while you sleep',
+        details: 'Apply a generous layer to face and neck as the last step before bed.',
+        products: 'Look for a rich overnight moisturiser.',
         icon: <Sparkles className="w-4 h-4" />
       });
     } else {
       routine.push({
-        task: 'Night Repair Cream',
-        benefit: 'Barrier restoration',
+        task: 'Night Recovery Cream',
+        benefit: 'Restore and maintain surface appearance',
         details: 'Massage a generous layer into face and neck.',
-        products: 'Ceramides, peptides, and squalane.',
+        products: 'Look for a barrier-supporting night cream.',
         icon: <Moon className="w-4 h-4" />
       });
     }
 
     return routine;
   };
+
 
   const morning = getMorningRoutine();
   const evening = getEveningRoutine();

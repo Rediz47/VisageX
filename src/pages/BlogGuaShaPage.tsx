@@ -48,7 +48,7 @@ export default function BlogGuaShaPage() {
     >
       <SEO
         title="Does Gua Sha Work for Face Fat? Science vs Trend"
-        description="Dermatologists and aesthetic analysts explain the exact science of Gua Sha, lymphatic drainage, and how to actually lose face fat safely."
+        description="Aesthetic specialists and photography analysts explain the exact science of Gua Sha, lymphatic drainage, and how to actually lose face fat safely."
         canonical="https://visagex.online/blog/does-gua-sha-work"
       />
 
@@ -96,7 +96,7 @@ export default function BlogGuaShaPage() {
             <h2
               className={`text-3xl font-display text-center ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}
             >
-              The Medical Truth
+              The Structural Truth
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card icon={Scale} title="It Does Not Burn Adipose Tissue">

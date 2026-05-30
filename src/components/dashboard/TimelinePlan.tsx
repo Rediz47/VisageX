@@ -93,8 +93,8 @@ const CATEGORY_CONFIG = {
     darkBg: 'rgba(239,68,68,0.06)',
     darkBorder: 'rgba(239,68,68,0.15)',
     icon: Scissors,
-    label: 'Surgical',
-    display: 'Medical',
+    label: 'Specialist',
+    display: 'Specialist',
     gradient: 'from-rose-400 to-red-500'
   }
 } as const;

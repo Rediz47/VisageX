@@ -10,7 +10,7 @@
 ---
 
 ## 🎨 Interface Overview & Live Experience
-VisageX features an ultra-premium, dark-mode-first aesthetic with rich micro-animations, custom canvases, and glassmorphic panels. It offers users a detailed assessment of their facial symmetry, features, skin health, and hairstyle recommendations, backed by Google Gemini AI and MediaPipe.
+VisageX features an ultra-premium, dark-mode-first aesthetic with rich micro-animations, custom canvases, and glassmorphic panels. It offers users a detailed assessment of their facial symmetry, features, surface clarity, and hairstyle recommendations, backed by Google Gemini AI and MediaPipe.
 
 ---
 
@@ -25,9 +25,9 @@ VisageX features an ultra-premium, dark-mode-first aesthetic with rich micro-ani
 - Instant, granular scores across asymmetry, facial shapes, facial profiles, and celebrity matches.
 - Automated generation of structured findings (strengths and areas of improvement).
 
-### 🧴 3. Dermatology & Skin Health Diagnostics
-- Computer-vision-assisted scanning that highlights areas of concern (e.g., skin clarity, circles, hydration indicators) with interactive overlays.
-- Diagnostic logs containing detailed coaching advice.
+### 🧴 3. Surface & Clarity Analysis
+- Computer-vision-assisted scanning that highlights areas of concern (e.g., surface clarity, visual tone, shade balance) with interactive overlays.
+- Detailed analytical logs containing grooming and presentation advice.
 
 ### 📅 4. Personalized Glow-Up Coach & Routine Planner
 - Dynamic **Routine Planner** generating specialized day/night routines (skincare steps, facial exercise guides, mewing advice).

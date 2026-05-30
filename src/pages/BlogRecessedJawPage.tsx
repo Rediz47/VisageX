@@ -85,7 +85,7 @@ export default function BlogRecessedJawPage() {
             <p
               className={`text-lg md:text-xl font-light max-w-2xl mx-auto ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
             >
-              Is it possible to correct a "weak chin" without surgery? The medical truth behind
+              Is it possible to correct a "weak chin" without surgery? The structural truth behind
               mewing, chewing habits, and orthotropics.
             </p>
           </header>

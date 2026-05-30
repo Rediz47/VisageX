@@ -537,7 +537,7 @@ export function ResultDashboard({
   const radarData = useMemo(() => {
     const data = [{ subject: 'Eyes', A: breakdown.Eyes || 5, fullMark: 10 }];
     if (breakdown['Skin Quality'] !== undefined) {
-      data.push({ subject: 'Skin Health', A: breakdown['Skin Quality'] || 5, fullMark: 10 });
+      data.push({ subject: 'Surface Quality', A: breakdown['Skin Quality'] || 5, fullMark: 10 });
     }
     data.push(
       { subject: 'Symmetry', A: breakdown.Symmetry || 5, fullMark: 10 },
@@ -580,22 +580,44 @@ export function ResultDashboard({
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Could not get canvas context');
 
-      // 1. Premium Dark Background
+      // 1. Futuristic Dark Gradient Background
       const bgGradient = ctx.createLinearGradient(0, 0, 0, 1920);
-      bgGradient.addColorStop(0, '#020204');
-      bgGradient.addColorStop(0.5, '#0a0a0f');
-      bgGradient.addColorStop(1, '#000000');
+      bgGradient.addColorStop(0, '#030208');
+      bgGradient.addColorStop(0.5, '#0b0916');
+      bgGradient.addColorStop(1, '#010103');
       ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, 1080, 1920);
 
-      // Ambient Glows
-      const glow1 = ctx.createRadialGradient(0, 0, 0, 0, 0, 1000);
-      glow1.addColorStop(0, 'rgba(99, 102, 241, 0.1)');
+      // Cybernetic Background Grid (Tech HUD feel)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= 1080; x += 120) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 1920);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= 1920; y += 120) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(1080, y);
+        ctx.stroke();
+      }
+
+      // Neon Ambient Backdrops
+      const glow1 = ctx.createRadialGradient(200, 400, 100, 200, 400, 900);
+      glow1.addColorStop(0, 'rgba(99, 102, 241, 0.15)');
       glow1.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = glow1;
       ctx.fillRect(0, 0, 1080, 1920);
 
-      // Load image
+      const glow2 = ctx.createRadialGradient(880, 1500, 100, 880, 1500, 800);
+      glow2.addColorStop(0, 'rgba(0, 240, 255, 0.1)');
+      glow2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = glow2;
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Load scanned face photo
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = imageUrl;
@@ -607,7 +629,7 @@ export function ResultDashboard({
       // Load QR Code
       const qrImg = new Image();
       qrImg.crossOrigin = 'anonymous';
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}&color=ffffff&bgcolor=020204`;
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}&color=ffffff&bgcolor=030208`;
       await new Promise((resolve) => {
         qrImg.onload = resolve;
         qrImg.onerror = () => {
@@ -616,21 +638,55 @@ export function ResultDashboard({
         };
       });
 
-      // 2. Focused Image Container
-      const destW = 900;
-      const destH = 900;
-      const destX = (1080 - destW) / 2;
-      const destY = 340;
+      // 2. Technical Viewfinder Image Frame
+      const destW = 880;
+      const destH = 880;
+      const destX = 100;
+      const destY = 160;
+
+      // Draw subtle neon corner brackets around image box
+      const drawCornerBrackets = (x: number, y: number, w: number, h: number, len: number) => {
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 3;
+        
+        // Top-Left
+        ctx.beginPath();
+        ctx.moveTo(x + len, y);
+        ctx.lineTo(x, y);
+        ctx.lineTo(x, y + len);
+        ctx.stroke();
+
+        // Top-Right
+        ctx.beginPath();
+        ctx.moveTo(x + w - len, y);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w, y + len);
+        ctx.stroke();
+
+        // Bottom-Left
+        ctx.beginPath();
+        ctx.moveTo(x, y + h - len);
+        ctx.lineTo(x, y + h);
+        ctx.lineTo(x + len, y + h);
+        ctx.stroke();
+
+        // Bottom-Right
+        ctx.beginPath();
+        ctx.moveTo(x + w, y + h - len);
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x + w - len, y + h);
+        ctx.stroke();
+      };
 
       ctx.save();
-      // Outer shadow for container
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-      ctx.shadowBlur = 60;
-      ctx.shadowOffsetY = 30;
+      // Card container drop shadow
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 20;
 
-      // Rounded clip
+      // Rounded clip for face picture
       ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(destX, destY, destW, destH, 60);
+      if (ctx.roundRect) ctx.roundRect(destX, destY, destW, destH, 40);
       else ctx.rect(destX, destY, destW, destH);
       ctx.fill();
       ctx.clip();
@@ -642,196 +698,336 @@ export function ResultDashboard({
       const drawX = destX - (drawW - destW) / 2;
       const drawY = destY - (drawH - destH) / 2;
 
-      // Draw Blurred Background (Full Face)
-      ctx.filter = 'blur(25px) brightness(0.6) saturate(0.8)';
+      // Blurred Background
+      ctx.filter = 'blur(15px) brightness(0.4) saturate(0.7)';
       ctx.drawImage(img, drawX, drawY, drawW, drawH);
       ctx.filter = 'none';
 
-      // Draw Sharp Eyes Strip
+      // Draw Sharp Eyes Strip with target rings
       if (ratioPoints && ratioPoints.length > 263) {
         const leftEye = ratioPoints[33];
         const rightEye = ratioPoints[263];
         const eyeY = (leftEye.y + rightEye.y) / 2;
 
-        const eyeStripH = 260; // Size of the sharp eye area
+        const eyeStripH = 240;
         const eyeStripY = drawY + eyeY * drawH - eyeStripH / 2;
 
         ctx.save();
         ctx.beginPath();
-        // Create a horizontal strip for the eyes
         ctx.rect(
           destX,
           Math.max(destY, eyeStripY),
           destW,
-          Math.min(eyeStripH, destH - (eyeStripY - destY))
+          Math.min(eyeStripH, destY + destH - Math.max(destY, eyeStripY))
         );
         ctx.clip();
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
-        // Add a subtle divider/glow for the sharp area
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-        ctx.lineWidth = 1;
+        // Neon border on eye strip
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+        ctx.lineWidth = 2.5;
         ctx.strokeRect(
           destX,
           Math.max(destY, eyeStripY),
           destW,
-          Math.min(eyeStripH, destH - (eyeStripY - destY))
+          Math.min(eyeStripH, destY + destH - Math.max(destY, eyeStripY))
         );
+
+        // Draw biometric crosshair target circles on the eyes
+        const lex = drawX + leftEye.x * drawW;
+        const ley = drawY + leftEye.y * drawH;
+        const rex = drawX + rightEye.x * drawW;
+        const rey = drawY + rightEye.y * drawH;
+
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 1.5;
+
+        // Left Eye Target
+        ctx.beginPath();
+        ctx.arc(lex, ley, 14, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(lex, ley, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#00f0ff';
+        ctx.fill();
+
+        // Right Eye Target
+        ctx.beginPath();
+        ctx.arc(rex, rey, 14, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(rex, rey, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#00f0ff';
+        ctx.fill();
+
         ctx.restore();
       } else {
-        // Fallback: Sharp center if no landmarks
+        // Fallback: sharp center strip
         ctx.save();
         ctx.beginPath();
         ctx.rect(destX, destY + destH * 0.35, destW, destH * 0.3);
         ctx.clip();
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(destX, destY + destH * 0.35, destW, destH * 0.3);
         ctx.restore();
       }
 
-      // Glass overlay on bottom of image
-      const glassGrad = ctx.createLinearGradient(0, destY + destH - 200, 0, destY + destH);
-      glassGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      glassGrad.addColorStop(1, 'rgba(0,0,0,0.4)');
-      ctx.fillStyle = glassGrad;
-      ctx.fillRect(destX, destY + destH - 200, destW, 200);
+      // HUD Text overlay inside image box
+      ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.8)';
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
+      ctx.fillText('SCAN_VIEWPORT // AUTOMATIC_LANDMARK_DETECTION', destX + 25, destY + 35);
 
       ctx.restore();
 
-      // 3. Typography & Header
-      ctx.textAlign = 'center';
+      // Draw neon brackets around the image frame
+      drawCornerBrackets(destX, destY, destW, destH, 40);
+
+      // 3. Technical Top Header (Above Image)
       ctx.textBaseline = 'middle';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.font = 'bold 14px "JetBrains Mono", monospace';
+      ctx.letterSpacing = '3px';
+      ctx.fillText('// VISAGEX NEURAL HARMONY ENGINE', 100, 70);
 
-      ctx.fillStyle = 'rgba(99, 102, 241, 0.8)';
-      ctx.font = 'bold 24px "JetBrains Mono", monospace';
-      ctx.letterSpacing = '8px';
-      ctx.fillText('NEURAL HARMONY REPORT', 540, 120);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.7)';
+      ctx.fillText('BIOMETRIC REPORT // VER. 2.5', 980, 70);
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 86px "Inter", sans-serif';
-      ctx.letterSpacing = '-3px';
-      ctx.fillText('visagex.online', 540, 210);
-
-      // 4. Score Circle
-      const badgeY = destY + destH;
-
-      // Outer Glow
+      // Neon separator line
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(540, badgeY, 150, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
-      ctx.fill();
+      ctx.moveTo(100, 105);
+      ctx.lineTo(980, 105);
+      ctx.stroke();
 
-      // Main Circle
-      ctx.beginPath();
-      ctx.arc(540, badgeY, 140, 0, Math.PI * 2);
-      const scoreGrad = ctx.createLinearGradient(400, badgeY - 140, 680, badgeY + 140);
-      scoreGrad.addColorStop(0, '#6366f1');
-      scoreGrad.addColorStop(1, '#a855f7');
-      ctx.fillStyle = scoreGrad;
-      ctx.fill();
+      // 4. Circular HUD Score Gauge (Center Placement)
+      const scoreX = 540;
+      const scoreY = 1110;
+      const radius = 100;
 
-      // Inner Dark
+      // Outer dotted frame
       ctx.beginPath();
-      ctx.arc(540, badgeY, 130, 0, Math.PI * 2);
-      ctx.fillStyle = '#050507';
+      ctx.arc(scoreX, scoreY, radius + 15, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(168, 85, 247, 0.2)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 6]);
+      ctx.stroke();
+      ctx.setLineDash([]); // clear dash
+
+      // Gauge background track
+      ctx.beginPath();
+      ctx.arc(scoreX, scoreY, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 12;
+      ctx.stroke();
+
+      // Glowing score arc
+      ctx.beginPath();
+      const startAngle = -Math.PI / 2;
+      const endAngle = startAngle + (overallScore / 10) * Math.PI * 2;
+      ctx.arc(scoreX, scoreY, radius, startAngle, endAngle);
+      
+      const arcGrad = ctx.createLinearGradient(scoreX - radius, scoreY - radius, scoreX + radius, scoreY + radius);
+      arcGrad.addColorStop(0, '#6366f1');
+      arcGrad.addColorStop(0.5, '#a855f7');
+      arcGrad.addColorStop(1, '#00f0ff');
+      
+      ctx.strokeStyle = arcGrad;
+      ctx.lineWidth = 12;
+      ctx.lineCap = 'round';
+      
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 240, 255, 0.4)';
+      ctx.shadowBlur = 12;
+      ctx.stroke();
+      ctx.restore();
+
+      // Inner dark core
+      ctx.beginPath();
+      ctx.arc(scoreX, scoreY, radius - 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#06050b';
       ctx.fill();
 
       // Score Value
+      ctx.textAlign = 'center';
       ctx.fillStyle = '#ffffff';
-      ctx.font = '900 120px "Inter", sans-serif';
-      ctx.fillText(overallScore.toFixed(1), 540, badgeY - 15);
+      ctx.font = '900 86px "Inter", sans-serif';
+      ctx.letterSpacing = '-2px';
+      ctx.fillText(overallScore.toFixed(1), scoreX, scoreY - 10);
 
-      ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.font = 'bold 22px "JetBrains Mono", monospace';
-      ctx.letterSpacing = '4px';
-      ctx.fillText('OVERALL', 540, badgeY + 65);
+      // Label under score
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.font = 'bold 15px "JetBrains Mono", monospace';
+      ctx.letterSpacing = '3px';
+      ctx.fillText('OVERALL', scoreX, scoreY + 45);
 
-      // 5. Stats Grid
+      // 5. Redesigned Stats Grid with Progress Bars
       const drawPremiumStat = (label: string, value: string, sx: number, sy: number) => {
+        const w = 420;
+        const h = 130;
+        
         ctx.save();
-        ctx.fillStyle = 'rgba(255,255,255,0.03)';
-        if (ctx.roundRect) ctx.roundRect(sx, sy, 420, 140, 35);
+        // Dark premium backdrop card
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+        if (ctx.roundRect) ctx.roundRect(sx, sy, w, h, 24);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        
+        // Subtle outline
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
-
+        
+        // Left accent neon border strip
+        ctx.beginPath();
+        const isLocked = value === 'LOCKED';
+        const accentGrad = ctx.createLinearGradient(sx, sy, sx, sy + h);
+        if (isLocked) {
+          accentGrad.addColorStop(0, '#a855f7');
+          accentGrad.addColorStop(1, '#3b0764');
+        } else {
+          accentGrad.addColorStop(0, '#00f0ff');
+          accentGrad.addColorStop(1, '#6366f1');
+        }
+        ctx.fillStyle = accentGrad;
+        if (ctx.roundRect) ctx.roundRect(sx, sy, 5, h, { topLeft: 24, bottomLeft: 24 });
+        ctx.fill();
+        
+        // Stat Label
         ctx.textAlign = 'left';
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        ctx.font = 'bold 24px "JetBrains Mono", monospace';
-        ctx.fillText(label, sx + 45, sy + 70);
-
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.font = 'bold 18px "JetBrains Mono", monospace';
+        ctx.letterSpacing = '1px';
+        ctx.fillText(label, sx + 30, sy + 38);
+        
+        // Stat Value / Locked Badge
         ctx.textAlign = 'right';
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '900 60px "Inter", sans-serif';
-        ctx.fillText(value, sx + 375, sy + 70);
+        if (isLocked) {
+          ctx.fillStyle = 'rgba(168, 85, 247, 0.9)';
+          ctx.font = 'bold 20px "JetBrains Mono", monospace';
+          ctx.fillText('LOCKED 🔒', sx + w - 30, sy + 38);
+          
+          // Draw diagonal warning stripes on the progress bar space
+          const barX = sx + 30;
+          const barY = sy + 85;
+          const barW = w - 60;
+          const barH = 8;
+          
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(barX, barY, barW, barH, 4);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+          ctx.fill();
+          
+          ctx.strokeStyle = 'rgba(168, 85, 247, 0.25)';
+          ctx.lineWidth = 1;
+          for (let offset = 0; offset < barW; offset += 16) {
+            ctx.beginPath();
+            ctx.moveTo(barX + offset, barY + barH);
+            ctx.lineTo(barX + offset + 8, barY);
+            ctx.stroke();
+          }
+        } else {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '900 48px "Inter", sans-serif';
+          ctx.fillText(value, sx + w - 30, sy + 38);
+          
+          // Draw score progress gauge bar
+          const scoreNum = parseFloat(value) || 0;
+          const barX = sx + 30;
+          const barY = sy + 85;
+          const barW = w - 60;
+          const barH = 8;
+          
+          // Gray track
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(barX, barY, barW, barH, 4);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+          ctx.fill();
+          
+          // Filled neon gradient progress
+          const fillW = Math.max(8, barW * (scoreNum / 10));
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(barX, barY, fillW, barH, 4);
+          const barFillGrad = ctx.createLinearGradient(barX, 0, barX + fillW, 0);
+          barFillGrad.addColorStop(0, '#6366f1');
+          barFillGrad.addColorStop(1, '#00f0ff');
+          ctx.fillStyle = barFillGrad;
+          ctx.fill();
+        }
+        
         ctx.restore();
       };
 
-      const gridY = badgeY + 160;
-      drawPremiumStat('SYMMETRY', breakdown['Symmetry']?.toFixed(1) || '-', 100, gridY);
-      drawPremiumStat('JAWLINE', breakdown['Jawline']?.toFixed(1) || '-', 560, gridY);
-      drawPremiumStat(
-        'SKIN HEALTH',
-        breakdown['Skin Quality']?.toFixed(1) || '-',
-        100,
-        gridY + 130
-      );
-      drawPremiumStat('EYES BALANCE', breakdown['Eyes']?.toFixed(1) || '-', 560, gridY + 130);
+      const getStatValue = (key: string) => {
+        const val = breakdown[key];
+        if (val === undefined || val === null) return 'LOCKED';
+        return val.toFixed(1);
+      };
 
-      // 6. Luxury Footer with QR & Watermark
-      const footerY = gridY + 280;
+      const gridY = 1270;
+      drawPremiumStat('SYMMETRY', getStatValue('Symmetry'), 100, gridY);
+      drawPremiumStat('JAWLINE', getStatValue('Jawline'), 560, gridY);
+      drawPremiumStat('SURFACE QUALITY', getStatValue('Skin Quality'), 100, gridY + 160);
+      drawPremiumStat('EYES BALANCE', getStatValue('Eyes'), 560, gridY + 160);
+
+      // 6. Cybernetic Footer with Branding and QR
+      const footerY = gridY + 330;
 
       // Divider line
-      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(100, footerY);
       ctx.lineTo(980, footerY);
       ctx.stroke();
 
-      // Left Column: Branding text
+      // Brand text (Left column)
       ctx.textAlign = 'left';
-
       ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.font = 'bold 20px "JetBrains Mono", monospace';
+      ctx.font = 'bold 15px "JetBrains Mono", monospace';
       ctx.letterSpacing = '4px';
-      ctx.fillText('SCAN TO CALCULATE YOUR HARMONY', 100, footerY + 50);
+      ctx.fillText('SCAN OR REFER TO RE-CALCULATE', 100, footerY + 50);
 
       const brandFooterGrad = ctx.createLinearGradient(100, 0, 450, 0);
       brandFooterGrad.addColorStop(0, '#6366f1');
-      brandFooterGrad.addColorStop(1, '#22d3ee');
+      brandFooterGrad.addColorStop(1, '#00f0ff');
       ctx.fillStyle = brandFooterGrad;
-      ctx.font = '900 58px "Inter", sans-serif';
-      ctx.letterSpacing = '-1px';
+      ctx.font = '900 56px "Inter", sans-serif';
+      ctx.letterSpacing = '-2px';
       ctx.fillText('visagex.online', 100, footerY + 115);
 
       ctx.fillStyle = '#818cf8';
-      ctx.font = 'bold 20px "JetBrains Mono", monospace';
+      ctx.font = 'bold 16px "JetBrains Mono", monospace';
       ctx.letterSpacing = '1px';
       let bottomText = `FACE SHAPE: ${result.visionAnalysis?.faceShape?.toUpperCase() || 'UNKNOWN'}`;
       if (result.visionAnalysis?.celebritySimilarity?.[0]) {
         bottomText += `  •  MATCH: ${result.visionAnalysis.celebritySimilarity[0].name.toUpperCase()}`;
       }
-      ctx.fillText(bottomText, 100, footerY + 180);
+      ctx.fillText(bottomText, 100, footerY + 175);
 
-      // Right Column: QR Code sitting in glowing rounded frame
+      // QR Code block sitting in frame (Right column)
       if (qrImg && qrImg.complete) {
-        const qrX = 800;
+        const qrX = 820;
         const qrY = footerY + 25;
         const qrSize = 160;
 
-        // Soft glow behind QR
         ctx.save();
-        ctx.shadowColor = 'rgba(99, 102, 241, 0.25)';
+        ctx.shadowColor = 'rgba(0, 240, 255, 0.2)';
         ctx.shadowBlur = 20;
-        ctx.fillStyle = '#07070b';
-        if (ctx.roundRect) ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 18);
+        ctx.fillStyle = '#06050b';
+        if (ctx.roundRect) ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 20);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
         ctx.lineWidth = 1.5;
         ctx.stroke();
         ctx.restore();
 
-        // Draw QR Image
+        // Draw QR
         ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
         // QR label
@@ -842,7 +1038,7 @@ export function ResultDashboard({
         ctx.fillText('SCAN ME', qrX + qrSize / 2, qrY + qrSize + 28);
       }
 
-      // Trigger Download
+      // Download trigger
       const link = document.createElement('a');
       link.download = `visagex-harmony-score-${overallScore.toFixed(1)}-${Date.now()}.jpg`;
       link.href = canvas.toDataURL('image/jpeg', 0.95);
@@ -858,6 +1054,7 @@ export function ResultDashboard({
     imageUrl,
     isGeneratingCard,
     overallScore,
+    ratioPoints,
     result.visionAnalysis,
     setIsGeneratingCard,
     userData

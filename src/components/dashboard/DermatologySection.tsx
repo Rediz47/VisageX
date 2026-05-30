@@ -3,10 +3,10 @@ import { motion } from 'motion/react';
 import { Activity } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
-interface DermatologySectionProps {
+interface SurfaceAnalysisSectionProps {
   isDarkMode: boolean;
   isLocked: boolean;
-  dermatology: any;
+  surfaceAnalysis: any;
 }
 
 function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
@@ -19,8 +19,8 @@ const getScoreBg = (score: number) => {
   return 'bg-rose-400';
 };
 
-export function DermatologySection({ isDarkMode, isLocked, dermatology }: DermatologySectionProps) {
-  if (!dermatology) return null;
+export function SurfaceAnalysisSection({ isDarkMode, isLocked, surfaceAnalysis }: SurfaceAnalysisSectionProps) {
+  if (!surfaceAnalysis) return null;
 
   return (
     <div
@@ -36,17 +36,17 @@ export function DermatologySection({ isDarkMode, isLocked, dermatology }: Dermat
         )}
       >
         <Activity className={cn('w-4 h-4 mr-2', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')} />
-        Dermatology Analysis
+        Surface Analysis
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
         {[
-          { label: 'Skin Health', value: dermatology.skin_quality },
-          { label: 'Acne (Clear)', value: dermatology.acne_presence },
-          { label: 'Wrinkles (Smooth)', value: dermatology.wrinkle_visibility },
-          { label: 'Skin Texture', value: dermatology.skin_texture },
-          { label: 'Dark Circles (Clear)', value: dermatology.dark_circles },
-          { label: 'Redness (Clear)', value: dermatology.redness },
-          { label: 'Oiliness (Balanced)', value: dermatology.oiliness }
+          { label: 'Surface Quality', value: surfaceAnalysis.skin_quality },
+          { label: 'Surface Clarity', value: surfaceAnalysis.acne_presence },
+          { label: 'Texture Smoothness', value: surfaceAnalysis.wrinkle_visibility },
+          { label: 'Texture Uniformity', value: surfaceAnalysis.skin_texture },
+          { label: 'Under-Eye Clarity', value: surfaceAnalysis.dark_circles },
+          { label: 'Tone Evenness', value: surfaceAnalysis.redness },
+          { label: 'Luminance Balance', value: surfaceAnalysis.oiliness }
         ].map((item, i) => (
           <div
             key={i}
@@ -102,3 +102,4 @@ export function DermatologySection({ isDarkMode, isLocked, dermatology }: Dermat
     </div>
   );
 }
+
